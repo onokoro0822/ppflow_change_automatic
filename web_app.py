@@ -17,7 +17,13 @@ from urllib.parse import unquote, urlparse
 
 from run_prototype import (
     BASE_DIR,
+    DEFAULT_GEOCODER_TIMEOUT,
+    DEFAULT_GEOCODER_URL,
+    DEFAULT_GEOCODER_MAX_DISTANCE_KM,
     DEFAULT_INPUT_CSV,
+    DEFAULT_OLLAMA_MODEL,
+    DEFAULT_OLLAMA_TIMEOUT,
+    DEFAULT_OLLAMA_URL,
     DEFAULT_OUTPUT_DIR,
     DEFAULT_SCENARIO_FILES,
     apply_scenario,
@@ -25,8 +31,10 @@ from run_prototype import (
     build_summary,
     format_time_window,
     load_trips,
+    parse_influence_radius_km,
     parse_lon_lat,
     parse_ratio,
+    parse_strength,
     parse_time_window,
     write_changed_trips,
     write_html_report,
@@ -39,6 +47,14 @@ WEB_OUTPUT_DIR = DEFAULT_OUTPUT_DIR / "web_latest"
 MAX_BODY_BYTES = 64 * 1024
 
 TRIPS_CACHE = None
+WEB_LLM_ENABLED = True
+WEB_OLLAMA_URL = DEFAULT_OLLAMA_URL
+WEB_OLLAMA_MODEL = DEFAULT_OLLAMA_MODEL
+WEB_OLLAMA_TIMEOUT = DEFAULT_OLLAMA_TIMEOUT
+WEB_GEOCODE_ENABLED = True
+WEB_GEOCODER_URL = DEFAULT_GEOCODER_URL
+WEB_GEOCODER_TIMEOUT = DEFAULT_GEOCODER_TIMEOUT
+WEB_GEOCODER_MAX_DISTANCE_KM = DEFAULT_GEOCODER_MAX_DISTANCE_KM
 
 
 def get_trips(input_csv: Path = DEFAULT_INPUT_CSV):
@@ -55,19 +71,40 @@ def default_scenario_text() -> str:
     return ""
 
 
-def namespace(seed: int = 42, sample_lines: int = 1200, background_points: int = 800):
+def namespace(
+    seed: int = 42,
+    sample_lines: int = 550,
+    background_points: int = 800,
+    use_llm: bool | None = None,
+    use_geocode: bool | None = None,
+):
+    geocode = WEB_GEOCODE_ENABLED if use_geocode is None else use_geocode
     return SimpleNamespace(
         yes=True,
         seed=seed,
         sample_lines=sample_lines,
         background_points=background_points,
         output_dir=WEB_OUTPUT_DIR,
+        llm=WEB_LLM_ENABLED if use_llm is None else use_llm,
+        ollama_url=WEB_OLLAMA_URL,
+        ollama_model=WEB_OLLAMA_MODEL,
+        ollama_timeout=WEB_OLLAMA_TIMEOUT,
+        no_geocode=not geocode,
+        geocoder_url=WEB_GEOCODER_URL,
+        geocoder_timeout=WEB_GEOCODER_TIMEOUT,
+        geocoder_max_distance_km=WEB_GEOCODER_MAX_DISTANCE_KM,
     )
 
 
-def infer_payload(scenario_text: str, seed: int = 42) -> dict[str, object]:
+def infer_payload(
+    scenario_text: str,
+    seed: int = 42,
+    use_llm: bool | None = None,
+    use_geocode: bool | None = None,
+) -> dict[str, object]:
     trips = get_trips()
-    rule = build_rule(trips, scenario_text, namespace(seed=seed))
+    args = namespace(seed=seed, use_llm=use_llm, use_geocode=use_geocode)
+    rule = build_rule(trips, scenario_text, args)
     return {
         "scenario_text": scenario_text,
         "target_label": rule.target_label,
@@ -78,6 +115,10 @@ def infer_payload(scenario_text: str, seed: int = 42) -> dict[str, object]:
         "affected_purposes": rule.affected_purposes,
         "time_window": format_time_window(rule.time_window),
         "strength": rule.strength,
+        "influence_radius_km": rule.influence_radius_km,
+        "notes": rule.notes,
+        "llm_enabled": args.llm,
+        "geocode_enabled": not args.no_geocode,
     }
 
 
@@ -98,13 +139,23 @@ def run_pipeline(payload: dict[str, object]) -> dict[str, object]:
         raise ValueError("シナリオ文を入力してください。")
 
     seed = int(payload.get("seed") or 42)
-    app_args = namespace(seed=seed)
+    use_geocode = payload.get("use_geocode")
+    app_args = namespace(
+        seed=seed,
+        use_llm=bool(payload.get("use_llm", False)),
+        use_geocode=None if use_geocode is None else bool(use_geocode),
+    )
     trips = get_trips()
     rule = build_rule(trips, scenario_text, app_args)
 
     target_value = f"{payload.get('target_lon', rule.target_lon)},{payload.get('target_lat', rule.target_lat)}"
     target_lon, target_lat = parse_lon_lat(target_value, rule.target_lon, rule.target_lat)
     affected_ratio = parse_ratio(str(payload.get("affected_ratio", rule.affected_ratio)), rule.affected_ratio)
+    strength = parse_strength(str(payload.get("strength", rule.strength)), rule.strength)
+    influence_radius_km = parse_influence_radius_km(
+        str(payload.get("influence_radius_km", rule.influence_radius_km)),
+        rule.influence_radius_km,
+    )
     time_window = parse_time_window(str(payload.get("time_window", format_time_window(rule.time_window))), rule.time_window)
     affected_purposes = parse_purposes(payload.get("affected_purposes"), rule.affected_purposes)
     target_label = str(payload.get("target_label") or rule.target_label).strip() or rule.target_label
@@ -125,6 +176,11 @@ def run_pipeline(payload: dict[str, object]) -> dict[str, object]:
             "question": "対象時間帯",
             "answer": format_time_window(time_window),
         },
+        {
+            "id": "influence_radius_km",
+            "question": "影響半径 km",
+            "answer": f"{influence_radius_km:g}",
+        },
     ]
 
     rule = replace(
@@ -135,6 +191,8 @@ def run_pipeline(payload: dict[str, object]) -> dict[str, object]:
         affected_ratio=affected_ratio,
         affected_purposes=affected_purposes,
         time_window=time_window,
+        strength=strength,
+        influence_radius_km=influence_radius_km,
         questions=questions,
     )
 
@@ -263,6 +321,7 @@ INDEX_HTML = """<!doctype html>
       font-size: 12px;
       font-weight: 700;
     }
+    .field-note { height: 8px; }
     textarea,
     input {
       width: 100%;
@@ -386,6 +445,53 @@ INDEX_HTML = """<!doctype html>
       border: 0;
       background: var(--surface-soft);
     }
+    .map-preview iframe {
+      height: 220px;
+      border-bottom: 1px solid var(--line);
+    }
+    .map-meta {
+      display: grid;
+      gap: 4px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .map-meta strong {
+      font-size: 13px;
+      letter-spacing: 0;
+    }
+    .map-meta span {
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .map-meta a {
+      color: var(--teal-dark);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .legend {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .legend-row {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+    .legend-code {
+      display: inline-flex;
+      justify-content: center;
+      min-width: 44px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--surface-soft);
+      color: var(--ink);
+      font-weight: 700;
+      padding: 2px 6px;
+    }
     .empty {
       display: grid;
       place-items: center;
@@ -451,20 +557,52 @@ INDEX_HTML = """<!doctype html>
         <div class="field grid2">
           <div>
             <label for="affectedRatio">影響割合</label>
-            <input id="affectedRatio" type="number" min="5" max="50" step="1">
+            <input id="affectedRatio" type="number" min="1" max="30" step="1">
           </div>
           <div>
             <label for="timeWindow">時間帯</label>
             <input id="timeWindow" type="text">
           </div>
         </div>
-        <div class="field">
-          <label for="affectedPurposes">目的コード</label>
-          <input id="affectedPurposes" type="text">
+        <div class="field grid2">
+          <div>
+            <label for="affectedPurposes">目的コード</label>
+            <input id="affectedPurposes" type="text">
+            <div class="legend" aria-label="目的コード凡例">
+              <div class="legend-row"><span class="legend-code">1</span><span>在宅</span></div>
+              <div class="legend-row"><span class="legend-code">2</span><span>通勤</span></div>
+              <div class="legend-row"><span class="legend-code">3</span><span>通学</span></div>
+              <div class="legend-row"><span class="legend-code">100</span><span>買い物</span></div>
+              <div class="legend-row"><span class="legend-code">200</span><span>外食</span></div>
+              <div class="legend-row"><span class="legend-code">300</span><span>通院</span></div>
+              <div class="legend-row"><span class="legend-code">400</span><span>自由行動</span></div>
+              <div class="legend-row"><span class="legend-code">500</span><span>業務</span></div>
+              <div class="legend-row"><span class="legend-code">空欄</span><span>目的コードで絞り込まない</span></div>
+            </div>
+          </div>
+          <div>
+            <label for="strength">移動強度</label>
+            <input id="strength" type="number" min="0.05" max="0.7" step="0.05">
+            <div class="field-note"></div>
+            <label for="influenceRadius">影響半径 km</label>
+            <input id="influenceRadius" type="number" min="0.3" max="10" step="0.1">
+          </div>
         </div>
         <div class="actions">
-          <button id="inferButton" type="button">推定値</button>
+          <button id="inferButton" type="button">LLM推定</button>
           <button class="primary" id="runButton" type="button">比較を作成</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>推定地点</h2>
+        <div class="map-preview">
+          <iframe id="targetMap" title="推定地点のGoogle Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <div class="map-meta">
+            <strong id="mapLabel">-</strong>
+            <span id="mapCoords">-</span>
+            <a id="mapLink" href="#" target="_blank" rel="noreferrer">Google Mapsで開く</a>
+          </div>
         </div>
       </section>
     </aside>
@@ -531,7 +669,29 @@ INDEX_HTML = """<!doctype html>
         affected_ratio: Number($("affectedRatio").value || 0) / 100,
         time_window: $("timeWindow").value,
         affected_purposes: $("affectedPurposes").value,
+        strength: Number($("strength").value || 0),
+        influence_radius_km: Number($("influenceRadius").value || 0),
       };
+    }
+
+    function updateTargetMap() {
+      const lon = Number($("targetLon").value);
+      const lat = Number($("targetLat").value);
+      const label = $("targetLabel").value || "推定地点";
+
+      if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
+        $("targetMap").removeAttribute("src");
+        $("mapLabel").textContent = "-";
+        $("mapCoords").textContent = "-";
+        $("mapLink").href = "#";
+        return;
+      }
+
+      const query = encodeURIComponent(`${lat},${lon}`);
+      $("targetMap").src = `https://maps.google.com/maps?q=${query}&z=16&output=embed`;
+      $("mapLabel").textContent = label;
+      $("mapCoords").textContent = `${lon.toFixed(6)}, ${lat.toFixed(6)}`;
+      $("mapLink").href = `https://www.google.com/maps/search/?api=1&query=${query}`;
     }
 
     function fillDefaults(data) {
@@ -539,9 +699,16 @@ INDEX_HTML = """<!doctype html>
       $("targetLabel").value = data.target_label || "";
       $("targetLon").value = Number(data.target_lon).toFixed(6);
       $("targetLat").value = Number(data.target_lat).toFixed(6);
-      $("affectedRatio").value = data.affected_ratio_percent || Math.round((data.affected_ratio || 0.25) * 100);
+      $("affectedRatio").value = data.affected_ratio_percent || Math.round((data.affected_ratio || 0.08) * 100);
       $("timeWindow").value = data.time_window || "all";
       $("affectedPurposes").value = (data.affected_purposes || []).join(",");
+      $("strength").value = Number(data.strength || 0.28).toFixed(2);
+      $("influenceRadius").value = Number(data.influence_radius_km || 2).toFixed(1);
+      updateTargetMap();
+    }
+
+    function ollamaWarning(data) {
+      return (data.notes || []).find((note) => note.includes("Ollama推定に失敗")) || "";
     }
 
     function formatNumber(value) {
@@ -588,6 +755,7 @@ INDEX_HTML = """<!doctype html>
         const data = await requestJSON("/api/infer", { scenario_text: $("scenarioText").value });
         fillDefaults(data);
         setBusy("待機中", false);
+        setError(ollamaWarning(data));
       } catch (error) {
         setBusy("エラー", false);
         setError(error.message);
@@ -609,6 +777,9 @@ INDEX_HTML = """<!doctype html>
 
     inferButton.addEventListener("click", infer);
     runButton.addEventListener("click", run);
+    ["targetLabel", "targetLon", "targetLat"].forEach((id) => {
+      $(id).addEventListener("input", updateTargetMap);
+    });
     loadDefaults();
   </script>
 </body>
@@ -625,7 +796,7 @@ class AppHandler(BaseHTTPRequestHandler):
             self.send_html(INDEX_HTML)
             return
         if request_path == "/api/defaults":
-            self.send_json(infer_payload(default_scenario_text()))
+            self.send_json(infer_payload(default_scenario_text(), use_llm=False))
             return
         if request_path.startswith("/output/"):
             self.send_output_file(request_path.removeprefix("/output/"))
@@ -637,7 +808,7 @@ class AppHandler(BaseHTTPRequestHandler):
             if self.path == "/api/infer":
                 payload = self.read_json()
                 scenario_text = str(payload.get("scenario_text") or default_scenario_text()).strip()
-                self.send_json(infer_payload(scenario_text))
+                self.send_json(infer_payload(scenario_text, use_llm=WEB_LLM_ENABLED))
                 return
             if self.path == "/api/run":
                 payload = self.read_json()
@@ -706,11 +877,29 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Start the local pseudo people-flow web UI.")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument("--no-llm", action="store_true", help="Disable Ollama inference in the web UI.")
+    parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL)
+    parser.add_argument("--ollama-model", default=DEFAULT_OLLAMA_MODEL)
+    parser.add_argument("--ollama-timeout", type=float, default=DEFAULT_OLLAMA_TIMEOUT)
+    parser.add_argument("--no-geocode", action="store_true", help="Disable Nominatim geocoding.")
+    parser.add_argument("--geocoder-url", default=DEFAULT_GEOCODER_URL)
+    parser.add_argument("--geocoder-timeout", type=float, default=DEFAULT_GEOCODER_TIMEOUT)
+    parser.add_argument("--geocoder-max-distance-km", type=float, default=DEFAULT_GEOCODER_MAX_DISTANCE_KM)
     return parser.parse_args()
 
 
 def main() -> None:
+    global WEB_GEOCODE_ENABLED, WEB_GEOCODER_MAX_DISTANCE_KM, WEB_GEOCODER_TIMEOUT, WEB_GEOCODER_URL
+    global WEB_LLM_ENABLED, WEB_OLLAMA_MODEL, WEB_OLLAMA_TIMEOUT, WEB_OLLAMA_URL
     args = parse_args()
+    WEB_LLM_ENABLED = not args.no_llm
+    WEB_OLLAMA_URL = args.ollama_url
+    WEB_OLLAMA_MODEL = args.ollama_model
+    WEB_OLLAMA_TIMEOUT = args.ollama_timeout
+    WEB_GEOCODE_ENABLED = not args.no_geocode
+    WEB_GEOCODER_URL = args.geocoder_url
+    WEB_GEOCODER_TIMEOUT = args.geocoder_timeout
+    WEB_GEOCODER_MAX_DISTANCE_KM = args.geocoder_max_distance_km
     try:
         server = ThreadingHTTPServer((args.host, args.port), AppHandler)
     except OSError as exc:
@@ -718,6 +907,14 @@ def main() -> None:
 
     url = f"http://{args.host}:{args.port}"
     print(f"Serving local UI: {url}")
+    if WEB_LLM_ENABLED:
+        print(f"Ollama inference: {WEB_OLLAMA_MODEL} at {WEB_OLLAMA_URL}")
+    else:
+        print("Ollama inference: disabled")
+    if WEB_GEOCODE_ENABLED:
+        print(f"Geocoding: {WEB_GEOCODER_URL}")
+    else:
+        print("Geocoding: disabled")
     print("Press Ctrl+C to stop.")
     try:
         server.serve_forever()

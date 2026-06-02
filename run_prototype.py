@@ -2,9 +2,9 @@
 """End-to-end prototype for scenario-based pseudo people-flow changes.
 
 This script is intentionally stdlib-only so it can run on a fresh Python 3
-environment. It reads headerless Pseudo-PFLOW trip OD data, asks a few
-clarifying questions, moves a deterministic sample of destinations toward a
-target area, and writes a self-contained HTML comparison.
+environment. It reads headerless Pseudo-PFLOW trip OD data, optionally asks
+Ollama to infer scenario settings, moves a deterministic sample of destinations
+toward a target area, and writes a self-contained HTML comparison.
 """
 
 from __future__ import annotations
@@ -17,6 +17,9 @@ import random
 import re
 import statistics
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from dataclasses import asdict, dataclass, replace
 from html import escape
 from pathlib import Path
@@ -30,6 +33,13 @@ DEFAULT_SCENARIO_FILES = [
     BASE_DIR / "input" / "scenaro.txt",
 ]
 DEFAULT_OUTPUT_DIR = BASE_DIR / "output"
+DEFAULT_OLLAMA_URL = "http://localhost:11434/api/chat"
+DEFAULT_OLLAMA_MODEL = "qwen2.5-coder:7b"
+DEFAULT_OLLAMA_TIMEOUT = 120.0
+DEFAULT_GEOCODER_URL = "https://nominatim.openstreetmap.org/search"
+DEFAULT_GEOCODER_TIMEOUT = 15.0
+DEFAULT_GEOCODER_USER_AGENT = "ppflow-change-automatic/0.1 local research prototype"
+DEFAULT_GEOCODER_MAX_DISTANCE_KM = 20.0
 
 TRIP_COLUMNS = [
     "person_id",
@@ -44,9 +54,57 @@ TRIP_COLUMNS = [
 ]
 
 PURPOSE_HINTS = {
-    "shopping": ["400"],
-    "dining": ["500"],
+    "home": ["1"],
+    "commute": ["2"],
+    "school": ["3"],
+    "shopping": ["100"],
+    "dining": ["200"],
+    "hospital": ["300"],
+    "free": ["400"],
+    "business": ["500"],
 }
+
+GENERIC_TARGET_LABELS = {"", "駅前", "新設商業施設", "仮想目的地"}
+GEOCODE_CACHE: dict[tuple[str, str], dict[str, object] | None] = {}
+
+LLM_SYSTEM_PROMPT = """
+あなたは都市計画シナリオを擬似人流データの変更ルールに変換するアシスタントです。
+
+自然文を読み、以下のJSONだけを返してください。説明文、Markdown、コードブロックは禁止です。
+
+{
+  "scenario_name": "",
+  "target_label": "",
+  "target_location": {
+    "lon": null,
+    "lat": null
+  },
+  "affected_ratio": 0.08,
+  "affected_purposes": [],
+  "time_window": "all",
+  "strength": 0.28,
+  "influence_radius_km": 3.0,
+  "notes": []
+}
+
+制約:
+- affected_ratio は 0.02 から 0.20 の数値にしてください。大規模な施設でも 0.12 程度を標準にしてください。
+- strength は 0.05 から 0.35 の数値にしてください。目的地へ完全に集めず、現実的な部分移動にしてください。
+- influence_radius_km は 0.5 から 8.0 の数値にしてください。大型商業施設でも 3.0km 程度を標準にしてください。
+- time_window は "12-18" のような24時間表記、または "all" にしてください。
+- affected_purposes はこのプロトタイプで使える目的コードだけを返してください。
+  - 在宅: "1"
+  - 通勤: "2"
+  - 通学: "3"
+  - 買い物、商業、ショッピング: "100"
+  - 外食、飲食、食事、レストラン、カフェ: "200"
+  - 通院、病院: "300"
+  - 自由行動、余暇、レジャー: "400"
+  - 業務、仕事、出張、営業: "500"
+  - 対象が不明、または上記以外なら [] にしてください。
+- lon/lat は文章に明示されている場合だけ数値にしてください。推測で座標を作らないでください。
+- target_label は地名や施設名を短く入れてください。
+"""
 
 
 @dataclass(frozen=True)
@@ -74,6 +132,7 @@ class ScenarioRule:
     affected_purposes: list[str]
     time_window: tuple[float, float] | None
     strength: float
+    influence_radius_km: float
     random_seed: int
     questions: list[dict[str, str]]
     notes: list[str]
@@ -89,8 +148,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--yes", action="store_true", help="Use inferred defaults without prompts.")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--sample-lines", type=int, default=1200, help="Changed trips drawn in HTML.")
+    parser.add_argument("--sample-lines", type=int, default=550, help="Changed trips drawn in HTML.")
     parser.add_argument("--background-points", type=int, default=800, help="Context points drawn in HTML.")
+    parser.add_argument("--llm", action="store_true", help="Use Ollama to infer scenario settings.")
+    parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL)
+    parser.add_argument("--ollama-model", default=DEFAULT_OLLAMA_MODEL)
+    parser.add_argument("--ollama-timeout", type=float, default=DEFAULT_OLLAMA_TIMEOUT)
+    parser.add_argument("--no-geocode", action="store_true", help="Disable Nominatim geocoding.")
+    parser.add_argument("--geocoder-url", default=DEFAULT_GEOCODER_URL)
+    parser.add_argument("--geocoder-timeout", type=float, default=DEFAULT_GEOCODER_TIMEOUT)
+    parser.add_argument("--geocoder-max-distance-km", type=float, default=DEFAULT_GEOCODER_MAX_DISTANCE_KM)
     return parser.parse_args()
 
 
@@ -179,10 +246,22 @@ def infer_target_label(text: str) -> str:
 
 def infer_purpose_codes(text: str) -> list[str]:
     purposes: list[str] = []
+    if any(word in text for word in ["在宅", "自宅"]):
+        purposes.extend(PURPOSE_HINTS["home"])
+    if any(word in text for word in ["通勤", "出勤"]):
+        purposes.extend(PURPOSE_HINTS["commute"])
+    if any(word in text for word in ["通学", "登校"]):
+        purposes.extend(PURPOSE_HINTS["school"])
     if any(word in text for word in ["買い物", "買物", "商業", "ショッピング"]):
         purposes.extend(PURPOSE_HINTS["shopping"])
-    if any(word in text for word in ["飲食", "食事", "レストラン", "カフェ"]):
+    if any(word in text for word in ["外食", "飲食", "食事", "レストラン", "カフェ"]):
         purposes.extend(PURPOSE_HINTS["dining"])
+    if any(word in text for word in ["通院", "病院", "診療", "クリニック"]):
+        purposes.extend(PURPOSE_HINTS["hospital"])
+    if any(word in text for word in ["自由行動", "余暇", "レジャー", "娯楽", "観光"]):
+        purposes.extend(PURPOSE_HINTS["free"])
+    if any(word in text for word in ["業務", "仕事", "出張", "営業"]):
+        purposes.extend(PURPOSE_HINTS["business"])
     return sorted(set(purposes))
 
 
@@ -207,10 +286,262 @@ def infer_time_window(text: str) -> tuple[float, float] | None:
 
 def infer_ratio(text: str) -> float:
     if any(word in text for word in ["大型", "大規模", "集中"]):
-        return 0.30
+        return 0.12
     if any(word in text for word in ["小規模", "少し", "一部"]):
-        return 0.15
-    return 0.25
+        return 0.05
+    return 0.08
+
+
+def infer_influence_radius_km(text: str) -> float:
+    if any(word in text for word in ["大型", "大規模", "広域", "集客"]):
+        return 3.0
+    if any(word in text for word in ["小規模", "少し", "一部"]):
+        return 1.0
+    if any(word in text for word in ["駅前", "商業施設", "ショッピング", "外食"]):
+        return 2.0
+    return 1.5
+
+
+def clean_text(value: object) -> str:
+    return str(value or "").strip()
+
+
+def extract_json_object(text: str) -> dict[str, object]:
+    cleaned = text.strip()
+    if cleaned.startswith("```"):
+        cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+
+    try:
+        payload = json.loads(cleaned)
+    except json.JSONDecodeError:
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start < 0 or end <= start:
+            raise ValueError("Ollama response did not contain a JSON object.")
+        payload = json.loads(cleaned[start : end + 1])
+
+    if not isinstance(payload, dict):
+        raise ValueError("Ollama response JSON was not an object.")
+    return payload
+
+
+def infer_rule_with_ollama(scenario_text: str, args: argparse.Namespace) -> dict[str, object]:
+    payload = {
+        "model": getattr(args, "ollama_model", DEFAULT_OLLAMA_MODEL),
+        "messages": [
+            {"role": "system", "content": LLM_SYSTEM_PROMPT},
+            {"role": "user", "content": scenario_text},
+        ],
+        "format": "json",
+        "stream": False,
+    }
+    body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    request = urllib.request.Request(
+        getattr(args, "ollama_url", DEFAULT_OLLAMA_URL),
+        data=body,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(  # nosec B310: local configurable prototype endpoint.
+            request,
+            timeout=float(getattr(args, "ollama_timeout", DEFAULT_OLLAMA_TIMEOUT)),
+        ) as response:
+            response_body = response.read().decode("utf-8")
+    except urllib.error.URLError as exc:
+        raise RuntimeError(f"Ollama APIに接続できません: {exc}") from exc
+
+    response_json = json.loads(response_body)
+    message = response_json.get("message", {})
+    content = message.get("content") if isinstance(message, dict) else None
+    if not content:
+        raise ValueError("Ollama response did not include message.content.")
+    return extract_json_object(str(content))
+
+
+def normalize_purpose_codes(value: object) -> list[str] | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        items = [part.strip() for part in value.replace("，", ",").split(",")]
+    elif isinstance(value, list):
+        items = [clean_text(item) for item in value]
+    else:
+        items = [clean_text(value)]
+
+    codes: list[str] = []
+    for item in items:
+        if not item:
+            continue
+        lowered = item.lower()
+        if lowered in {"all", "none", "null", "なし", "全て", "すべて"}:
+            continue
+        if re.fullmatch(r"\d+", item):
+            codes.append(item)
+            continue
+        if any(word in item for word in ["在宅", "自宅"]):
+            codes.extend(PURPOSE_HINTS["home"])
+        if any(word in item for word in ["通勤", "出勤"]):
+            codes.extend(PURPOSE_HINTS["commute"])
+        if any(word in item for word in ["通学", "登校"]):
+            codes.extend(PURPOSE_HINTS["school"])
+        if any(word in item for word in ["買い物", "買物", "商業", "ショッピング"]):
+            codes.extend(PURPOSE_HINTS["shopping"])
+        if any(word in item for word in ["外食", "飲食", "食事", "レストラン", "カフェ"]):
+            codes.extend(PURPOSE_HINTS["dining"])
+        if any(word in item for word in ["通院", "病院", "診療", "クリニック"]):
+            codes.extend(PURPOSE_HINTS["hospital"])
+        if any(word in item for word in ["自由行動", "余暇", "レジャー", "娯楽", "観光"]):
+            codes.extend(PURPOSE_HINTS["free"])
+        if any(word in item for word in ["業務", "仕事", "出張", "営業"]):
+            codes.extend(PURPOSE_HINTS["business"])
+
+    return sorted(set(codes))
+
+
+def parse_hour_value(value: object) -> float | None:
+    if isinstance(value, (int, float)):
+        return clamp(float(value), 0.0, 24.0)
+    match = re.search(r"\d{1,2}(?:\.\d+)?", clean_text(value))
+    if not match:
+        return None
+    return clamp(float(match.group(0)), 0.0, 24.0)
+
+
+def normalize_time_window(
+    value: object,
+    default: tuple[float, float] | None,
+) -> tuple[float, float] | None:
+    if value is None:
+        return None
+    if isinstance(value, list) and len(value) >= 2:
+        start = parse_hour_value(value[0])
+        end = parse_hour_value(value[1])
+        if start is None or end is None or start == end:
+            return default
+        return start, end
+    return parse_time_window(clean_text(value), default)
+
+
+def normalize_location(value: object) -> tuple[float, float] | None:
+    if not isinstance(value, dict):
+        return None
+    lon = value.get("lon", value.get("lng"))
+    lat = value.get("lat")
+    if lon is None or lat is None:
+        return None
+    try:
+        lon_float = float(lon)
+        lat_float = float(lat)
+    except (TypeError, ValueError):
+        return None
+    if not (-180.0 <= lon_float <= 180.0 and -90.0 <= lat_float <= 90.0):
+        return None
+    return lon_float, lat_float
+
+
+def destination_focus(trips: list[Trip]) -> tuple[float, float]:
+    return infer_target_from_destinations(trips)
+
+
+def validate_geocoded_location(
+    lon: float,
+    lat: float,
+    trips: list[Trip],
+    args: argparse.Namespace,
+) -> tuple[bool, float]:
+    focus_lon, focus_lat = destination_focus(trips)
+    distance_km = haversine_km(lon, lat, focus_lon, focus_lat)
+    max_distance_km = float(
+        getattr(args, "geocoder_max_distance_km", DEFAULT_GEOCODER_MAX_DISTANCE_KM)
+    )
+    return distance_km <= max_distance_km, distance_km
+
+
+def geocode_queries(label: str) -> list[str]:
+    text = label.strip()
+    candidates: list[str] = []
+    if text:
+        candidates.append(text)
+    if "駅前" in text:
+        candidates.append(text.replace("駅前", "駅"))
+    if text.endswith("前") and len(text) > 1:
+        candidates.append(text[:-1])
+
+    expanded: list[str] = []
+    for candidate in candidates:
+        expanded.extend([candidate, f"{candidate} 日本"])
+
+    unique: list[str] = []
+    seen: set[str] = set()
+    for candidate in expanded:
+        if candidate and candidate not in seen:
+            unique.append(candidate)
+            seen.add(candidate)
+    return unique
+
+
+def geocode_place(label: str, args: argparse.Namespace) -> dict[str, object] | None:
+    endpoint = getattr(args, "geocoder_url", DEFAULT_GEOCODER_URL)
+    cache_key = (endpoint, label.strip())
+    if cache_key in GEOCODE_CACHE:
+        return GEOCODE_CACHE[cache_key]
+
+    headers = {
+        "Accept": "application/json",
+        "Accept-Language": "ja,en;q=0.8",
+        "User-Agent": DEFAULT_GEOCODER_USER_AGENT,
+    }
+
+    for query in geocode_queries(label):
+        params = urllib.parse.urlencode(
+            {
+                "q": query,
+                "format": "jsonv2",
+                "limit": "1",
+                "countrycodes": "jp",
+            }
+        )
+        url = f"{endpoint}?{params}"
+        request = urllib.request.Request(url, headers=headers, method="GET")
+        try:
+            with urllib.request.urlopen(  # nosec B310: user-configurable prototype endpoint.
+                request,
+                timeout=float(getattr(args, "geocoder_timeout", DEFAULT_GEOCODER_TIMEOUT)),
+            ) as response:
+                body = response.read().decode("utf-8")
+        except urllib.error.URLError:
+            continue
+
+        try:
+            results = json.loads(body)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(results, list) or not results:
+            continue
+
+        first = results[0]
+        if not isinstance(first, dict):
+            continue
+        try:
+            lat = float(first["lat"])
+            lon = float(first["lon"])
+        except (KeyError, TypeError, ValueError):
+            continue
+
+        result = {
+            "query": query,
+            "label": clean_text(first.get("display_name")) or query,
+            "lon": lon,
+            "lat": lat,
+        }
+        GEOCODE_CACHE[cache_key] = result
+        return result
+
+    GEOCODE_CACHE[cache_key] = None
+    return None
 
 
 def ask(prompt: str, default: str, enabled: bool) -> tuple[str, str]:
@@ -237,7 +568,21 @@ def parse_ratio(value: str, default: float) -> float:
     ratio = float(text)
     if ratio > 1.0:
         ratio = ratio / 100.0
-    return clamp(ratio, 0.05, 0.50)
+    return clamp(ratio, 0.01, 0.30)
+
+
+def parse_strength(value: str, default: float) -> float:
+    text = value.strip()
+    if not text:
+        return default
+    return clamp(float(text), 0.05, 0.70)
+
+
+def parse_influence_radius_km(value: str, default: float) -> float:
+    text = value.strip().lower().replace("km", "").replace("キロ", "")
+    if not text:
+        return default
+    return clamp(float(text), 0.3, 10.0)
 
 
 def parse_time_window(value: str, default: tuple[float, float] | None) -> tuple[float, float] | None:
@@ -260,12 +605,126 @@ def build_rule(trips: list[Trip], scenario_text: str, args: argparse.Namespace) 
     ratio = infer_ratio(scenario_text)
     purposes = infer_purpose_codes(scenario_text)
     time_window = infer_time_window(scenario_text)
-    strength = 0.82
+    strength = 0.28
+    influence_radius_km = infer_influence_radius_km(scenario_text)
+    scenario_name = scenario_text.replace("\n", " ")[:48] or "scenario"
     questions: list[dict[str, str]] = []
     notes = [
-        "目的コードはデータ仕様に依存するため、買い物=400、飲食=500の仮定で処理します。",
-        "地点名のジオコーディングは行わず、既存トリップの高密度な目的地クラスタを初期値にします。",
+        "移動目的コードは入力CSV仕様に従い、100=買い物、200=外食、300=通院、400=自由行動、500=業務として処理します。",
+        "地点名はNominatimでジオコーディングし、取得できない場合は既存トリップの高密度な目的地クラスタを使います。",
     ]
+    location_source = "destination_cluster"
+
+    if bool(getattr(args, "llm", False)):
+        try:
+            llm_rule = infer_rule_with_ollama(scenario_text, args)
+            notes.append(
+                f"Ollama({getattr(args, 'ollama_model', DEFAULT_OLLAMA_MODEL)})で自然文から初期ルールを生成しました。"
+            )
+
+            llm_name = clean_text(llm_rule.get("scenario_name"))
+            if llm_name:
+                scenario_name = llm_name[:48]
+
+            llm_label = clean_text(
+                llm_rule.get("target_label")
+                or llm_rule.get("target_area")
+                or (
+                    llm_rule.get("target_location", {}).get("label")
+                    if isinstance(llm_rule.get("target_location"), dict)
+                    else ""
+                )
+            )
+            if llm_label:
+                target_label = llm_label
+
+            location = normalize_location(llm_rule.get("target_location"))
+            if location is not None:
+                llm_lon, llm_lat = location
+                valid, data_distance_km = validate_geocoded_location(llm_lon, llm_lat, trips, args)
+                if valid:
+                    target_lon, target_lat = location
+                    location_source = "llm"
+                else:
+                    notes.append(
+                        "LLMが返した座標がデータ中心から遠すぎるため採用しませんでした: "
+                        f"{llm_lon:.6f}, {llm_lat:.6f} ({data_distance_km:.1f}km)"
+                    )
+
+            if "affected_ratio" in llm_rule:
+                try:
+                    ratio = parse_ratio(str(llm_rule["affected_ratio"]), ratio)
+                except (TypeError, ValueError):
+                    notes.append("LLMの影響割合が読めなかったため、従来推定値を使いました。")
+
+            if "affected_purposes" in llm_rule:
+                normalized_purposes = normalize_purpose_codes(llm_rule.get("affected_purposes"))
+                if normalized_purposes is not None:
+                    purposes = normalized_purposes
+
+            time_value = llm_rule.get("time_window", llm_rule.get("affected_time"))
+            if "time_window" in llm_rule or "affected_time" in llm_rule:
+                time_window = normalize_time_window(time_value, time_window)
+
+            if "strength" in llm_rule:
+                try:
+                    strength = min(parse_strength(str(llm_rule["strength"]), strength), 0.35)
+                except (TypeError, ValueError):
+                    notes.append("LLMの移動強度が読めなかったため、既定値を使いました。")
+
+            if "influence_radius_km" in llm_rule:
+                try:
+                    influence_radius_km = parse_influence_radius_km(
+                        str(llm_rule["influence_radius_km"]),
+                        influence_radius_km,
+                    )
+                except (TypeError, ValueError):
+                    notes.append("LLMの影響半径が読めなかったため、従来推定値を使いました。")
+
+            llm_notes = llm_rule.get("notes", [])
+            if isinstance(llm_notes, list):
+                notes.extend(clean_text(note) for note in llm_notes[:3] if clean_text(note))
+        except Exception as exc:
+            notes.append(f"Ollama推定に失敗したため、従来のキーワード推定を使いました: {exc}")
+
+    geocode_enabled = not bool(getattr(args, "no_geocode", False))
+    if geocode_enabled and target_label not in GENERIC_TARGET_LABELS:
+        try:
+            geocoded = geocode_place(target_label, args)
+        except Exception as exc:
+            geocoded = None
+            notes.append(f"ジオコーディングに失敗しました: {exc}")
+
+        if geocoded is not None:
+            geocoded_lon = float(geocoded["lon"])
+            geocoded_lat = float(geocoded["lat"])
+            valid, data_distance_km = validate_geocoded_location(
+                geocoded_lon,
+                geocoded_lat,
+                trips,
+                args,
+            )
+            if valid:
+                target_lon = geocoded_lon
+                target_lat = geocoded_lat
+                location_source = "geocoder"
+                notes.append(
+                    "Nominatimジオコーディングで目的地を設定しました: "
+                    f"{geocoded['query']} -> {geocoded['label']}"
+                )
+            else:
+                notes.append(
+                    "ジオコーディング結果がデータ中心から遠すぎるため採用しませんでした: "
+                    f"{geocoded['query']} ({data_distance_km:.1f}km)"
+                )
+                if location_source == "destination_cluster":
+                    target_label = "データ内高密度目的地クラスタ"
+                    notes.append("データ内の高密度目的地クラスタを目的地にしました。")
+        elif location_source == "destination_cluster":
+            target_label = "データ内高密度目的地クラスタ"
+            notes.append("ジオコーディングで地点を取得できなかったため、データ内の高密度目的地クラスタを使いました。")
+    elif not geocode_enabled and location_source == "destination_cluster":
+        notes.append("ジオコーディングは無効です。データ内の高密度目的地クラスタを使いました。")
 
     interactive = (not args.yes) and sys.stdin.isatty()
 
@@ -302,10 +761,20 @@ def build_rule(trips: list[Trip], scenario_text: str, args: argparse.Namespace) 
         }
     )
 
-    name = scenario_text.replace("\n", " ")[:48] or "scenario"
+    default_radius = f"{influence_radius_km:g}"
+    value, raw = ask("影響半径 km を入力してください", default_radius, interactive)
+    influence_radius_km = parse_influence_radius_km(value, influence_radius_km)
+    questions.append(
+        {
+            "id": "influence_radius_km",
+            "question": "影響半径 km",
+            "answer": raw or default_radius,
+        }
+    )
+
     return ScenarioRule(
         scenario_text=scenario_text,
-        scenario_name=name,
+        scenario_name=scenario_name,
         target_label=target_label,
         target_lon=target_lon,
         target_lat=target_lat,
@@ -313,6 +782,7 @@ def build_rule(trips: list[Trip], scenario_text: str, args: argparse.Namespace) 
         affected_purposes=purposes,
         time_window=time_window,
         strength=strength,
+        influence_radius_km=influence_radius_km,
         random_seed=args.seed,
         questions=questions,
         notes=notes,
@@ -374,11 +844,39 @@ def meters_to_lon_delta(meters: float, lat: float) -> float:
 
 
 def apply_scenario(trips: list[Trip], rule: ScenarioRule) -> tuple[list[Trip], list[int], list[int], list[str]]:
-    candidates, notes = choose_candidates(trips, rule)
+    base_candidates, notes = choose_candidates(trips, rule)
     rng = random.Random(rule.random_seed)
-    changed_count = max(1, int(round(len(candidates) * rule.affected_ratio)))
-    changed_count = min(changed_count, len(candidates))
-    changed_indices = sorted(rng.sample(candidates, changed_count))
+
+    influence_radius_km = max(rule.influence_radius_km, 0.001)
+    weighted_candidates: list[tuple[int, float, float]] = []
+    for i in base_candidates:
+        trip = trips[i]
+        distance_km = haversine_km(
+            trip.destination_lon,
+            trip.destination_lat,
+            rule.target_lon,
+            rule.target_lat,
+        )
+        if distance_km > influence_radius_km:
+            continue
+        distance_weight = 1.0 - (distance_km / influence_radius_km)
+        weighted_candidates.append((i, distance_km, distance_weight))
+
+    notes.append(
+        "影響圏モデル: "
+        f"目的・時間候補 {len(base_candidates):,} 件のうち、"
+        f"施設から {influence_radius_km:g}km 以内の {len(weighted_candidates):,} 件を対象にしました。"
+    )
+    notes.append(
+        f"選択確率は施設距離に対して線形減衰し、施設直近の最大確率を {rule.affected_ratio:.0%} としました。"
+    )
+
+    candidates = [i for i, _, _ in weighted_candidates]
+    changed_indices = sorted(
+        i
+        for i, _, distance_weight in weighted_candidates
+        if rng.random() < rule.affected_ratio * distance_weight
+    )
     changed_set = set(changed_indices)
 
     scenario_trips: list[Trip] = []
@@ -494,6 +992,8 @@ def build_summary(
         )
         for i in changed_indices
     ]
+    avg_before = statistics.fmean(before_distances) if before_distances else 0.0
+    avg_after = statistics.fmean(after_distances) if after_distances else 0.0
     return {
         "total_trips": len(baseline),
         "candidate_trips": len(candidates),
@@ -507,8 +1007,9 @@ def build_summary(
         "affected_purposes": rule.affected_purposes,
         "time_window": format_time_window(rule.time_window),
         "movement_strength": rule.strength,
-        "avg_distance_to_target_before_km": statistics.fmean(before_distances),
-        "avg_distance_to_target_after_km": statistics.fmean(after_distances),
+        "influence_radius_km": rule.influence_radius_km,
+        "avg_distance_to_target_before_km": avg_before,
+        "avg_distance_to_target_after_km": avg_after,
         "notes": rule.notes + notes,
     }
 
@@ -621,26 +1122,34 @@ def write_html_report(
         points.append((trip.destination_lon, trip.destination_lat))
     bbox = make_bbox(points)
 
-    before_panel = svg_panel(
-        "Before: 変更前の目的地",
-        baseline,
-        baseline,
-        changed_sample,
-        background_sample,
-        bbox,
-        rule,
-        "#2563eb",
-    )
-    after_panel = svg_panel(
-        "After: シナリオ適用後",
-        scenario,
-        baseline,
-        changed_sample,
-        background_sample,
-        bbox,
-        rule,
-        "#dc2626",
-    )
+    min_lon, max_lon, min_lat, max_lat = bbox
+    map_payload = {
+        "target": {
+            "label": rule.target_label,
+            "lon": rule.target_lon,
+            "lat": rule.target_lat,
+        },
+        "bounds": [[min_lat, min_lon], [max_lat, max_lon]],
+        "background": [
+            [baseline[i].destination_lat, baseline[i].destination_lon] for i in background_sample
+        ],
+        "before": [
+            [baseline[i].destination_lat, baseline[i].destination_lon] for i in changed_sample
+        ],
+        "after": [
+            [scenario[i].destination_lat, scenario[i].destination_lon] for i in changed_sample
+        ],
+        "movements": [
+            [
+                baseline[i].destination_lat,
+                baseline[i].destination_lon,
+                scenario[i].destination_lat,
+                scenario[i].destination_lon,
+            ]
+            for i in changed_sample
+        ],
+    }
+    map_json = json.dumps(map_payload, ensure_ascii=False)
 
     rows = [
         ("総トリップ数", f"{summary['total_trips']:,}"),
@@ -649,6 +1158,7 @@ def write_html_report(
         ("対象地点", f"{rule.target_label} / {rule.target_lon:.6f}, {rule.target_lat:.6f}"),
         ("対象時間帯", str(summary["time_window"])),
         ("対象目的コード", ", ".join(rule.affected_purposes) or "all"),
+        ("影響半径", f"{rule.influence_radius_km:g} km"),
         ("平均距離 Before", f"{summary['avg_distance_to_target_before_km']:.2f} km"),
         ("平均距離 After", f"{summary['avg_distance_to_target_after_km']:.2f} km"),
     ]
@@ -663,6 +1173,7 @@ def write_html_report(
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>擬似人流シナリオ比較</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     :root {{
       color-scheme: light;
@@ -743,12 +1254,38 @@ def write_html_report(
       font-size: 17px;
       letter-spacing: 0;
     }}
-    svg {{
+    .map {{
       width: 100%;
-      aspect-ratio: 3 / 2;
-      display: block;
+      height: min(62vh, 620px);
+      min-height: 430px;
       border: 1px solid var(--line);
-      background: #f7f5ef;
+      background: #eef0ea;
+    }}
+    .legend {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }}
+    .legend span {{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }}
+    .swatch {{
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.2);
+      background: var(--swatch);
+    }}
+    .line-swatch {{
+      width: 22px;
+      height: 2px;
+      background: var(--swatch);
+      opacity: 0.65;
     }}
     footer {{
       padding: 0 clamp(14px, 3vw, 38px) 28px;
@@ -772,13 +1309,109 @@ def write_html_report(
       <ul class="notes">{notes_html}</ul>
     </section>
     <section class="comparison">
-      {before_panel}
-      {after_panel}
+      <section class="panel">
+        <h2>Before: 変更前の目的地</h2>
+        <div id="beforeMap" class="map"></div>
+        <div class="legend">
+          <span><i class="swatch" style="--swatch:#2563eb"></i>変更対象の変更前目的地</span>
+          <span><i class="swatch" style="--swatch:#8a8f98"></i>候補トリップの背景点</span>
+          <span><i class="swatch" style="--swatch:#111827"></i>シナリオ対象地点</span>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>After: シナリオ適用後</h2>
+        <div id="afterMap" class="map"></div>
+        <div class="legend">
+          <span><i class="swatch" style="--swatch:#dc2626"></i>変更後目的地</span>
+          <span><i class="line-swatch" style="--swatch:#dc2626"></i>変更前から変更後への移動</span>
+          <span><i class="swatch" style="--swatch:#111827"></i>シナリオ対象地点</span>
+        </div>
+      </section>
     </section>
   </main>
   <footer>
     出力: <code>{escape(str(path.name))}</code>。線はサンプル表示で、CSVには全件を書き出しています。
   </footer>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const report = {map_json};
+
+    function makeMap(id) {{
+      const map = L.map(id, {{
+        scrollWheelZoom: false,
+        preferCanvas: true,
+      }});
+      L.tileLayer("https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png", {{
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }}).addTo(map);
+      map.fitBounds(report.bounds, {{ padding: [18, 18] }});
+      return map;
+    }}
+
+    function addPoints(map, points, color, radius, opacity) {{
+      points.forEach(([lat, lon]) => {{
+        L.circleMarker([lat, lon], {{
+          radius,
+          color,
+          weight: 1,
+          fillColor: color,
+          fillOpacity: opacity,
+          opacity: Math.min(1, opacity + 0.18),
+        }}).addTo(map);
+      }});
+    }}
+
+    function addTarget(map) {{
+      const target = [report.target.lat, report.target.lon];
+      L.circleMarker(target, {{
+        radius: 8,
+        color: "#111827",
+        weight: 3,
+        fillColor: "#ffffff",
+        fillOpacity: 0.92,
+      }}).addTo(map).bindTooltip(report.target.label, {{ direction: "top" }});
+    }}
+
+    function addMovements(map) {{
+      report.movements.forEach(([beforeLat, beforeLon, afterLat, afterLon]) => {{
+        L.polyline([[beforeLat, beforeLon], [afterLat, afterLon]], {{
+          color: "#dc2626",
+          weight: 1,
+          opacity: 0.24,
+        }}).addTo(map);
+      }});
+    }}
+
+    function syncMaps(left, right) {{
+      let moving = false;
+      function mirror(source, target) {{
+        if (moving) return;
+        moving = true;
+        target.setView(source.getCenter(), source.getZoom(), {{ animate: false }});
+        moving = false;
+      }}
+      left.on("moveend", () => mirror(left, right));
+      right.on("moveend", () => mirror(right, left));
+    }}
+
+    if (window.L) {{
+      const beforeMap = makeMap("beforeMap");
+      const afterMap = makeMap("afterMap");
+      addPoints(beforeMap, report.background, "#8a8f98", 2, 0.22);
+      addPoints(afterMap, report.background, "#8a8f98", 2, 0.16);
+      addPoints(beforeMap, report.before, "#2563eb", 3, 0.58);
+      addMovements(afterMap);
+      addPoints(afterMap, report.after, "#dc2626", 3, 0.56);
+      addTarget(beforeMap);
+      addTarget(afterMap);
+      syncMaps(beforeMap, afterMap);
+    }} else {{
+      document.querySelectorAll(".map").forEach((node) => {{
+        node.textContent = "地図ライブラリを読み込めませんでした。ネットワーク接続を確認してください。";
+      }});
+    }}
+  </script>
 </body>
 </html>
 """
