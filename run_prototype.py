@@ -39,7 +39,6 @@ DEFAULT_OLLAMA_TIMEOUT = 120.0
 DEFAULT_GEOCODER_URL = "https://nominatim.openstreetmap.org/search"
 DEFAULT_GEOCODER_TIMEOUT = 15.0
 DEFAULT_GEOCODER_USER_AGENT = "ppflow-change-automatic/0.1 local research prototype"
-DEFAULT_GEOCODER_MAX_DISTANCE_KM = 20.0
 
 TRIP_COLUMNS = [
     "person_id",
@@ -64,7 +63,7 @@ PURPOSE_HINTS = {
     "business": ["500"],
 }
 
-GENERIC_TARGET_LABELS = {"", "駅前", "新設商業施設", "仮想目的地"}
+GENERIC_TARGET_LABELS = {"", "駅前", "商業施設", "大型商業施設", "新設商業施設", "仮想目的地"}
 GEOCODE_CACHE: dict[tuple[str, str], dict[str, object] | None] = {}
 
 LLM_SYSTEM_PROMPT = """
@@ -157,7 +156,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no-geocode", action="store_true", help="Disable Nominatim geocoding.")
     parser.add_argument("--geocoder-url", default=DEFAULT_GEOCODER_URL)
     parser.add_argument("--geocoder-timeout", type=float, default=DEFAULT_GEOCODER_TIMEOUT)
-    parser.add_argument("--geocoder-max-distance-km", type=float, default=DEFAULT_GEOCODER_MAX_DISTANCE_KM)
     return parser.parse_args()
 
 
@@ -235,6 +233,19 @@ def infer_target_from_destinations(trips: list[Trip], grid_size: float = 0.01) -
 
 
 def infer_target_label(text: str) -> str:
+    explicit_places = [
+        ("千葉駅", "千葉駅"),
+        ("千葉駅前", "千葉駅"),
+        ("千葉市", "千葉市"),
+        ("アメリカ", "アメリカ"),
+        ("米国", "アメリカ"),
+        ("USA", "United States"),
+        ("United States", "United States"),
+    ]
+    for keyword, label in explicit_places:
+        if keyword in text:
+            return label
+
     if "柏の葉キャンパス駅" in text:
         return "柏の葉キャンパス駅前"
     if "駅前" in text:
@@ -242,6 +253,20 @@ def infer_target_label(text: str) -> str:
     if "商業施設" in text:
         return "新設商業施設"
     return "仮想目的地"
+
+
+def is_compatible_llm_label(scenario_text: str, label: str) -> bool:
+    if not label:
+        return False
+    if label in GENERIC_TARGET_LABELS or any(word in label for word in ["商業施設", "新設", "施設"]):
+        return False
+    if label in scenario_text or scenario_text in label:
+        return True
+    if label in {"United States"} and any(word in scenario_text for word in ["アメリカ", "米国", "USA"]):
+        return True
+    if label in {"アメリカ"} and any(word in scenario_text for word in ["United States", "USA", "米国"]):
+        return True
+    return False
 
 
 def infer_purpose_codes(text: str) -> list[str]:
@@ -442,24 +467,6 @@ def normalize_location(value: object) -> tuple[float, float] | None:
     return lon_float, lat_float
 
 
-def destination_focus(trips: list[Trip]) -> tuple[float, float]:
-    return infer_target_from_destinations(trips)
-
-
-def validate_geocoded_location(
-    lon: float,
-    lat: float,
-    trips: list[Trip],
-    args: argparse.Namespace,
-) -> tuple[bool, float]:
-    focus_lon, focus_lat = destination_focus(trips)
-    distance_km = haversine_km(lon, lat, focus_lon, focus_lat)
-    max_distance_km = float(
-        getattr(args, "geocoder_max_distance_km", DEFAULT_GEOCODER_MAX_DISTANCE_KM)
-    )
-    return distance_km <= max_distance_km, distance_km
-
-
 def geocode_queries(label: str) -> list[str]:
     text = label.strip()
     candidates: list[str] = []
@@ -501,7 +508,6 @@ def geocode_place(label: str, args: argparse.Namespace) -> dict[str, object] | N
                 "q": query,
                 "format": "jsonv2",
                 "limit": "1",
-                "countrycodes": "jp",
             }
         )
         url = f"{endpoint}?{params}"
@@ -611,7 +617,7 @@ def build_rule(trips: list[Trip], scenario_text: str, args: argparse.Namespace) 
     questions: list[dict[str, str]] = []
     notes = [
         "移動目的コードは入力CSV仕様に従い、100=買い物、200=外食、300=通院、400=自由行動、500=業務として処理します。",
-        "地点名はNominatimでジオコーディングし、取得できない場合は既存トリップの高密度な目的地クラスタを使います。",
+        "地点名はNominatimでジオコーディングし、取得できない場合だけ既存トリップの高密度な目的地クラスタを使います。",
     ]
     location_source = "destination_cluster"
 
@@ -635,21 +641,16 @@ def build_rule(trips: list[Trip], scenario_text: str, args: argparse.Namespace) 
                     else ""
                 )
             )
-            if llm_label:
+            if llm_label and is_compatible_llm_label(scenario_text, llm_label):
                 target_label = llm_label
+            elif llm_label:
+                notes.append(f"LLMの地点名が自然文と一致しないため採用しませんでした: {llm_label}")
 
             location = normalize_location(llm_rule.get("target_location"))
             if location is not None:
-                llm_lon, llm_lat = location
-                valid, data_distance_km = validate_geocoded_location(llm_lon, llm_lat, trips, args)
-                if valid:
-                    target_lon, target_lat = location
-                    location_source = "llm"
-                else:
-                    notes.append(
-                        "LLMが返した座標がデータ中心から遠すぎるため採用しませんでした: "
-                        f"{llm_lon:.6f}, {llm_lat:.6f} ({data_distance_km:.1f}km)"
-                    )
+                target_lon, target_lat = location
+                location_source = "llm"
+                notes.append(f"LLMが返した座標を目的地にしました: {target_lon:.6f}, {target_lat:.6f}")
 
             if "affected_ratio" in llm_rule:
                 try:
@@ -698,28 +699,13 @@ def build_rule(trips: list[Trip], scenario_text: str, args: argparse.Namespace) 
         if geocoded is not None:
             geocoded_lon = float(geocoded["lon"])
             geocoded_lat = float(geocoded["lat"])
-            valid, data_distance_km = validate_geocoded_location(
-                geocoded_lon,
-                geocoded_lat,
-                trips,
-                args,
+            target_lon = geocoded_lon
+            target_lat = geocoded_lat
+            location_source = "geocoder"
+            notes.append(
+                "Nominatimジオコーディングで目的地を設定しました: "
+                f"{geocoded['query']} -> {geocoded['label']}"
             )
-            if valid:
-                target_lon = geocoded_lon
-                target_lat = geocoded_lat
-                location_source = "geocoder"
-                notes.append(
-                    "Nominatimジオコーディングで目的地を設定しました: "
-                    f"{geocoded['query']} -> {geocoded['label']}"
-                )
-            else:
-                notes.append(
-                    "ジオコーディング結果がデータ中心から遠すぎるため採用しませんでした: "
-                    f"{geocoded['query']} ({data_distance_km:.1f}km)"
-                )
-                if location_source == "destination_cluster":
-                    target_label = "データ内高密度目的地クラスタ"
-                    notes.append("データ内の高密度目的地クラスタを目的地にしました。")
         elif location_source == "destination_cluster":
             target_label = "データ内高密度目的地クラスタ"
             notes.append("ジオコーディングで地点を取得できなかったため、データ内の高密度目的地クラスタを使いました。")
@@ -843,6 +829,26 @@ def meters_to_lon_delta(meters: float, lat: float) -> float:
     return meters / (111_320.0 * max(0.2, math.cos(math.radians(lat))))
 
 
+def local_xy_km(lon: float, lat: float, ref_lon: float, ref_lat: float) -> tuple[float, float]:
+    x = (lon - ref_lon) * 111.320 * max(0.2, math.cos(math.radians(ref_lat)))
+    y = (lat - ref_lat) * 111.320
+    return x, y
+
+
+def point_to_trip_segment_distance_km(trip: Trip, target_lon: float, target_lat: float) -> float:
+    ox, oy = local_xy_km(trip.origin_lon, trip.origin_lat, target_lon, target_lat)
+    dx, dy = local_xy_km(trip.destination_lon, trip.destination_lat, target_lon, target_lat)
+    vx = dx - ox
+    vy = dy - oy
+    denom = vx * vx + vy * vy
+    if denom <= 1e-12:
+        return math.hypot(ox, oy)
+    t = clamp(-((ox * vx + oy * vy) / denom), 0.0, 1.0)
+    closest_x = ox + t * vx
+    closest_y = oy + t * vy
+    return math.hypot(closest_x, closest_y)
+
+
 def apply_scenario(trips: list[Trip], rule: ScenarioRule) -> tuple[list[Trip], list[int], list[int], list[str]]:
     base_candidates, notes = choose_candidates(trips, rule)
     rng = random.Random(rule.random_seed)
@@ -851,9 +857,8 @@ def apply_scenario(trips: list[Trip], rule: ScenarioRule) -> tuple[list[Trip], l
     weighted_candidates: list[tuple[int, float, float]] = []
     for i in base_candidates:
         trip = trips[i]
-        distance_km = haversine_km(
-            trip.destination_lon,
-            trip.destination_lat,
+        distance_km = point_to_trip_segment_distance_km(
+            trip,
             rule.target_lon,
             rule.target_lat,
         )
@@ -865,10 +870,10 @@ def apply_scenario(trips: list[Trip], rule: ScenarioRule) -> tuple[list[Trip], l
     notes.append(
         "影響圏モデル: "
         f"目的・時間候補 {len(base_candidates):,} 件のうち、"
-        f"施設から {influence_radius_km:g}km 以内の {len(weighted_candidates):,} 件を対象にしました。"
+        f"移動経路が施設から {influence_radius_km:g}km 以内を通る {len(weighted_candidates):,} 件を対象にしました。"
     )
     notes.append(
-        f"選択確率は施設距離に対して線形減衰し、施設直近の最大確率を {rule.affected_ratio:.0%} としました。"
+        f"選択確率は経路と施設の近さに対して線形減衰し、施設直近の最大確率を {rule.affected_ratio:.0%} としました。"
     )
 
     candidates = [i for i, _, _ in weighted_candidates]

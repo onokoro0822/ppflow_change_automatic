@@ -19,7 +19,6 @@ from run_prototype import (
     BASE_DIR,
     DEFAULT_GEOCODER_TIMEOUT,
     DEFAULT_GEOCODER_URL,
-    DEFAULT_GEOCODER_MAX_DISTANCE_KM,
     DEFAULT_INPUT_CSV,
     DEFAULT_OLLAMA_MODEL,
     DEFAULT_OLLAMA_TIMEOUT,
@@ -54,7 +53,6 @@ WEB_OLLAMA_TIMEOUT = DEFAULT_OLLAMA_TIMEOUT
 WEB_GEOCODE_ENABLED = True
 WEB_GEOCODER_URL = DEFAULT_GEOCODER_URL
 WEB_GEOCODER_TIMEOUT = DEFAULT_GEOCODER_TIMEOUT
-WEB_GEOCODER_MAX_DISTANCE_KM = DEFAULT_GEOCODER_MAX_DISTANCE_KM
 
 
 def get_trips(input_csv: Path = DEFAULT_INPUT_CSV):
@@ -92,7 +90,6 @@ def namespace(
         no_geocode=not geocode,
         geocoder_url=WEB_GEOCODER_URL,
         geocoder_timeout=WEB_GEOCODER_TIMEOUT,
-        geocoder_max_distance_km=WEB_GEOCODER_MAX_DISTANCE_KM,
     )
 
 
@@ -274,6 +271,13 @@ INDEX_HTML = """<!doctype html>
       font-weight: 700;
       letter-spacing: 0;
     }
+    .header-tools {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-left: auto;
+    }
     .status {
       min-width: 160px;
       color: var(--muted);
@@ -351,7 +355,7 @@ INDEX_HTML = """<!doctype html>
     }
     .actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
       padding: 12px;
     }
@@ -371,6 +375,17 @@ INDEX_HTML = """<!doctype html>
       text-decoration: none;
       cursor: pointer;
       padding: 8px 12px;
+    }
+    .language-toggle {
+      min-height: 32px;
+      min-width: 68px;
+      padding: 6px 10px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .actions button {
+      padding: 8px 8px;
+      white-space: nowrap;
     }
     button.primary {
       border-color: var(--teal);
@@ -517,6 +532,7 @@ INDEX_HTML = """<!doctype html>
     }
     @media (max-width: 560px) {
       header { align-items: flex-start; flex-direction: column; padding: 12px 16px; }
+      .header-tools { width: 100%; justify-content: space-between; margin-left: 0; }
       .status { text-align: left; }
       aside, .workspace { padding: 12px; }
       .grid2, .actions, .metrics { grid-template-columns: 1fr; }
@@ -525,23 +541,30 @@ INDEX_HTML = """<!doctype html>
 </head>
 <body>
   <header>
-    <h1>擬似人流シナリオ</h1>
-    <div class="status" id="status">待機中</div>
+    <h1 data-i18n="app.title">擬似人流シナリオ</h1>
+    <div class="header-tools">
+      <button class="language-toggle" id="languageButton" type="button">EN</button>
+      <div class="status" id="status">待機中</div>
+    </div>
   </header>
   <main>
     <aside>
       <section>
-        <h2>シナリオ</h2>
+        <h2 data-i18n="sections.scenario">シナリオ</h2>
         <div class="field">
-          <label for="scenarioText">自然文</label>
+          <label for="scenarioText" data-i18n="labels.scenarioText">自然文</label>
           <textarea id="scenarioText"></textarea>
+        </div>
+        <div class="actions">
+          <button id="inferButton" type="button" data-i18n="actions.infer">LLM推定</button>
+          <button class="primary" id="inferRunButton" type="button" data-i18n="actions.inferRun">推論して比較</button>
         </div>
       </section>
 
       <section>
-        <h2>確認</h2>
+        <h2 data-i18n="sections.confirm">確認</h2>
         <div class="field">
-          <label for="targetLabel">地点名</label>
+          <label for="targetLabel" data-i18n="labels.targetLabel">地点名</label>
           <input id="targetLabel" type="text">
         </div>
         <div class="field grid2">
@@ -556,52 +579,52 @@ INDEX_HTML = """<!doctype html>
         </div>
         <div class="field grid2">
           <div>
-            <label for="affectedRatio">影響割合</label>
+            <label for="affectedRatio" data-i18n="labels.affectedRatio">影響割合</label>
             <input id="affectedRatio" type="number" min="1" max="30" step="1">
           </div>
           <div>
-            <label for="timeWindow">時間帯</label>
+            <label for="timeWindow" data-i18n="labels.timeWindow">時間帯</label>
             <input id="timeWindow" type="text">
           </div>
         </div>
         <div class="field grid2">
           <div>
-            <label for="affectedPurposes">目的コード</label>
+            <label for="affectedPurposes" data-i18n="labels.affectedPurposes">目的コード</label>
             <input id="affectedPurposes" type="text">
-            <div class="legend" aria-label="目的コード凡例">
-              <div class="legend-row"><span class="legend-code">1</span><span>在宅</span></div>
-              <div class="legend-row"><span class="legend-code">2</span><span>通勤</span></div>
-              <div class="legend-row"><span class="legend-code">3</span><span>通学</span></div>
-              <div class="legend-row"><span class="legend-code">100</span><span>買い物</span></div>
-              <div class="legend-row"><span class="legend-code">200</span><span>外食</span></div>
-              <div class="legend-row"><span class="legend-code">300</span><span>通院</span></div>
-              <div class="legend-row"><span class="legend-code">400</span><span>自由行動</span></div>
-              <div class="legend-row"><span class="legend-code">500</span><span>業務</span></div>
-              <div class="legend-row"><span class="legend-code">空欄</span><span>目的コードで絞り込まない</span></div>
+            <div class="legend" aria-label="目的コード凡例" data-i18n-aria="aria.purposeLegend">
+              <div class="legend-row"><span class="legend-code">1</span><span data-i18n="purposes.home">在宅</span></div>
+              <div class="legend-row"><span class="legend-code">2</span><span data-i18n="purposes.commute">通勤</span></div>
+              <div class="legend-row"><span class="legend-code">3</span><span data-i18n="purposes.school">通学</span></div>
+              <div class="legend-row"><span class="legend-code">100</span><span data-i18n="purposes.shopping">買い物</span></div>
+              <div class="legend-row"><span class="legend-code">200</span><span data-i18n="purposes.dining">外食</span></div>
+              <div class="legend-row"><span class="legend-code">300</span><span data-i18n="purposes.hospital">通院</span></div>
+              <div class="legend-row"><span class="legend-code">400</span><span data-i18n="purposes.free">自由行動</span></div>
+              <div class="legend-row"><span class="legend-code">500</span><span data-i18n="purposes.business">業務</span></div>
+              <div class="legend-row"><span class="legend-code" data-i18n="purposes.blankCode">空欄</span><span data-i18n="purposes.blankDescription">目的コードで絞り込まない</span></div>
             </div>
           </div>
           <div>
-            <label for="strength">移動強度</label>
+            <label for="strength" data-i18n="labels.strength">移動強度</label>
             <input id="strength" type="number" min="0.05" max="0.7" step="0.05">
             <div class="field-note"></div>
-            <label for="influenceRadius">影響半径 km</label>
+            <label for="influenceRadius" data-i18n="labels.influenceRadius">影響半径 km</label>
             <input id="influenceRadius" type="number" min="0.3" max="10" step="0.1">
           </div>
         </div>
         <div class="actions">
-          <button id="inferButton" type="button">LLM推定</button>
-          <button class="primary" id="runButton" type="button">比較を作成</button>
+          <button id="resetButton" type="button" data-i18n="actions.reset" data-i18n-title="actions.resetTitle">リセット</button>
+          <button class="primary" id="runButton" type="button" data-i18n="actions.run">比較を作成</button>
         </div>
       </section>
 
       <section>
-        <h2>推定地点</h2>
+        <h2 data-i18n="sections.estimatedPoint">推定地点</h2>
         <div class="map-preview">
           <iframe id="targetMap" title="推定地点のGoogle Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="map-meta">
             <strong id="mapLabel">-</strong>
             <span id="mapCoords">-</span>
-            <a id="mapLink" href="#" target="_blank" rel="noreferrer">Google Mapsで開く</a>
+            <a id="mapLink" href="#" target="_blank" rel="noreferrer" data-i18n="actions.openGoogleMaps">Google Mapsで開く</a>
           </div>
         </div>
       </section>
@@ -610,17 +633,17 @@ INDEX_HTML = """<!doctype html>
     <div class="workspace">
       <div class="error" id="errorBox"></div>
       <div class="metrics">
-        <div class="metric"><span>変更トリップ</span><strong id="changedTrips">-</strong></div>
-        <div class="metric"><span>候補トリップ</span><strong id="candidateTrips">-</strong></div>
-        <div class="metric before"><span>Before 平均距離</span><strong id="beforeKm">-</strong></div>
-        <div class="metric after"><span>After 平均距離</span><strong id="afterKm">-</strong></div>
+        <div class="metric"><span data-i18n="metrics.changedTrips">変更トリップ</span><strong id="changedTrips">-</strong></div>
+        <div class="metric"><span data-i18n="metrics.candidateTrips">候補トリップ</span><strong id="candidateTrips">-</strong></div>
+        <div class="metric before"><span data-i18n="metrics.beforeKm">Before 平均距離</span><strong id="beforeKm">-</strong></div>
+        <div class="metric after"><span data-i18n="metrics.afterKm">After 平均距離</span><strong id="afterKm">-</strong></div>
       </div>
       <div class="viewer">
         <div class="viewer-head">
-          <h2>比較</h2>
+          <h2 data-i18n="sections.comparison">比較</h2>
           <div class="links" id="links"></div>
         </div>
-        <div class="empty" id="emptyState">比較結果はここに表示されます</div>
+        <div class="empty" id="emptyState" data-i18n="empty.comparison">比較結果はここに表示されます</div>
         <iframe id="comparisonFrame" title="擬似人流比較" hidden></iframe>
       </div>
     </div>
@@ -632,11 +655,237 @@ INDEX_HTML = """<!doctype html>
     const errorBox = $("errorBox");
     const runButton = $("runButton");
     const inferButton = $("inferButton");
+    const inferRunButton = $("inferRunButton");
+    const resetButton = $("resetButton");
+    const languageButton = $("languageButton");
+    let confirmationDefaults = null;
+    let latestFiles = null;
+    let statusKey = "idle";
+    let currentLanguage = localStorage.getItem("ppflowLanguage") === "en" ? "en" : "ja";
 
-    function setBusy(message, busy) {
-      status.textContent = message;
+    const I18N = {
+      ja: {
+        app: { title: "擬似人流シナリオ" },
+        sections: {
+          scenario: "シナリオ",
+          confirm: "確認",
+          estimatedPoint: "推定地点",
+          comparison: "比較",
+        },
+        labels: {
+          scenarioText: "自然文",
+          targetLabel: "地点名",
+          affectedRatio: "影響割合",
+          timeWindow: "時間帯",
+          affectedPurposes: "目的コード",
+          strength: "移動強度",
+          influenceRadius: "影響半径 km",
+        },
+        purposes: {
+          home: "在宅",
+          commute: "通勤",
+          school: "通学",
+          shopping: "買い物",
+          dining: "外食",
+          hospital: "通院",
+          free: "自由行動",
+          business: "業務",
+          blankCode: "空欄",
+          blankDescription: "目的コードで絞り込まない",
+        },
+        actions: {
+          infer: "LLM推定",
+          inferRun: "推論して比較",
+          reset: "リセット",
+          resetTitle: "現在の自然文から確認欄を再推定します",
+          run: "比較を作成",
+          openGoogleMaps: "Google Mapsで開く",
+          switchLanguage: "英語表示に切り替え",
+        },
+        status: {
+          idle: "待機中",
+          loading: "読み込み中",
+          inferring: "推定中",
+          inferRunning: "推論と比較を作成中",
+          resetting: "リセット中",
+          running: "作成中",
+          done: "完了",
+          resetDone: "確認をリセットしました",
+          error: "エラー",
+        },
+        metrics: {
+          changedTrips: "変更トリップ",
+          candidateTrips: "候補トリップ",
+          beforeKm: "Before 平均距離",
+          afterKm: "After 平均距離",
+        },
+        links: {
+          html: "HTML",
+          changedCsv: "変更CSV",
+          ruleJson: "ルールJSON",
+          summaryJson: "要約JSON",
+        },
+        empty: { comparison: "比較結果はここに表示されます" },
+        map: {
+          defaultLabel: "推定地点",
+          iframeTitle: "推定地点のGoogle Maps",
+          comparisonTitle: "擬似人流比較",
+        },
+        aria: { purposeLegend: "目的コード凡例" },
+        errors: {
+          noScenario: "自然文を入力してください。",
+        },
+      },
+      en: {
+        app: { title: "Pseudo People-Flow Scenario" },
+        sections: {
+          scenario: "Scenario",
+          confirm: "Confirmation",
+          estimatedPoint: "Estimated Point",
+          comparison: "Comparison",
+        },
+        labels: {
+          scenarioText: "Scenario text",
+          targetLabel: "Place name",
+          affectedRatio: "Impact rate",
+          timeWindow: "Time window",
+          affectedPurposes: "Purpose codes",
+          strength: "Move strength",
+          influenceRadius: "Influence radius km",
+        },
+        purposes: {
+          home: "Home",
+          commute: "Commute",
+          school: "School",
+          shopping: "Shopping",
+          dining: "Dining out",
+          hospital: "Hospital visit",
+          free: "Leisure/free activity",
+          business: "Business",
+          blankCode: "Blank",
+          blankDescription: "Do not filter by purpose",
+        },
+        actions: {
+          infer: "Infer",
+          inferRun: "Infer & Compare",
+          reset: "Reset",
+          resetTitle: "Re-infer the confirmation fields from the current scenario text",
+          run: "Create comparison",
+          openGoogleMaps: "Open in Google Maps",
+          switchLanguage: "Switch to Japanese",
+        },
+        status: {
+          idle: "Idle",
+          loading: "Loading",
+          inferring: "Inferring",
+          inferRunning: "Inferring and creating comparison",
+          resetting: "Resetting",
+          running: "Creating",
+          done: "Done",
+          resetDone: "Confirmation reset",
+          error: "Error",
+        },
+        metrics: {
+          changedTrips: "Changed trips",
+          candidateTrips: "Candidate trips",
+          beforeKm: "Before avg distance",
+          afterKm: "After avg distance",
+        },
+        links: {
+          html: "HTML",
+          changedCsv: "Changed CSV",
+          ruleJson: "Rule JSON",
+          summaryJson: "Summary JSON",
+        },
+        empty: { comparison: "Comparison results will appear here" },
+        map: {
+          defaultLabel: "Estimated point",
+          iframeTitle: "Google Maps for the estimated point",
+          comparisonTitle: "Pseudo people-flow comparison",
+        },
+        aria: { purposeLegend: "Purpose code legend" },
+        errors: {
+          noScenario: "Enter scenario text.",
+        },
+      },
+    };
+
+    function cloneData(data) {
+      return JSON.parse(JSON.stringify(data));
+    }
+
+    function t(key) {
+      return key.split(".").reduce((value, part) => value && value[part], I18N[currentLanguage]) || key;
+    }
+
+    const PLACE_TRANSLATIONS = [
+      ["千葉駅", "Chiba Station"],
+      ["千葉駅前", "Chiba Station area"],
+      ["千葉中央駅", "Chiba-Chuo Station"],
+      ["千葉中央駅周辺", "Chiba-Chuo Station area"],
+      ["蘇我駅", "Soga Station"],
+      ["蘇我駅前", "Soga Station area"],
+      ["柏の葉キャンパス駅前", "Kashiwanoha-campus Station area"],
+      ["データ内高密度目的地クラスタ", "High-density destination cluster in the data"],
+      ["アメリカ", "United States"],
+      ["米国", "United States"],
+    ];
+
+    function localizeTargetLabel(label) {
+      const text = String(label || "").trim();
+      const match = PLACE_TRANSLATIONS.find(([ja, en]) => text === ja || text === en);
+      if (!match) return text;
+      return currentLanguage === "en" ? match[1] : match[0];
+    }
+
+    function localizeTimeWindow(value) {
+      const text = String(value || "").trim();
+      if (text.toLowerCase() === "all" || text === "全日" || text === "終日") {
+        return currentLanguage === "en" ? "All" : "終日";
+      }
+      return text;
+    }
+
+    function renderLinks(files) {
+      latestFiles = files;
+      $("links").innerHTML = [
+        [t("links.html"), files.comparison_html],
+        [t("links.changedCsv"), files.changed_csv],
+        [t("links.ruleJson"), files.rule_json],
+        [t("links.summaryJson"), files.summary_json],
+      ].map(([label, href]) => `<a href="${href}" target="_blank" rel="noreferrer">${label}</a>`).join("");
+    }
+
+    function applyLanguage() {
+      document.documentElement.lang = currentLanguage;
+      document.title = t("app.title");
+      document.querySelectorAll("[data-i18n]").forEach((node) => {
+        node.textContent = t(node.dataset.i18n);
+      });
+      document.querySelectorAll("[data-i18n-title]").forEach((node) => {
+        node.title = t(node.dataset.i18nTitle);
+      });
+      document.querySelectorAll("[data-i18n-aria]").forEach((node) => {
+        node.setAttribute("aria-label", t(node.dataset.i18nAria));
+      });
+      languageButton.textContent = currentLanguage === "ja" ? "EN" : "日本語";
+      languageButton.setAttribute("aria-label", t("actions.switchLanguage"));
+      $("targetMap").title = t("map.iframeTitle");
+      $("comparisonFrame").title = t("map.comparisonTitle");
+      status.textContent = t(`status.${statusKey}`);
+      $("targetLabel").value = localizeTargetLabel($("targetLabel").value);
+      $("timeWindow").value = localizeTimeWindow($("timeWindow").value);
+      if (latestFiles) renderLinks(latestFiles);
+      updateTargetMap();
+    }
+
+    function setBusy(nextStatusKey, busy) {
+      statusKey = nextStatusKey;
+      status.textContent = t(`status.${statusKey}`);
       runButton.disabled = busy;
       inferButton.disabled = busy;
+      inferRunButton.disabled = busy;
+      resetButton.disabled = busy;
     }
 
     function setError(message) {
@@ -675,11 +924,13 @@ INDEX_HTML = """<!doctype html>
     }
 
     function updateTargetMap() {
-      const lon = Number($("targetLon").value);
-      const lat = Number($("targetLat").value);
-      const label = $("targetLabel").value || "推定地点";
+      const lonText = $("targetLon").value.trim();
+      const latText = $("targetLat").value.trim();
+      const lon = Number(lonText);
+      const lat = Number(latText);
+      const label = $("targetLabel").value || t("map.defaultLabel");
 
-      if (!Number.isFinite(lon) || !Number.isFinite(lat)) {
+      if (!lonText || !latText || !Number.isFinite(lon) || !Number.isFinite(lat)) {
         $("targetMap").removeAttribute("src");
         $("mapLabel").textContent = "-";
         $("mapCoords").textContent = "-";
@@ -694,17 +945,23 @@ INDEX_HTML = """<!doctype html>
       $("mapLink").href = `https://www.google.com/maps/search/?api=1&query=${query}`;
     }
 
-    function fillDefaults(data) {
-      $("scenarioText").value = data.scenario_text || $("scenarioText").value;
-      $("targetLabel").value = data.target_label || "";
+    function fillConfirmation(data) {
+      $("targetLabel").value = localizeTargetLabel(data.target_label || "");
       $("targetLon").value = Number(data.target_lon).toFixed(6);
       $("targetLat").value = Number(data.target_lat).toFixed(6);
       $("affectedRatio").value = data.affected_ratio_percent || Math.round((data.affected_ratio || 0.08) * 100);
-      $("timeWindow").value = data.time_window || "all";
+      $("timeWindow").value = localizeTimeWindow(data.time_window || "all");
       $("affectedPurposes").value = (data.affected_purposes || []).join(",");
       $("strength").value = Number(data.strength || 0.28).toFixed(2);
       $("influenceRadius").value = Number(data.influence_radius_km || 2).toFixed(1);
       updateTargetMap();
+    }
+
+    function fillDefaults(data) {
+      $("scenarioText").value = data.scenario_text || $("scenarioText").value;
+      confirmationDefaults = cloneData(data);
+      fillConfirmation(confirmationDefaults);
+      resetButton.disabled = false;
     }
 
     function ollamaWarning(data) {
@@ -712,7 +969,7 @@ INDEX_HTML = """<!doctype html>
     }
 
     function formatNumber(value) {
-      return Number(value).toLocaleString("ja-JP");
+      return Number(value).toLocaleString(currentLanguage === "ja" ? "ja-JP" : "en-US");
     }
 
     function updateResults(data) {
@@ -722,64 +979,101 @@ INDEX_HTML = """<!doctype html>
       $("beforeKm").textContent = `${Number(summary.avg_distance_to_target_before_km).toFixed(2)} km`;
       $("afterKm").textContent = `${Number(summary.avg_distance_to_target_after_km).toFixed(2)} km`;
 
-      const files = data.files;
-      $("links").innerHTML = [
-        ["HTML", files.comparison_html],
-        ["変更CSV", files.changed_csv],
-        ["ルールJSON", files.rule_json],
-        ["要約JSON", files.summary_json],
-      ].map(([label, href]) => `<a href="${href}" target="_blank" rel="noreferrer">${label}</a>`).join("");
+      renderLinks(data.files);
 
       $("emptyState").hidden = true;
       $("comparisonFrame").hidden = false;
-      $("comparisonFrame").src = `${files.comparison_html}?t=${Date.now()}`;
+      $("comparisonFrame").src = `${data.files.comparison_html}?t=${Date.now()}`;
     }
 
     async function loadDefaults() {
-      setBusy("読み込み中", true);
+      setBusy("loading", true);
       setError("");
       try {
         const data = await requestJSON("/api/defaults");
         fillDefaults(data);
-        setBusy("待機中", false);
+        setBusy("idle", false);
       } catch (error) {
-        setBusy("エラー", false);
+        setBusy("error", false);
         setError(error.message);
       }
     }
 
     async function infer() {
-      setBusy("推定中", true);
+      setBusy("inferring", true);
       setError("");
       try {
         const data = await requestJSON("/api/infer", { scenario_text: $("scenarioText").value });
         fillDefaults(data);
-        setBusy("待機中", false);
+        setBusy("idle", false);
         setError(ollamaWarning(data));
       } catch (error) {
-        setBusy("エラー", false);
+        setBusy("error", false);
         setError(error.message);
       }
     }
 
     async function run() {
-      setBusy("作成中", true);
+      setBusy("running", true);
       setError("");
       try {
         const data = await requestJSON("/api/run", formPayload());
         updateResults(data);
-        setBusy("完了", false);
+        setBusy("done", false);
       } catch (error) {
-        setBusy("エラー", false);
+        setBusy("error", false);
         setError(error.message);
       }
     }
 
+    async function inferAndRun() {
+      setBusy("inferRunning", true);
+      setError("");
+      try {
+        const inferred = await requestJSON("/api/infer", { scenario_text: $("scenarioText").value });
+        fillDefaults(inferred);
+        setBusy("inferRunning", true);
+        const data = await requestJSON("/api/run", formPayload());
+        updateResults(data);
+        setBusy("done", false);
+        setError(ollamaWarning(inferred));
+      } catch (error) {
+        setBusy("error", false);
+        setError(error.message);
+      }
+    }
+
+    async function resetConfirmation() {
+      const scenarioText = $("scenarioText").value.trim();
+      setBusy("resetting", true);
+      setError("");
+      try {
+        const data = scenarioText
+          ? await requestJSON("/api/infer", { scenario_text: scenarioText })
+          : await requestJSON("/api/defaults");
+        fillDefaults(data);
+        setBusy("resetDone", false);
+        setError(ollamaWarning(data));
+      } catch (error) {
+        if (confirmationDefaults) fillConfirmation(confirmationDefaults);
+        setBusy("error", false);
+        setError(error.message || t("errors.noScenario"));
+      }
+    }
+
+    languageButton.addEventListener("click", () => {
+      currentLanguage = currentLanguage === "ja" ? "en" : "ja";
+      localStorage.setItem("ppflowLanguage", currentLanguage);
+      applyLanguage();
+    });
     inferButton.addEventListener("click", infer);
+    inferRunButton.addEventListener("click", inferAndRun);
+    resetButton.addEventListener("click", resetConfirmation);
     runButton.addEventListener("click", run);
     ["targetLabel", "targetLon", "targetLat"].forEach((id) => {
       $(id).addEventListener("input", updateTargetMap);
     });
+    applyLanguage();
     loadDefaults();
   </script>
 </body>
@@ -884,12 +1178,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no-geocode", action="store_true", help="Disable Nominatim geocoding.")
     parser.add_argument("--geocoder-url", default=DEFAULT_GEOCODER_URL)
     parser.add_argument("--geocoder-timeout", type=float, default=DEFAULT_GEOCODER_TIMEOUT)
-    parser.add_argument("--geocoder-max-distance-km", type=float, default=DEFAULT_GEOCODER_MAX_DISTANCE_KM)
     return parser.parse_args()
 
 
 def main() -> None:
-    global WEB_GEOCODE_ENABLED, WEB_GEOCODER_MAX_DISTANCE_KM, WEB_GEOCODER_TIMEOUT, WEB_GEOCODER_URL
+    global WEB_GEOCODE_ENABLED, WEB_GEOCODER_TIMEOUT, WEB_GEOCODER_URL
     global WEB_LLM_ENABLED, WEB_OLLAMA_MODEL, WEB_OLLAMA_TIMEOUT, WEB_OLLAMA_URL
     args = parse_args()
     WEB_LLM_ENABLED = not args.no_llm
@@ -899,7 +1192,6 @@ def main() -> None:
     WEB_GEOCODE_ENABLED = not args.no_geocode
     WEB_GEOCODER_URL = args.geocoder_url
     WEB_GEOCODER_TIMEOUT = args.geocoder_timeout
-    WEB_GEOCODER_MAX_DISTANCE_KM = args.geocoder_max_distance_km
     try:
         server = ThreadingHTTPServer((args.host, args.port), AppHandler)
     except OSError as exc:
