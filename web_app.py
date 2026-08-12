@@ -4,38 +4,47 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
+import math
 import mimetypes
+import os
+import random
 import sys
 import traceback
 from dataclasses import asdict, replace
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from itertools import islice
 from pathlib import Path
 from types import SimpleNamespace
 from urllib.parse import unquote, urlparse
 
+from dialogue_session import DIALOGUE_SESSIONS
 from run_prototype import (
     BASE_DIR,
     DEFAULT_GEOCODER_TIMEOUT,
     DEFAULT_GEOCODER_URL,
     DEFAULT_INPUT_CSV,
     DEFAULT_OLLAMA_MODEL,
-    DEFAULT_OLLAMA_TIMEOUT,
     DEFAULT_OLLAMA_URL,
     DEFAULT_OUTPUT_DIR,
     DEFAULT_SCENARIO_FILES,
-    apply_scenario,
+    Trip,
     build_rule,
-    build_summary,
     format_time_window,
-    load_trips,
+    geocode_place,
+    haversine_km,
+    is_in_time_window,
+    iter_trips,
+    meters_to_lat_delta,
+    meters_to_lon_delta,
     parse_influence_radius_km,
     parse_lon_lat,
     parse_ratio,
     parse_strength,
     parse_time_window,
-    write_changed_trips,
+    point_to_trip_segment_distance_km,
     write_html_report,
     write_json,
     write_trips,
@@ -43,22 +52,44 @@ from run_prototype import (
 
 
 WEB_OUTPUT_DIR = DEFAULT_OUTPUT_DIR / "web_latest"
+NAGOYA_INPUT_DIR = BASE_DIR / "input" / "nagoya"
+NAGOYA_PREVIEW_PER_FILE = 2000
 MAX_BODY_BYTES = 64 * 1024
+DEFAULT_WEB_OLLAMA_TIMEOUT = 60.0
+DEFAULT_GEMINI_MODEL = "gemini-3.1-flash-lite"
+DEFAULT_GEMINI_TIMEOUT = 60.0
+DEFAULT_TAVILY_TIMEOUT = 20.0
 
 TRIPS_CACHE = None
 WEB_LLM_ENABLED = True
 WEB_OLLAMA_URL = DEFAULT_OLLAMA_URL
 WEB_OLLAMA_MODEL = DEFAULT_OLLAMA_MODEL
-WEB_OLLAMA_TIMEOUT = DEFAULT_OLLAMA_TIMEOUT
-WEB_GEOCODE_ENABLED = True
-WEB_GEOCODER_URL = DEFAULT_GEOCODER_URL
-WEB_GEOCODER_TIMEOUT = DEFAULT_GEOCODER_TIMEOUT
+WEB_OLLAMA_TIMEOUT = DEFAULT_WEB_OLLAMA_TIMEOUT
+WEB_GEMINI_API_KEY = ""
+WEB_GEMINI_MODEL = DEFAULT_GEMINI_MODEL
+WEB_GEMINI_TIMEOUT = DEFAULT_GEMINI_TIMEOUT
+WEB_GEMINI_SEARCH_ENABLED = False
+WEB_TAVILY_API_KEY = ""
+WEB_TAVILY_TIMEOUT = DEFAULT_TAVILY_TIMEOUT
+WEB_TAVILY_SEARCH_ENABLED = False
 
 
-def get_trips(input_csv: Path = DEFAULT_INPUT_CSV):
+def nagoya_input_files() -> list[Path]:
+    paths = sorted(NAGOYA_INPUT_DIR.glob("trip_231*.csv"))
+    if len(paths) != 16:
+        raise FileNotFoundError(
+            f"名古屋市16区のCSVが必要です。{NAGOYA_INPUT_DIR} で {len(paths)} ファイル見つかりました。"
+        )
+    return paths
+
+
+def get_trips():
+    """Load a small balanced preview; full simulation streams all 16 files."""
     global TRIPS_CACHE
     if TRIPS_CACHE is None:
-        TRIPS_CACHE = load_trips(input_csv)
+        TRIPS_CACHE = []
+        for path in nagoya_input_files():
+            TRIPS_CACHE.extend(islice(iter_trips([path]), NAGOYA_PREVIEW_PER_FILE))
     return TRIPS_CACHE
 
 
@@ -71,12 +102,10 @@ def default_scenario_text() -> str:
 
 def namespace(
     seed: int = 42,
-    sample_lines: int = 550,
+    sample_lines: int = 1200,
     background_points: int = 800,
     use_llm: bool | None = None,
-    use_geocode: bool | None = None,
 ):
-    geocode = WEB_GEOCODE_ENABLED if use_geocode is None else use_geocode
     return SimpleNamespace(
         yes=True,
         seed=seed,
@@ -87,9 +116,6 @@ def namespace(
         ollama_url=WEB_OLLAMA_URL,
         ollama_model=WEB_OLLAMA_MODEL,
         ollama_timeout=WEB_OLLAMA_TIMEOUT,
-        no_geocode=not geocode,
-        geocoder_url=WEB_GEOCODER_URL,
-        geocoder_timeout=WEB_GEOCODER_TIMEOUT,
     )
 
 
@@ -97,10 +123,9 @@ def infer_payload(
     scenario_text: str,
     seed: int = 42,
     use_llm: bool | None = None,
-    use_geocode: bool | None = None,
 ) -> dict[str, object]:
     trips = get_trips()
-    args = namespace(seed=seed, use_llm=use_llm, use_geocode=use_geocode)
+    args = namespace(seed=seed, use_llm=use_llm)
     rule = build_rule(trips, scenario_text, args)
     return {
         "scenario_text": scenario_text,
@@ -115,7 +140,46 @@ def infer_payload(
         "influence_radius_km": rule.influence_radius_km,
         "notes": rule.notes,
         "llm_enabled": args.llm,
-        "geocode_enabled": not args.no_geocode,
+        "dataset_label": "名古屋市16区",
+        "dataset_files": len(nagoya_input_files()),
+        "preview_trips": len(trips),
+    }
+
+
+def geocode_payload(label: str) -> dict[str, object]:
+    target_label = label.strip()
+    if not target_label:
+        raise ValueError("座標を取得する対象地名がありません。")
+    search_labels = [target_label]
+    if "名鉄百貨店" in target_label:
+        # The department-store name is fuzzily matched to an unrelated store by
+        # Nominatim.  Its adjacent railway station is a stable map anchor.
+        search_labels.insert(0, "名鉄名古屋駅")
+    geocoder_args = SimpleNamespace(
+        geocoder_url=DEFAULT_GEOCODER_URL,
+        geocoder_timeout=DEFAULT_GEOCODER_TIMEOUT,
+    )
+    result = None
+    for search_label in search_labels:
+        candidate = geocode_place(search_label, geocoder_args)
+        if candidate is None:
+            continue
+        matched_label = str(candidate.get("label") or "")
+        if "名鉄百貨店" in target_label and not any(
+            marker in matched_label for marker in ["名鉄名古屋駅", "名古屋駅"]
+        ):
+            continue
+        result = candidate
+        break
+    if result is None:
+        raise ValueError(
+            f"「{target_label}」の座標を取得できませんでした。対象地名またはlon/latを確認してください。"
+        )
+    return {
+        "target_label": target_label,
+        "matched_label": str(result.get("label") or target_label),
+        "target_lon": float(result["lon"]),
+        "target_lat": float(result["lat"]),
     }
 
 
@@ -130,18 +194,177 @@ def parse_purposes(value: object, default: list[str]) -> list[str]:
     return [part.strip() for part in text.replace("，", ",").split(",") if part.strip()]
 
 
+def reservoir_add(
+    sample: list[object],
+    item: object,
+    seen_count: int,
+    limit: int,
+    rng: random.Random,
+) -> None:
+    if len(sample) < limit:
+        sample.append(item)
+        return
+    replace_at = rng.randrange(seen_count)
+    if replace_at < limit:
+        sample[replace_at] = item
+
+
+def apply_streaming_nagoya(
+    rule,
+    app_args: SimpleNamespace,
+    changed_csv: Path,
+) -> tuple[list[Trip], list[Trip], list[int], list[int], dict[str, object]]:
+    purpose_set = set(rule.affected_purposes)
+    influence_radius_km = max(rule.influence_radius_km, 0.001)
+    selection_rng = random.Random(rule.random_seed)
+    jitter_rng = random.Random(rule.random_seed + 17)
+    candidate_sample_rng = random.Random(rule.random_seed + 29)
+    changed_sample_rng = random.Random(rule.random_seed + 43)
+    candidate_sample: list[object] = []
+    changed_sample: list[object] = []
+    candidate_sample_limit = max(app_args.background_points * 2, 1600)
+    changed_sample_limit = max(app_args.sample_lines * 2, 2400)
+    total_trips = 0
+    purpose_time_candidates = 0
+    candidate_trips = 0
+    changed_trips = 0
+    before_distance_sum = 0.0
+    after_distance_sum = 0.0
+
+    changed_csv.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = [
+        "person_id",
+        "departure_time_sec",
+        "trip_purpose",
+        "before_destination_lon",
+        "before_destination_lat",
+        "after_destination_lon",
+        "after_destination_lat",
+    ]
+    with changed_csv.open("w", encoding="utf-8", newline="") as changed_file:
+        writer = csv.DictWriter(changed_file, fieldnames=fieldnames)
+        writer.writeheader()
+        for trip in iter_trips(nagoya_input_files()):
+            total_trips += 1
+            if purpose_set and trip.trip_purpose not in purpose_set:
+                continue
+            if not is_in_time_window(trip, rule.time_window):
+                continue
+            purpose_time_candidates += 1
+            distance_km = point_to_trip_segment_distance_km(
+                trip,
+                rule.target_lon,
+                rule.target_lat,
+            )
+            if distance_km > influence_radius_km:
+                continue
+            candidate_trips += 1
+            reservoir_add(
+                candidate_sample,
+                trip,
+                candidate_trips,
+                candidate_sample_limit,
+                candidate_sample_rng,
+            )
+            distance_weight = 1.0 - (distance_km / influence_radius_km)
+            if selection_rng.random() >= rule.affected_ratio * distance_weight:
+                continue
+
+            jitter_m = jitter_rng.gauss(0.0, 85.0)
+            jitter_angle = jitter_rng.random() * math.tau
+            jitter_lon = meters_to_lon_delta(
+                math.cos(jitter_angle) * jitter_m,
+                rule.target_lat,
+            )
+            jitter_lat = meters_to_lat_delta(math.sin(jitter_angle) * jitter_m)
+            changed = replace(
+                trip,
+                destination_lon=(
+                    trip.destination_lon
+                    + (rule.target_lon - trip.destination_lon) * rule.strength
+                    + jitter_lon
+                ),
+                destination_lat=(
+                    trip.destination_lat
+                    + (rule.target_lat - trip.destination_lat) * rule.strength
+                    + jitter_lat
+                ),
+                changed=True,
+            )
+            changed_trips += 1
+            before_distance_sum += haversine_km(
+                trip.destination_lon,
+                trip.destination_lat,
+                rule.target_lon,
+                rule.target_lat,
+            )
+            after_distance_sum += haversine_km(
+                changed.destination_lon,
+                changed.destination_lat,
+                rule.target_lon,
+                rule.target_lat,
+            )
+            writer.writerow(
+                {
+                    "person_id": trip.person_id,
+                    "departure_time_sec": trip.departure_time_sec,
+                    "trip_purpose": trip.trip_purpose,
+                    "before_destination_lon": trip.destination_lon,
+                    "before_destination_lat": trip.destination_lat,
+                    "after_destination_lon": changed.destination_lon,
+                    "after_destination_lat": changed.destination_lat,
+                }
+            )
+            reservoir_add(
+                changed_sample,
+                (trip, changed),
+                changed_trips,
+                changed_sample_limit,
+                changed_sample_rng,
+            )
+
+    before_sample = [pair[0] for pair in changed_sample]
+    after_sample = [pair[1] for pair in changed_sample]
+    background = [trip for trip in candidate_sample]
+    baseline_display = before_sample + background
+    scenario_display = after_sample + background
+    changed_indices = list(range(len(before_sample)))
+    candidate_indices = list(range(len(baseline_display)))
+    avg_before = before_distance_sum / changed_trips if changed_trips else 0.0
+    avg_after = after_distance_sum / changed_trips if changed_trips else 0.0
+    summary = {
+        "total_trips": total_trips,
+        "candidate_trips": candidate_trips,
+        "changed_trips": changed_trips,
+        "changed_share_of_all": changed_trips / total_trips if total_trips else 0.0,
+        "target": {
+            "label": rule.target_label,
+            "lon": rule.target_lon,
+            "lat": rule.target_lat,
+        },
+        "affected_purposes": rule.affected_purposes,
+        "time_window": format_time_window(rule.time_window),
+        "movement_strength": rule.strength,
+        "influence_radius_km": rule.influence_radius_km,
+        "avg_distance_to_target_before_km": avg_before,
+        "avg_distance_to_target_after_km": avg_after,
+        "notes": rule.notes
+        + [
+            "名古屋市16区のCSV全件をストリーミング走査しました。",
+            f"目的・時間条件に合う {purpose_time_candidates:,} 件のうち、移動経路が対象地点から {influence_radius_km:g}km 以内を通る {candidate_trips:,} 件を候補にしました。",
+            "地図とbaseline/scenario CSVは表示用サンプル、changed CSVは変更対象の全件です。",
+        ],
+    }
+    return baseline_display, scenario_display, candidate_indices, changed_indices, summary
+
+
 def run_pipeline(payload: dict[str, object]) -> dict[str, object]:
     scenario_text = str(payload.get("scenario_text") or "").strip()
     if not scenario_text:
         raise ValueError("シナリオ文を入力してください。")
 
     seed = int(payload.get("seed") or 42)
-    use_geocode = payload.get("use_geocode")
-    app_args = namespace(
-        seed=seed,
-        use_llm=bool(payload.get("use_llm", False)),
-        use_geocode=None if use_geocode is None else bool(use_geocode),
-    )
+    app_args = namespace(seed=seed, use_llm=bool(payload.get("use_llm", False)))
     trips = get_trips()
     rule = build_rule(trips, scenario_text, app_args)
 
@@ -175,8 +398,8 @@ def run_pipeline(payload: dict[str, object]) -> dict[str, object]:
         },
         {
             "id": "influence_radius_km",
-            "question": "影響半径 km",
-            "answer": f"{influence_radius_km:g}",
+            "question": "対象地点からの影響半径",
+            "answer": f"{influence_radius_km:g}km",
         },
     ]
 
@@ -193,31 +416,41 @@ def run_pipeline(payload: dict[str, object]) -> dict[str, object]:
         questions=questions,
     )
 
-    scenario_trips, candidates, changed_indices, selection_notes = apply_scenario(trips, rule)
-    summary = build_summary(trips, scenario_trips, rule, candidates, changed_indices, selection_notes)
-
     WEB_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    baseline_csv = WEB_OUTPUT_DIR / "baseline_trips.csv"
-    scenario_csv = WEB_OUTPUT_DIR / "scenario_trips.csv"
+    baseline_csv = WEB_OUTPUT_DIR / "baseline_sample.csv"
+    scenario_csv = WEB_OUTPUT_DIR / "scenario_sample.csv"
     changed_csv = WEB_OUTPUT_DIR / "changed_trips.csv"
     rule_json = WEB_OUTPUT_DIR / "scenario_rule.json"
     summary_json = WEB_OUTPUT_DIR / "comparison_summary.json"
     html_report = WEB_OUTPUT_DIR / "comparison.html"
 
-    write_trips(baseline_csv, trips)
-    write_trips(scenario_csv, scenario_trips)
-    write_changed_trips(changed_csv, trips, scenario_trips, changed_indices)
+    baseline_sample, scenario_sample, candidates, changed_indices, summary = apply_streaming_nagoya(
+        rule,
+        app_args,
+        changed_csv,
+    )
+    write_trips(baseline_csv, baseline_sample)
+    write_trips(scenario_csv, scenario_sample)
     write_json(rule_json, asdict(rule))
     write_json(summary_json, summary)
-    write_html_report(html_report, trips, scenario_trips, rule, summary, candidates, changed_indices, app_args)
+    write_html_report(
+        html_report,
+        baseline_sample,
+        scenario_sample,
+        rule,
+        summary,
+        candidates,
+        changed_indices,
+        app_args,
+    )
 
     return {
         "rule": asdict(rule),
         "summary": summary,
         "files": {
             "comparison_html": "/output/web_latest/comparison.html",
-            "baseline_csv": "/output/web_latest/baseline_trips.csv",
-            "scenario_csv": "/output/web_latest/scenario_trips.csv",
+            "baseline_csv": "/output/web_latest/baseline_sample.csv",
+            "scenario_csv": "/output/web_latest/scenario_sample.csv",
             "changed_csv": "/output/web_latest/changed_trips.csv",
             "rule_json": "/output/web_latest/scenario_rule.json",
             "summary_json": "/output/web_latest/comparison_summary.json",
@@ -271,12 +504,10 @@ INDEX_HTML = """<!doctype html>
       font-weight: 700;
       letter-spacing: 0;
     }
-    .header-tools {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-left: auto;
+    .dataset-note {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
     }
     .status {
       min-width: 160px;
@@ -287,7 +518,7 @@ INDEX_HTML = """<!doctype html>
     }
     main {
       display: grid;
-      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      grid-template-columns: minmax(380px, 480px) minmax(0, 1fr);
       min-height: calc(100vh - 58px);
     }
     aside {
@@ -318,6 +549,85 @@ INDEX_HTML = """<!doctype html>
       border-bottom: 1px solid #edf0f3;
     }
     .field:last-child { border-bottom: 0; }
+    .chat-log {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      height: 320px;
+      overflow: auto;
+      padding: 12px;
+      background: var(--surface-soft);
+      border-bottom: 1px solid var(--line);
+    }
+    .chat-message {
+      max-width: 91%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-size: 13px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .chat-message.assistant {
+      align-self: flex-start;
+      background: #fff;
+    }
+    .chat-message.user {
+      align-self: flex-end;
+      border-color: #93c5c0;
+      background: #e7f4f1;
+    }
+    .chat-message.pending {
+      color: var(--muted);
+      border-style: dashed;
+    }
+    .web-sources {
+      margin-top: 8px;
+      padding-top: 7px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .web-sources a {
+      display: block;
+      margin-top: 4px;
+      color: var(--teal);
+      overflow-wrap: anywhere;
+    }
+    .message-updates {
+      margin-top: 8px;
+      padding: 8px;
+      border: 1px solid #d6e8e5;
+      border-radius: 6px;
+      background: #f3faf8;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: normal;
+    }
+    .message-updates strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--teal-dark);
+    }
+    .message-update-row {
+      margin-top: 3px;
+      overflow-wrap: anywhere;
+    }
+    .search-entry-point {
+      margin-top: 7px;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    textarea.chat-input {
+      min-height: 84px;
+    }
+    .chat-hint {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
     label {
       display: block;
       margin-bottom: 6px;
@@ -325,7 +635,6 @@ INDEX_HTML = """<!doctype html>
       font-size: 12px;
       font-weight: 700;
     }
-    .field-note { height: 8px; }
     textarea,
     input {
       width: 100%;
@@ -355,9 +664,16 @@ INDEX_HTML = """<!doctype html>
     }
     .actions {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
       padding: 12px;
+    }
+    .actions .wide { grid-column: 1 / -1; }
+    .workflow-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
     }
     button,
     a.button {
@@ -375,17 +691,6 @@ INDEX_HTML = """<!doctype html>
       text-decoration: none;
       cursor: pointer;
       padding: 8px 12px;
-    }
-    .language-toggle {
-      min-height: 32px;
-      min-width: 68px;
-      padding: 6px 10px;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-    .actions button {
-      padding: 8px 8px;
-      white-space: nowrap;
     }
     button.primary {
       border-color: var(--teal);
@@ -424,6 +729,64 @@ INDEX_HTML = """<!doctype html>
     .metric.before strong { color: var(--blue); }
     .metric.after strong { color: var(--red); }
     .metric.note strong { color: var(--amber); }
+    .plan-panel {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      margin-bottom: 14px;
+    }
+    .plan-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .plan-head h2 {
+      margin: 0;
+      font-size: 14px;
+    }
+    .phase-badge {
+      border: 1px solid #8cc7c1;
+      border-radius: 999px;
+      background: #edf8f6;
+      color: var(--teal-dark);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+    }
+    .plan-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .plan-item {
+      min-width: 0;
+      min-height: 70px;
+      padding: 10px 12px;
+      border-right: 1px solid #edf0f3;
+      border-bottom: 1px solid #edf0f3;
+    }
+    .plan-item span {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .plan-item strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+    .assumption-box {
+      padding: 9px 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .assumption-box strong { color: var(--ink); }
     .viewer {
       border: 1px solid var(--line);
       background: var(--surface);
@@ -492,7 +855,7 @@ INDEX_HTML = """<!doctype html>
     }
     .legend-row {
       display: grid;
-      grid-template-columns: 48px minmax(0, 1fr);
+      grid-template-columns: 52px minmax(0, 1fr);
       gap: 8px;
       align-items: center;
     }
@@ -528,43 +891,59 @@ INDEX_HTML = """<!doctype html>
       main { grid-template-columns: 1fr; }
       aside { border-right: 0; border-bottom: 1px solid var(--line); }
       .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       iframe { height: 680px; }
     }
     @media (max-width: 560px) {
       header { align-items: flex-start; flex-direction: column; padding: 12px 16px; }
-      .header-tools { width: 100%; justify-content: space-between; margin-left: 0; }
       .status { text-align: left; }
       aside, .workspace { padding: 12px; }
-      .grid2, .actions, .metrics { grid-template-columns: 1fr; }
+      .grid2, .actions, .metrics, .plan-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1 data-i18n="app.title">擬似人流シナリオ</h1>
-    <div class="header-tools">
-      <button class="language-toggle" id="languageButton" type="button">EN</button>
-      <div class="status" id="status">待機中</div>
+    <div>
+      <h1>都市計画対話・擬似人流シナリオ</h1>
+      <div class="dataset-note">計画対話と人流シミュレーションを別工程で実行</div>
     </div>
+    <div class="status" id="status">待機中</div>
   </header>
   <main>
     <aside>
       <section>
-        <h2 data-i18n="sections.scenario">シナリオ</h2>
+        <h2>計画エージェントとの対話</h2>
+        <div class="chat-log" id="chatLog" aria-live="polite"></div>
         <div class="field">
-          <label for="scenarioText" data-i18n="labels.scenarioText">自然文</label>
-          <textarea id="scenarioText"></textarea>
+          <label for="chatInput">回答・追加条件</label>
+          <textarea class="chat-input" id="chatInput" placeholder="例：名鉄百貨店本店の空きフロアを暫定活用したい"></textarea>
+          <div class="chat-hint" id="chatMode">対話セッションを準備しています</div>
         </div>
         <div class="actions">
-          <button id="inferButton" type="button" data-i18n="actions.infer">LLM推定</button>
-          <button class="primary" id="inferRunButton" type="button" data-i18n="actions.inferRun">推論して比較</button>
+          <button id="newSessionButton" type="button">新しい対話</button>
+          <button class="primary" id="sendMessageButton" type="button">送信</button>
         </div>
       </section>
 
       <section>
-        <h2 data-i18n="sections.confirm">確認</h2>
+        <h2>シミュレーション入力（別工程）</h2>
         <div class="field">
-          <label for="targetLabel" data-i18n="labels.targetLabel">地点名</label>
+          <p class="workflow-note">上の対話はトリップデータを参照しません。計画条件の確定後、構造化された項目だけを人流解析パラメータへ変換します。人流計算では名古屋市16区のCSVを使用します。</p>
+        </div>
+        <div class="field">
+          <label for="scenarioText">解析条件（構造化計画から生成）</label>
+          <textarea id="scenarioText"></textarea>
+        </div>
+        <div class="actions">
+          <button class="wide" id="applyDialogueButton" type="button" disabled>計画条件を人流解析へ反映</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>確認</h2>
+        <div class="field">
+          <label for="targetLabel">地点名</label>
           <input id="targetLabel" type="text">
         </div>
         <div class="field grid2">
@@ -579,52 +958,49 @@ INDEX_HTML = """<!doctype html>
         </div>
         <div class="field grid2">
           <div>
-            <label for="affectedRatio" data-i18n="labels.affectedRatio">影響割合</label>
-            <input id="affectedRatio" type="number" min="1" max="30" step="1">
+            <label for="affectedRatio">影響割合</label>
+            <input id="affectedRatio" type="number" min="5" max="50" step="1">
           </div>
           <div>
-            <label for="timeWindow" data-i18n="labels.timeWindow">時間帯</label>
+            <label for="timeWindow">時間帯</label>
             <input id="timeWindow" type="text">
           </div>
         </div>
         <div class="field grid2">
           <div>
-            <label for="affectedPurposes" data-i18n="labels.affectedPurposes">目的コード</label>
+            <label for="affectedPurposes">目的コード</label>
             <input id="affectedPurposes" type="text">
-            <div class="legend" aria-label="目的コード凡例" data-i18n-aria="aria.purposeLegend">
-              <div class="legend-row"><span class="legend-code">1</span><span data-i18n="purposes.home">在宅</span></div>
-              <div class="legend-row"><span class="legend-code">2</span><span data-i18n="purposes.commute">通勤</span></div>
-              <div class="legend-row"><span class="legend-code">3</span><span data-i18n="purposes.school">通学</span></div>
-              <div class="legend-row"><span class="legend-code">100</span><span data-i18n="purposes.shopping">買い物</span></div>
-              <div class="legend-row"><span class="legend-code">200</span><span data-i18n="purposes.dining">外食</span></div>
-              <div class="legend-row"><span class="legend-code">300</span><span data-i18n="purposes.hospital">通院</span></div>
-              <div class="legend-row"><span class="legend-code">400</span><span data-i18n="purposes.free">自由行動</span></div>
-              <div class="legend-row"><span class="legend-code">500</span><span data-i18n="purposes.business">業務</span></div>
-              <div class="legend-row"><span class="legend-code" data-i18n="purposes.blankCode">空欄</span><span data-i18n="purposes.blankDescription">目的コードで絞り込まない</span></div>
+            <div class="legend" aria-label="目的コード凡例">
+              <div class="legend-row"><span class="legend-code">100</span><span>買い物・商業・ショッピング</span></div>
+              <div class="legend-row"><span class="legend-code">200</span><span>飲食・食事・レストラン・カフェ</span></div>
+              <div class="legend-row"><span class="legend-code">400</span><span>自由行動・イベント・文化</span></div>
+              <div class="legend-row"><span class="legend-code">500</span><span>業務・オフィス</span></div>
+              <div class="legend-row"><span class="legend-code">空欄</span><span>目的コードで絞り込まない</span></div>
             </div>
           </div>
           <div>
-            <label for="strength" data-i18n="labels.strength">移動強度</label>
-            <input id="strength" type="number" min="0.05" max="0.7" step="0.05">
-            <div class="field-note"></div>
-            <label for="influenceRadius" data-i18n="labels.influenceRadius">影響半径 km</label>
+            <label for="strength">移動強度</label>
+            <input id="strength" type="number" min="0.1" max="1" step="0.05">
+          </div>
+          <div>
+            <label for="influenceRadius">影響半径（km）</label>
             <input id="influenceRadius" type="number" min="0.3" max="10" step="0.1">
           </div>
         </div>
         <div class="actions">
-          <button id="resetButton" type="button" data-i18n="actions.reset" data-i18n-title="actions.resetTitle">リセット</button>
-          <button class="primary" id="runButton" type="button" data-i18n="actions.run">比較を作成</button>
+          <button id="inferButton" type="button">LLM推定</button>
+          <button class="primary" id="runButton" type="button">比較を作成</button>
         </div>
       </section>
 
       <section>
-        <h2 data-i18n="sections.estimatedPoint">推定地点</h2>
+        <h2>推定地点</h2>
         <div class="map-preview">
           <iframe id="targetMap" title="推定地点のGoogle Maps" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
           <div class="map-meta">
             <strong id="mapLabel">-</strong>
             <span id="mapCoords">-</span>
-            <a id="mapLink" href="#" target="_blank" rel="noreferrer" data-i18n="actions.openGoogleMaps">Google Mapsで開く</a>
+            <a id="mapLink" href="#" target="_blank" rel="noreferrer">Google Mapsで開く</a>
           </div>
         </div>
       </section>
@@ -632,18 +1008,26 @@ INDEX_HTML = """<!doctype html>
 
     <div class="workspace">
       <div class="error" id="errorBox"></div>
+      <div class="plan-panel">
+        <div class="plan-head">
+          <h2>構造化された計画条件</h2>
+          <span class="phase-badge" id="phaseBadge">対象地</span>
+        </div>
+        <div class="plan-grid" id="planSummary"></div>
+        <div class="assumption-box" id="assumptionBox">LLMの仮定はここに表示されます。</div>
+      </div>
       <div class="metrics">
-        <div class="metric"><span data-i18n="metrics.changedTrips">変更トリップ</span><strong id="changedTrips">-</strong></div>
-        <div class="metric"><span data-i18n="metrics.candidateTrips">候補トリップ</span><strong id="candidateTrips">-</strong></div>
-        <div class="metric before"><span data-i18n="metrics.beforeKm">Before 平均距離</span><strong id="beforeKm">-</strong></div>
-        <div class="metric after"><span data-i18n="metrics.afterKm">After 平均距離</span><strong id="afterKm">-</strong></div>
+        <div class="metric"><span>変更トリップ</span><strong id="changedTrips">-</strong></div>
+        <div class="metric"><span>候補トリップ</span><strong id="candidateTrips">-</strong></div>
+        <div class="metric before"><span>Before 平均距離</span><strong id="beforeKm">-</strong></div>
+        <div class="metric after"><span>After 平均距離</span><strong id="afterKm">-</strong></div>
       </div>
       <div class="viewer">
         <div class="viewer-head">
-          <h2 data-i18n="sections.comparison">比較</h2>
+          <h2>比較</h2>
           <div class="links" id="links"></div>
         </div>
-        <div class="empty" id="emptyState" data-i18n="empty.comparison">比較結果はここに表示されます</div>
+        <div class="empty" id="emptyState">比較結果はここに表示されます</div>
         <iframe id="comparisonFrame" title="擬似人流比較" hidden></iframe>
       </div>
     </div>
@@ -655,237 +1039,19 @@ INDEX_HTML = """<!doctype html>
     const errorBox = $("errorBox");
     const runButton = $("runButton");
     const inferButton = $("inferButton");
-    const inferRunButton = $("inferRunButton");
-    const resetButton = $("resetButton");
-    const languageButton = $("languageButton");
-    let confirmationDefaults = null;
-    let latestFiles = null;
-    let statusKey = "idle";
-    let currentLanguage = localStorage.getItem("ppflowLanguage") === "en" ? "en" : "ja";
+    const sendMessageButton = $("sendMessageButton");
+    const newSessionButton = $("newSessionButton");
+    const applyDialogueButton = $("applyDialogueButton");
+    let dialogueSessionId = null;
+    let latestDialogueDraft = null;
 
-    const I18N = {
-      ja: {
-        app: { title: "擬似人流シナリオ" },
-        sections: {
-          scenario: "シナリオ",
-          confirm: "確認",
-          estimatedPoint: "推定地点",
-          comparison: "比較",
-        },
-        labels: {
-          scenarioText: "自然文",
-          targetLabel: "地点名",
-          affectedRatio: "影響割合",
-          timeWindow: "時間帯",
-          affectedPurposes: "目的コード",
-          strength: "移動強度",
-          influenceRadius: "影響半径 km",
-        },
-        purposes: {
-          home: "在宅",
-          commute: "通勤",
-          school: "通学",
-          shopping: "買い物",
-          dining: "外食",
-          hospital: "通院",
-          free: "自由行動",
-          business: "業務",
-          blankCode: "空欄",
-          blankDescription: "目的コードで絞り込まない",
-        },
-        actions: {
-          infer: "LLM推定",
-          inferRun: "推論して比較",
-          reset: "リセット",
-          resetTitle: "現在の自然文から確認欄を再推定します",
-          run: "比較を作成",
-          openGoogleMaps: "Google Mapsで開く",
-          switchLanguage: "英語表示に切り替え",
-        },
-        status: {
-          idle: "待機中",
-          loading: "読み込み中",
-          inferring: "推定中",
-          inferRunning: "推論と比較を作成中",
-          resetting: "リセット中",
-          running: "作成中",
-          done: "完了",
-          resetDone: "確認をリセットしました",
-          error: "エラー",
-        },
-        metrics: {
-          changedTrips: "変更トリップ",
-          candidateTrips: "候補トリップ",
-          beforeKm: "Before 平均距離",
-          afterKm: "After 平均距離",
-        },
-        links: {
-          html: "HTML",
-          changedCsv: "変更CSV",
-          ruleJson: "ルールJSON",
-          summaryJson: "要約JSON",
-        },
-        empty: { comparison: "比較結果はここに表示されます" },
-        map: {
-          defaultLabel: "推定地点",
-          iframeTitle: "推定地点のGoogle Maps",
-          comparisonTitle: "擬似人流比較",
-        },
-        aria: { purposeLegend: "目的コード凡例" },
-        errors: {
-          noScenario: "自然文を入力してください。",
-        },
-      },
-      en: {
-        app: { title: "Pseudo People-Flow Scenario" },
-        sections: {
-          scenario: "Scenario",
-          confirm: "Confirmation",
-          estimatedPoint: "Estimated Point",
-          comparison: "Comparison",
-        },
-        labels: {
-          scenarioText: "Scenario text",
-          targetLabel: "Place name",
-          affectedRatio: "Impact rate",
-          timeWindow: "Time window",
-          affectedPurposes: "Purpose codes",
-          strength: "Move strength",
-          influenceRadius: "Influence radius km",
-        },
-        purposes: {
-          home: "Home",
-          commute: "Commute",
-          school: "School",
-          shopping: "Shopping",
-          dining: "Dining out",
-          hospital: "Hospital visit",
-          free: "Leisure/free activity",
-          business: "Business",
-          blankCode: "Blank",
-          blankDescription: "Do not filter by purpose",
-        },
-        actions: {
-          infer: "Infer",
-          inferRun: "Infer & Compare",
-          reset: "Reset",
-          resetTitle: "Re-infer the confirmation fields from the current scenario text",
-          run: "Create comparison",
-          openGoogleMaps: "Open in Google Maps",
-          switchLanguage: "Switch to Japanese",
-        },
-        status: {
-          idle: "Idle",
-          loading: "Loading",
-          inferring: "Inferring",
-          inferRunning: "Inferring and creating comparison",
-          resetting: "Resetting",
-          running: "Creating",
-          done: "Done",
-          resetDone: "Confirmation reset",
-          error: "Error",
-        },
-        metrics: {
-          changedTrips: "Changed trips",
-          candidateTrips: "Candidate trips",
-          beforeKm: "Before avg distance",
-          afterKm: "After avg distance",
-        },
-        links: {
-          html: "HTML",
-          changedCsv: "Changed CSV",
-          ruleJson: "Rule JSON",
-          summaryJson: "Summary JSON",
-        },
-        empty: { comparison: "Comparison results will appear here" },
-        map: {
-          defaultLabel: "Estimated point",
-          iframeTitle: "Google Maps for the estimated point",
-          comparisonTitle: "Pseudo people-flow comparison",
-        },
-        aria: { purposeLegend: "Purpose code legend" },
-        errors: {
-          noScenario: "Enter scenario text.",
-        },
-      },
-    };
-
-    function cloneData(data) {
-      return JSON.parse(JSON.stringify(data));
-    }
-
-    function t(key) {
-      return key.split(".").reduce((value, part) => value && value[part], I18N[currentLanguage]) || key;
-    }
-
-    const PLACE_TRANSLATIONS = [
-      ["千葉駅", "Chiba Station"],
-      ["千葉駅前", "Chiba Station area"],
-      ["千葉中央駅", "Chiba-Chuo Station"],
-      ["千葉中央駅周辺", "Chiba-Chuo Station area"],
-      ["蘇我駅", "Soga Station"],
-      ["蘇我駅前", "Soga Station area"],
-      ["柏の葉キャンパス駅前", "Kashiwanoha-campus Station area"],
-      ["データ内高密度目的地クラスタ", "High-density destination cluster in the data"],
-      ["アメリカ", "United States"],
-      ["米国", "United States"],
-    ];
-
-    function localizeTargetLabel(label) {
-      const text = String(label || "").trim();
-      const match = PLACE_TRANSLATIONS.find(([ja, en]) => text === ja || text === en);
-      if (!match) return text;
-      return currentLanguage === "en" ? match[1] : match[0];
-    }
-
-    function localizeTimeWindow(value) {
-      const text = String(value || "").trim();
-      if (text.toLowerCase() === "all" || text === "全日" || text === "終日") {
-        return currentLanguage === "en" ? "All" : "終日";
-      }
-      return text;
-    }
-
-    function renderLinks(files) {
-      latestFiles = files;
-      $("links").innerHTML = [
-        [t("links.html"), files.comparison_html],
-        [t("links.changedCsv"), files.changed_csv],
-        [t("links.ruleJson"), files.rule_json],
-        [t("links.summaryJson"), files.summary_json],
-      ].map(([label, href]) => `<a href="${href}" target="_blank" rel="noreferrer">${label}</a>`).join("");
-    }
-
-    function applyLanguage() {
-      document.documentElement.lang = currentLanguage;
-      document.title = t("app.title");
-      document.querySelectorAll("[data-i18n]").forEach((node) => {
-        node.textContent = t(node.dataset.i18n);
-      });
-      document.querySelectorAll("[data-i18n-title]").forEach((node) => {
-        node.title = t(node.dataset.i18nTitle);
-      });
-      document.querySelectorAll("[data-i18n-aria]").forEach((node) => {
-        node.setAttribute("aria-label", t(node.dataset.i18nAria));
-      });
-      languageButton.textContent = currentLanguage === "ja" ? "EN" : "日本語";
-      languageButton.setAttribute("aria-label", t("actions.switchLanguage"));
-      $("targetMap").title = t("map.iframeTitle");
-      $("comparisonFrame").title = t("map.comparisonTitle");
-      status.textContent = t(`status.${statusKey}`);
-      $("targetLabel").value = localizeTargetLabel($("targetLabel").value);
-      $("timeWindow").value = localizeTimeWindow($("timeWindow").value);
-      if (latestFiles) renderLinks(latestFiles);
-      updateTargetMap();
-    }
-
-    function setBusy(nextStatusKey, busy) {
-      statusKey = nextStatusKey;
-      status.textContent = t(`status.${statusKey}`);
+    function setBusy(message, busy) {
+      status.textContent = message;
       runButton.disabled = busy;
       inferButton.disabled = busy;
-      inferRunButton.disabled = busy;
-      resetButton.disabled = busy;
+      sendMessageButton.disabled = busy;
+      newSessionButton.disabled = busy;
+      applyDialogueButton.disabled = busy || !(latestDialogueDraft && latestDialogueDraft.ready);
     }
 
     function setError(message) {
@@ -923,20 +1089,250 @@ INDEX_HTML = """<!doctype html>
       };
     }
 
-    function updateTargetMap() {
-      const lonText = $("targetLon").value.trim();
-      const latText = $("targetLat").value.trim();
-      const lon = Number(lonText);
-      const lat = Number(latText);
-      const label = $("targetLabel").value || t("map.defaultLabel");
+    function displayValue(value, suffix = "") {
+      if (Array.isArray(value)) {
+        return value.length ? value.join("、") : "未設定";
+      }
+      if (value === null || value === undefined || value === "") {
+        return "未設定";
+      }
+      return `${value}${suffix}`;
+    }
 
-      if (!lonText || !latText || !Number.isFinite(lon) || !Number.isFinite(lat)) {
+    function appendPlanItem(label, value) {
+      const item = document.createElement("div");
+      item.className = "plan-item";
+      const heading = document.createElement("span");
+      heading.textContent = label;
+      const content = document.createElement("strong");
+      content.textContent = value;
+      item.append(heading, content);
+      $("planSummary").appendChild(item);
+    }
+
+    function renderDialogue(session) {
+      dialogueSessionId = session.id;
+      const chatLog = $("chatLog");
+      chatLog.replaceChildren();
+      (session.messages || []).forEach((message) => {
+        const node = document.createElement("div");
+        node.className = `chat-message ${message.role === "user" ? "user" : "assistant"}`;
+        const text = document.createElement("div");
+        text.textContent = message.content;
+        node.appendChild(text);
+        const appliedUpdates = message.applied_updates || [];
+        const appliedAssumptions = message.applied_assumptions || [];
+        if (appliedUpdates.length || appliedAssumptions.length || message.turn_type === "clarification" || message.turn_type === "confirmation") {
+          const updateBox = document.createElement("div");
+          updateBox.className = "message-updates";
+          const updateLabel = document.createElement("strong");
+          if (message.turn_type === "clarification") {
+            updateLabel.textContent = "今回は計画条件を変更していません";
+          } else if (message.turn_type === "confirmation") {
+            updateLabel.textContent = "計画条件を確定しました";
+          } else {
+            updateLabel.textContent = "今回反映した計画条件";
+          }
+          updateBox.appendChild(updateLabel);
+          appliedUpdates.forEach((item) => {
+            const row = document.createElement("div");
+            row.className = "message-update-row";
+            row.textContent = `${item.label}（${item.field}）= ${item.value}`;
+            updateBox.appendChild(row);
+          });
+          appliedAssumptions.forEach((item) => {
+            const row = document.createElement("div");
+            row.className = "message-update-row";
+            row.textContent = `参考推定（${item.field}）= ${item.value} / ${item.reason || "Web検索結果に基づく"}`;
+            updateBox.appendChild(row);
+          });
+          node.appendChild(updateBox);
+        }
+        const sources = message.web_sources || [];
+        if (message.web_search_used || sources.length) {
+          const sourceBox = document.createElement("div");
+          sourceBox.className = "web-sources";
+          const label = document.createElement("div");
+          label.textContent = `${message.web_search_provider || "Web"}検索で確認`;
+          sourceBox.appendChild(label);
+          sources.forEach((source) => {
+            const link = document.createElement("a");
+            link.href = source.url;
+            link.target = "_blank";
+            link.rel = "noreferrer";
+            link.textContent = source.title || source.url;
+            sourceBox.appendChild(link);
+          });
+          node.appendChild(sourceBox);
+        }
+        if (message.search_entry_point) {
+          const entryPoint = document.createElement("div");
+          entryPoint.className = "search-entry-point";
+          entryPoint.innerHTML = message.search_entry_point;
+          node.appendChild(entryPoint);
+        }
+        if (message.warning) {
+          const warning = document.createElement("div");
+          warning.className = "web-sources";
+          warning.textContent = message.warning;
+          node.appendChild(warning);
+        }
+        chatLog.appendChild(node);
+      });
+      chatLog.scrollTop = chatLog.scrollHeight;
+
+      const plan = session.plan;
+      $("phaseBadge").textContent = session.phase_label || "計画整理中";
+      $("planSummary").replaceChildren();
+      appendPlanItem("対象地", displayValue(plan.site.name));
+      appendPlanItem("現状", displayValue(plan.site.existing_state));
+      appendPlanItem("制約", displayValue(plan.site.constraints));
+      appendPlanItem("施設種別", displayValue(plan.intent.facility_type));
+      appendPlanItem("用途", displayValue(plan.intent.candidate_uses));
+      appendPlanItem("想定利用者", displayValue(plan.intent.target_users));
+      appendPlanItem("階数", displayValue(plan.scale.floors, "階"));
+      appendPlanItem("床面積", displayValue(plan.scale.floor_area_sqm, "㎡"));
+      appendPlanItem("収容人数", displayValue(plan.scale.capacity, "人"));
+      appendPlanItem("曜日・時間帯", [plan.operations.days, plan.operations.time_window].filter(Boolean).join(" / ") || "未設定");
+      appendPlanItem("接続条件", displayValue(plan.connections.items));
+      appendPlanItem("比較条件", displayValue(plan.scenario.comparison_request));
+
+      const assumptions = session.assumptions || [];
+      if (assumptions.length) {
+        $("assumptionBox").textContent = `LLMの仮定: ${assumptions.map((item) => `${item.field}=${item.value}（${item.status === "confirmed" ? "確認済み" : "要確認"}）`).join(" / ")}`;
+      } else {
+        $("assumptionBox").textContent = "LLMの仮定はまだありません。推定値は確定情報と分けて表示します。";
+      }
+
+      const modeLabels = {
+        enabled: session.external_search_enabled
+          ? `Geminiと対話中（必要時にTavily検索 / このセッション ${session.web_search_count || 0} 回・${session.web_search_credits_used || 0}クレジット）`
+          : (session.web_search_provider === "Google"
+            ? `Geminiと対話中（必要時にGoogle検索 / 検索 ${session.web_search_count || 0} 回）`
+            : "Geminiと対話中（Tavily未設定または無効・Web検索なし）"),
+        fallback: "Geminiに接続できないためルールベースで継続中",
+        missing_key: "GEMINI_API_KEY未設定のためルールベースで動作中",
+        rule_based: "高速対話モード（具体案を即時作成）",
+      };
+      $("chatMode").textContent = `${modeLabels[session.llm_status] || "対話中"} / セッション ${session.id.slice(0, 8)}`;
+
+      latestDialogueDraft = session.simulation_draft || null;
+      applyDialogueButton.disabled = !(latestDialogueDraft && latestDialogueDraft.ready);
+    }
+
+    async function applyDialogueToSimulation() {
+      const draft = latestDialogueDraft;
+      if (!draft || !draft.ready || !draft.scenario_text) {
+        setError("計画条件を確定してから人流解析へ反映してください。");
+        return;
+      }
+      setError("");
+      setBusy("対象地の座標を取得中", true);
+      $("scenarioText").value = draft.scenario_text;
+      if (draft.target_label) {
+        $("targetLabel").value = draft.target_label;
+      }
+      if ((draft.affected_purposes || []).length) {
+        $("affectedPurposes").value = draft.affected_purposes.join(",");
+      }
+      if (draft.time_window) {
+        $("timeWindow").value = draft.time_window;
+      }
+      if (draft.affected_ratio) {
+        $("affectedRatio").value = Math.round(draft.affected_ratio * 100);
+      }
+      if (draft.strength) {
+        $("strength").value = Number(draft.strength).toFixed(2);
+      }
+      if (draft.influence_radius_km) {
+        $("influenceRadius").value = Number(draft.influence_radius_km).toFixed(1);
+      }
+      try {
+        if (draft.target_label) {
+          const location = await requestJSON("/api/geocode", { label: draft.target_label });
+          $("targetLon").value = Number(location.target_lon).toFixed(6);
+          $("targetLat").value = Number(location.target_lat).toFixed(6);
+        }
+        updateTargetMap();
+        status.textContent = "構造化された計画条件を人流解析へ反映しました";
+      } catch (error) {
+        $("targetLon").value = "";
+        $("targetLat").value = "";
+        updateTargetMap();
+        setError(error.message);
+      } finally {
+        setBusy(errorBox.textContent ? "座標取得エラー" : "待機中", false);
+      }
+    }
+
+    function appendChatMessage(role, content, extraClass = "") {
+      const node = document.createElement("div");
+      node.className = `chat-message ${role} ${extraClass}`.trim();
+      node.textContent = content;
+      $("chatLog").appendChild(node);
+      $("chatLog").scrollTop = $("chatLog").scrollHeight;
+      return node;
+    }
+
+    async function createDialogueSession() {
+      setBusy("対話を準備中", true);
+      setError("");
+      try {
+        const session = await requestJSON("/api/sessions", { use_llm: true });
+        renderDialogue(session);
+        $("chatInput").value = "";
+        setBusy("待機中", false);
+      } catch (error) {
+        setBusy("エラー", false);
+        setError(error.message);
+      }
+    }
+
+    async function sendDialogueMessage() {
+      const message = $("chatInput").value.trim();
+      if (!message || !dialogueSessionId) return;
+      setBusy("具体案を整理中", true);
+      setError("");
+      $("chatInput").value = "";
+      appendChatMessage("user", message);
+      const pendingMessage = appendChatMessage("assistant", "入力内容から具体案を組み立てています…", "pending");
+      let elapsedSeconds = 0;
+      const progressTimer = window.setInterval(() => {
+        elapsedSeconds += 1;
+        if (elapsedSeconds >= 6) {
+          status.textContent = "具体案を整理中";
+          pendingMessage.textContent = "Geminiの応答を待っています。必要な場合はWebも確認しています…";
+        }
+      }, 1000);
+      try {
+        const session = await requestJSON(`/api/sessions/${dialogueSessionId}/messages`, { message });
+        renderDialogue(session);
+      } catch (error) {
+        pendingMessage.textContent = "応答を取得できませんでした。もう一度送信してください。";
+        pendingMessage.classList.remove("pending");
+        $("chatInput").value = message;
+        setError(error.message);
+      } finally {
+        window.clearInterval(progressTimer);
+        setBusy(errorBox.textContent ? "エラー" : "待機中", false);
+      }
+    }
+
+    function updateTargetMap() {
+      const lonValue = $("targetLon").value.trim();
+      const latValue = $("targetLat").value.trim();
+      const label = $("targetLabel").value || "推定地点";
+
+      if (!lonValue || !latValue) {
         $("targetMap").removeAttribute("src");
         $("mapLabel").textContent = "-";
         $("mapCoords").textContent = "-";
         $("mapLink").href = "#";
         return;
       }
+      const lon = Number(lonValue);
+      const lat = Number(latValue);
+      if (!Number.isFinite(lon) || !Number.isFinite(lat)) return;
 
       const query = encodeURIComponent(`${lat},${lon}`);
       $("targetMap").src = `https://maps.google.com/maps?q=${query}&z=16&output=embed`;
@@ -945,23 +1341,17 @@ INDEX_HTML = """<!doctype html>
       $("mapLink").href = `https://www.google.com/maps/search/?api=1&query=${query}`;
     }
 
-    function fillConfirmation(data) {
-      $("targetLabel").value = localizeTargetLabel(data.target_label || "");
-      $("targetLon").value = Number(data.target_lon).toFixed(6);
-      $("targetLat").value = Number(data.target_lat).toFixed(6);
-      $("affectedRatio").value = data.affected_ratio_percent || Math.round((data.affected_ratio || 0.08) * 100);
-      $("timeWindow").value = localizeTimeWindow(data.time_window || "all");
-      $("affectedPurposes").value = (data.affected_purposes || []).join(",");
-      $("strength").value = Number(data.strength || 0.28).toFixed(2);
-      $("influenceRadius").value = Number(data.influence_radius_km || 2).toFixed(1);
-      updateTargetMap();
-    }
-
     function fillDefaults(data) {
       $("scenarioText").value = data.scenario_text || $("scenarioText").value;
-      confirmationDefaults = cloneData(data);
-      fillConfirmation(confirmationDefaults);
-      resetButton.disabled = false;
+      $("targetLabel").value = data.target_label || "";
+      $("targetLon").value = Number(data.target_lon).toFixed(6);
+      $("targetLat").value = Number(data.target_lat).toFixed(6);
+      $("affectedRatio").value = data.affected_ratio_percent || Math.round((data.affected_ratio || 0.25) * 100);
+      $("timeWindow").value = data.time_window || "all";
+      $("affectedPurposes").value = (data.affected_purposes || []).join(",");
+      $("strength").value = Number(data.strength || 0.82).toFixed(2);
+      $("influenceRadius").value = Number(data.influence_radius_km || 1.5).toFixed(1);
+      updateTargetMap();
     }
 
     function ollamaWarning(data) {
@@ -969,7 +1359,7 @@ INDEX_HTML = """<!doctype html>
     }
 
     function formatNumber(value) {
-      return Number(value).toLocaleString(currentLanguage === "ja" ? "ja-JP" : "en-US");
+      return Number(value).toLocaleString("ja-JP");
     }
 
     function updateResults(data) {
@@ -979,102 +1369,74 @@ INDEX_HTML = """<!doctype html>
       $("beforeKm").textContent = `${Number(summary.avg_distance_to_target_before_km).toFixed(2)} km`;
       $("afterKm").textContent = `${Number(summary.avg_distance_to_target_after_km).toFixed(2)} km`;
 
-      renderLinks(data.files);
+      const files = data.files;
+      $("links").innerHTML = [
+        ["HTML", files.comparison_html],
+        ["変更CSV", files.changed_csv],
+        ["ルールJSON", files.rule_json],
+        ["要約JSON", files.summary_json],
+      ].map(([label, href]) => `<a href="${href}" target="_blank" rel="noreferrer">${label}</a>`).join("");
 
       $("emptyState").hidden = true;
       $("comparisonFrame").hidden = false;
-      $("comparisonFrame").src = `${data.files.comparison_html}?t=${Date.now()}`;
+      $("comparisonFrame").src = `${files.comparison_html}?t=${Date.now()}`;
     }
 
     async function loadDefaults() {
-      setBusy("loading", true);
+      setBusy("読み込み中", true);
       setError("");
       try {
         const data = await requestJSON("/api/defaults");
         fillDefaults(data);
-        setBusy("idle", false);
+        setBusy("待機中", false);
       } catch (error) {
-        setBusy("error", false);
+        setBusy("エラー", false);
         setError(error.message);
       }
     }
 
     async function infer() {
-      setBusy("inferring", true);
+      setBusy("推定中", true);
       setError("");
       try {
         const data = await requestJSON("/api/infer", { scenario_text: $("scenarioText").value });
         fillDefaults(data);
-        setBusy("idle", false);
+        setBusy("待機中", false);
         setError(ollamaWarning(data));
       } catch (error) {
-        setBusy("error", false);
+        setBusy("エラー", false);
         setError(error.message);
       }
     }
 
     async function run() {
-      setBusy("running", true);
+      setBusy("作成中", true);
       setError("");
       try {
         const data = await requestJSON("/api/run", formPayload());
         updateResults(data);
-        setBusy("done", false);
+        setBusy("完了", false);
       } catch (error) {
-        setBusy("error", false);
+        setBusy("エラー", false);
         setError(error.message);
       }
     }
 
-    async function inferAndRun() {
-      setBusy("inferRunning", true);
-      setError("");
-      try {
-        const inferred = await requestJSON("/api/infer", { scenario_text: $("scenarioText").value });
-        fillDefaults(inferred);
-        setBusy("inferRunning", true);
-        const data = await requestJSON("/api/run", formPayload());
-        updateResults(data);
-        setBusy("done", false);
-        setError(ollamaWarning(inferred));
-      } catch (error) {
-        setBusy("error", false);
-        setError(error.message);
-      }
-    }
-
-    async function resetConfirmation() {
-      const scenarioText = $("scenarioText").value.trim();
-      setBusy("resetting", true);
-      setError("");
-      try {
-        const data = scenarioText
-          ? await requestJSON("/api/infer", { scenario_text: scenarioText })
-          : await requestJSON("/api/defaults");
-        fillDefaults(data);
-        setBusy("resetDone", false);
-        setError(ollamaWarning(data));
-      } catch (error) {
-        if (confirmationDefaults) fillConfirmation(confirmationDefaults);
-        setBusy("error", false);
-        setError(error.message || t("errors.noScenario"));
-      }
-    }
-
-    languageButton.addEventListener("click", () => {
-      currentLanguage = currentLanguage === "ja" ? "en" : "ja";
-      localStorage.setItem("ppflowLanguage", currentLanguage);
-      applyLanguage();
-    });
     inferButton.addEventListener("click", infer);
-    inferRunButton.addEventListener("click", inferAndRun);
-    resetButton.addEventListener("click", resetConfirmation);
     runButton.addEventListener("click", run);
+    sendMessageButton.addEventListener("click", sendDialogueMessage);
+    newSessionButton.addEventListener("click", createDialogueSession);
+    applyDialogueButton.addEventListener("click", applyDialogueToSimulation);
+    $("chatInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        sendDialogueMessage();
+      }
+    });
     ["targetLabel", "targetLon", "targetLat"].forEach((id) => {
       $(id).addEventListener("input", updateTargetMap);
     });
-    applyLanguage();
-    loadDefaults();
+    loadDefaults().then(createDialogueSession);
   </script>
 </body>
 </html>
@@ -1085,30 +1447,81 @@ class AppHandler(BaseHTTPRequestHandler):
     server_version = "PPFlowWeb/0.1"
 
     def do_GET(self) -> None:
-        request_path = urlparse(self.path).path
-        if request_path == "/":
-            self.send_html(INDEX_HTML)
-            return
-        if request_path == "/api/defaults":
-            self.send_json(infer_payload(default_scenario_text(), use_llm=False))
-            return
-        if request_path.startswith("/output/"):
-            self.send_output_file(request_path.removeprefix("/output/"))
-            return
-        self.send_error(HTTPStatus.NOT_FOUND)
+        try:
+            request_path = urlparse(self.path).path
+            if request_path == "/":
+                self.send_html(INDEX_HTML)
+                return
+            if request_path == "/api/defaults":
+                self.send_json(infer_payload(default_scenario_text(), use_llm=False))
+                return
+            parts = request_path.strip("/").split("/")
+            if len(parts) == 3 and parts[:2] == ["api", "sessions"]:
+                self.send_json(DIALOGUE_SESSIONS.get(parts[2]))
+                return
+            if request_path.startswith("/output/"):
+                self.send_output_file(request_path.removeprefix("/output/"))
+                return
+            self.send_error(HTTPStatus.NOT_FOUND)
+        except KeyError as exc:
+            self.send_json({"error": str(exc.args[0])}, status=HTTPStatus.NOT_FOUND)
+        except Exception as exc:
+            traceback.print_exc()
+            self.send_json({"error": str(exc)}, status=HTTPStatus.BAD_REQUEST)
 
     def do_POST(self) -> None:
         try:
-            if self.path == "/api/infer":
+            request_path = urlparse(self.path).path
+            if request_path == "/api/sessions":
+                payload = self.read_json()
+                requested_llm = bool(payload.get("use_llm", True))
+                configured = bool(WEB_GEMINI_API_KEY)
+                dialogue_enabled = WEB_LLM_ENABLED and requested_llm and configured
+                initial_status = None
+                if WEB_LLM_ENABLED and requested_llm and not configured:
+                    initial_status = "missing_key"
+                self.send_json(
+                    DIALOGUE_SESSIONS.create(
+                        dialogue_enabled,
+                        llm_model=WEB_GEMINI_MODEL,
+                        web_search_enabled=WEB_GEMINI_SEARCH_ENABLED,
+                        external_search_enabled=WEB_TAVILY_SEARCH_ENABLED,
+                        initial_status=initial_status,
+                    )
+                )
+                return
+            if request_path == "/api/geocode":
+                payload = self.read_json()
+                self.send_json(geocode_payload(str(payload.get("label") or "")))
+                return
+            parts = request_path.strip("/").split("/")
+            if len(parts) == 4 and parts[:2] == ["api", "sessions"] and parts[3] == "messages":
+                payload = self.read_json()
+                session = DIALOGUE_SESSIONS.add_message(
+                    parts[2],
+                    str(payload.get("message") or ""),
+                    gemini_api_key=WEB_GEMINI_API_KEY,
+                    gemini_model=WEB_GEMINI_MODEL,
+                    gemini_timeout=WEB_GEMINI_TIMEOUT,
+                    enable_web_search=WEB_GEMINI_SEARCH_ENABLED,
+                    tavily_api_key=WEB_TAVILY_API_KEY,
+                    tavily_timeout=WEB_TAVILY_TIMEOUT,
+                    enable_external_search=WEB_TAVILY_SEARCH_ENABLED,
+                )
+                self.send_json(session)
+                return
+            if request_path == "/api/infer":
                 payload = self.read_json()
                 scenario_text = str(payload.get("scenario_text") or default_scenario_text()).strip()
                 self.send_json(infer_payload(scenario_text, use_llm=WEB_LLM_ENABLED))
                 return
-            if self.path == "/api/run":
+            if request_path == "/api/run":
                 payload = self.read_json()
                 self.send_json(run_pipeline(payload))
                 return
             self.send_error(HTTPStatus.NOT_FOUND)
+        except KeyError as exc:
+            self.send_json({"error": str(exc.args[0])}, status=HTTPStatus.NOT_FOUND)
         except Exception as exc:
             traceback.print_exc()
             self.send_json({"error": str(exc)}, status=HTTPStatus.BAD_REQUEST)
@@ -1174,24 +1587,44 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no-llm", action="store_true", help="Disable Ollama inference in the web UI.")
     parser.add_argument("--ollama-url", default=DEFAULT_OLLAMA_URL)
     parser.add_argument("--ollama-model", default=DEFAULT_OLLAMA_MODEL)
-    parser.add_argument("--ollama-timeout", type=float, default=DEFAULT_OLLAMA_TIMEOUT)
-    parser.add_argument("--no-geocode", action="store_true", help="Disable Nominatim geocoding.")
-    parser.add_argument("--geocoder-url", default=DEFAULT_GEOCODER_URL)
-    parser.add_argument("--geocoder-timeout", type=float, default=DEFAULT_GEOCODER_TIMEOUT)
+    parser.add_argument("--ollama-timeout", type=float, default=DEFAULT_WEB_OLLAMA_TIMEOUT)
+    parser.add_argument("--gemini-model", default=DEFAULT_GEMINI_MODEL)
+    parser.add_argument("--gemini-timeout", type=float, default=DEFAULT_GEMINI_TIMEOUT)
+    parser.add_argument("--tavily-timeout", type=float, default=DEFAULT_TAVILY_TIMEOUT)
+    parser.add_argument(
+        "--no-tavily-search",
+        action="store_true",
+        help="Disable Tavily search even when TAVILY_API_KEY is set.",
+    )
+    parser.add_argument(
+        "--web-search",
+        action="store_true",
+        help="Enable Google Search grounding (requires a supported paid Gemini API project).",
+    )
+    parser.add_argument(
+        "--no-web-search",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
     return parser.parse_args()
 
 
 def main() -> None:
-    global WEB_GEOCODE_ENABLED, WEB_GEOCODER_TIMEOUT, WEB_GEOCODER_URL
+    global WEB_GEMINI_API_KEY, WEB_GEMINI_MODEL, WEB_GEMINI_SEARCH_ENABLED, WEB_GEMINI_TIMEOUT
+    global WEB_TAVILY_API_KEY, WEB_TAVILY_SEARCH_ENABLED, WEB_TAVILY_TIMEOUT
     global WEB_LLM_ENABLED, WEB_OLLAMA_MODEL, WEB_OLLAMA_TIMEOUT, WEB_OLLAMA_URL
     args = parse_args()
     WEB_LLM_ENABLED = not args.no_llm
     WEB_OLLAMA_URL = args.ollama_url
     WEB_OLLAMA_MODEL = args.ollama_model
     WEB_OLLAMA_TIMEOUT = args.ollama_timeout
-    WEB_GEOCODE_ENABLED = not args.no_geocode
-    WEB_GEOCODER_URL = args.geocoder_url
-    WEB_GEOCODER_TIMEOUT = args.geocoder_timeout
+    WEB_GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+    WEB_GEMINI_MODEL = args.gemini_model
+    WEB_GEMINI_TIMEOUT = args.gemini_timeout
+    WEB_GEMINI_SEARCH_ENABLED = args.web_search and not args.no_web_search
+    WEB_TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "").strip()
+    WEB_TAVILY_TIMEOUT = args.tavily_timeout
+    WEB_TAVILY_SEARCH_ENABLED = bool(WEB_TAVILY_API_KEY) and not args.no_tavily_search
     try:
         server = ThreadingHTTPServer((args.host, args.port), AppHandler)
     except OSError as exc:
@@ -1200,13 +1633,16 @@ def main() -> None:
     url = f"http://{args.host}:{args.port}"
     print(f"Serving local UI: {url}")
     if WEB_LLM_ENABLED:
-        print(f"Ollama inference: {WEB_OLLAMA_MODEL} at {WEB_OLLAMA_URL}")
+        if WEB_GEMINI_API_KEY:
+            google_search_mode = "automatic" if WEB_GEMINI_SEARCH_ENABLED else "disabled"
+            print(f"Gemini dialogue: {WEB_GEMINI_MODEL} (Google Search: {google_search_mode})")
+            tavily_mode = "automatic / basic" if WEB_TAVILY_SEARCH_ENABLED else "disabled"
+            print(f"External web search: Tavily ({tavily_mode})")
+        else:
+            print("Gemini dialogue: GEMINI_API_KEY is not set; using rule-based fallback")
+        print(f"Simulation-rule Ollama inference: {WEB_OLLAMA_MODEL} at {WEB_OLLAMA_URL}")
     else:
-        print("Ollama inference: disabled")
-    if WEB_GEOCODE_ENABLED:
-        print(f"Geocoding: {WEB_GEOCODER_URL}")
-    else:
-        print("Geocoding: disabled")
+        print("LLM inference: disabled")
     print("Press Ctrl+C to stop.")
     try:
         server.serve_forever()

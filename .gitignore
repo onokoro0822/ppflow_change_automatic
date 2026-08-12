@@ -4,3 +4,7 @@ __pycache__/
 *.pyc
 output/
 input/*.csv
+input/**/*.csv
+tmp/
+docs/progress/~$*
+docs/progress/20260806_修士論文進捗報告_更新版.pptx

@@ -1,0 +1,170 @@
+{"kind":"deck","id":"pr/1hwg6a","name":"Deck"}
+{"kind":"layout","layoutId":"/ppt/slideMasters/slideMaster1.xml","name":"","type":"master","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"body","type":"body","textPreview":"マスター テキストの書式設定 | 第 2 レベル | 第 3 レベル | 第 4 レベル | 第 5 レベル"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout1.xml","name":"タイトル スライド","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout2.xml","name":"タイトルとコンテンツ","type":"obj","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"content placeholder 2","textPreview":"マスター テキストの書式設定 | 第 2 レベル | 第 3 レベル | 第 4 レベル | 第 5 レベル"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout3.xml","name":"セクション見出し","type":"secHead","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"body","type":"body","textPreview":"マスター テキストの書式設定"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout4.xml","name":"2 つのコンテンツ","type":"twoObj","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"content placeholder 2","textPreview":"マスター テキストの書式設定 | 第 2 レベル | 第 3 レベル | 第 4 レベル | 第 5 レベル"},{"name":"content placeholder 3","textPreview":"マスター テキストの書式設定 | 第 2 レベル | 第 3 レベル | 第 4 レベル | 第 5 レベル"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout5.xml","name":"比較","type":"twoTxTwoObj","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"body","type":"body","textPreview":"マスター テキストの書式設定"},{"name":"content placeholder 3","textPreview":"マスター テキストの書式設定 | 第 2 レベル | 第 3 レベル | 第 4 レベル | 第 5 レベル"},{"name":"body","type":"body","textPreview":"マスター テキストの書式設定"},{"name":"content placeholder 5","textPreview":"マスター テキストの書式設定 | 第 2 レベル | 第 3 レベル | 第 4 レベル | 第 5 レベル"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout6.xml","name":"タイトルのみ","type":"titleOnly","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout7.xml","name":"白紙","type":"blank","placeholders":[{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout8.xml","name":"タイトル付きのコンテンツ","type":"objTx","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"content placeholder 2","textPreview":"マスター テキストの書式設定 | 第 2 レベル | 第 3 レベル | 第 4 レベル | 第 5 レベル"},{"name":"body","type":"body","textPreview":"マスター テキストの書式設定"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout9.xml","name":"タイトル付きの図","type":"picTx","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"picture","type":"picture","textPreview":"アイコンをクリックして図を追加"},{"name":"body","type":"body","textPreview":"マスター テキストの書式設定"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout10.xml","name":"タイトルと縦書きテキスト","type":"vertTx","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"body","type":"body","textPreview":"マスター テキストの書式設定 | 第 2 レベル | 第 3 レベル | 第 4 レベル | 第 5 レベル"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"layout","layoutId":"/ppt/slideLayouts/slideLayout11.xml","name":"縦書きタイトルと\n縦書きテキスト","type":"vertTitleAndTx","placeholders":[{"name":"title","type":"title","textPreview":"マスター タイトルの書式設定"},{"name":"body","type":"body","textPreview":"マスター テキストの書式設定 | 第 2 レベル | 第 3 レベル | 第 4 レベル | 第 5 レベル"},{"name":"dateTime","type":"dateTime","textPreview":"2026/7"},{"name":"footer","type":"footer","textPreview":"関本・中居研究室"},{"name":"slideNumber","type":"slideNumber","textPreview":"‹#›"}]}
+{"kind":"slide","id":"sl/y90nupkv","slide":1,"title":"修士論文研究の進捗","textShapes":1}
+{"kind":"textbox","id":"sh/547294r6","slide":1,"name":"タイトル 1","placeholder":"title","text":"修士論文研究の進捗\n名鉄百貨店閉店後の買い物トリップ再配分\n— Pseudo-PFLOWによるBefore / After推定 —","textPreview":"修士論文研究の進捗 | 名鉄百貨店閉店後の買い物トリップ再配分 | — Pseudo-PFLOWによるBefore / After推定 —","textChars":65,"textLines":3,"bbox":[87.18,204.08,935.54,174.82]}
+{"kind":"notes","id":"nt/y90nupkv","slide":1,"text":"[Sources]\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/CURRENT.md\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/20260806_名鉄閉店後の買い物目的地再配分初版.md\n[/Sources]"}
+{"kind":"slide","id":"sl/hwbqtkby","slide":2,"title":"研究の軸を「名鉄への誘引」から「閉店後の再配分」へ変更","textShapes":34}
+{"kind":"textbox","id":"sh/9072xkry","slide":2,"name":"タイトル 1","placeholder":"title","text":"研究の軸を「名鉄への誘引」から「閉店後の再配分」へ変更","textPreview":"研究の軸を「名鉄への誘引」から「閉店後の再配分」へ変更","textChars":27,"textLines":1,"bbox":[21.03,4,1084.14,87.4]}
+{"kind":"textbox","id":"sh/b29kza94","slide":2,"name":"日付プレースホルダー 3","placeholder":"dateTime","text":"2026/8","textPreview":"2026/8","textChars":6,"textLines":1,"bbox":[88,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/a10jqpsj","slide":2,"name":"フッター プレースホルダー 4","placeholder":"footer","text":"関本・中居研究室","textPreview":"関本・中居研究室","textChars":8,"textLines":1,"bbox":[424,667.33,432,38.33]}
+{"kind":"textbox","id":"sh/x4r21kru","slide":2,"name":"スライド番号プレースホルダー 5","placeholder":"slideNumber","text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[904,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/76twva5c","slide":2,"name":"コンテンツ プレースホルダー 2","text":"Pseudo-PFLOWには旧名鉄百貨店への既存の買い物人流がある\nBefore＝営業中、After＝閉店後に他の商業施設へ移行した状態\n静的な典型人流を、現在の施設状態に合わせて更新する問題として扱う","textPreview":"Pseudo-PFLOWには旧名鉄百貨店への既存の買い物人流がある | Before＝営業中、After＝閉店後に他の商業施設へ移行した状態 | 静的な典型人流を、現在の施設状態に合わせて更新する問題として扱う","textChars":101,"textLines":3,"bbox":[44.66,109.33,1217.31,118.37]}
+{"kind":"shape","id":"sh/65kfmpor","slide":2,"name":"Rounded Rectangle 5","bbox":[64.9,242.12,359.09,396.65]}
+{"kind":"shape","id":"sh/gbmxszmt","slide":2,"name":"片側の 2 つの角を丸めた四角形 24","bbox":[64.9,242.12,359.09,61.02]}
+{"kind":"textbox","id":"sh/u94fqp4n","slide":2,"name":"テキスト ボックス 26","text":"方針変更の理由","textPreview":"方針変更の理由","textChars":7,"textLines":1,"bbox":[76.23,259.37,335.95,35.54]}
+{"kind":"shape","id":"sh/onydsbmd","slide":2,"name":"Rounded Rectangle 5","bbox":[450.72,243.39,359.09,396.65]}
+{"kind":"shape","id":"sh/9o7ulg3y","slide":2,"name":"片側の 2 つの角を丸めた四角形 32","bbox":[450.72,243.39,359.09,61.02]}
+{"kind":"textbox","id":"sh/nmpcj6ls","slide":2,"name":"テキスト ボックス 30","text":"実装・検証できたこと","textPreview":"実装・検証できたこと","textChars":10,"textLines":1,"bbox":[556.25,260.72,148.64,35.54]}
+{"kind":"shape","id":"sh/xcrupg3u","slide":2,"name":"Rounded Rectangle 5","bbox":[837.13,242.12,359.09,396.65]}
+{"kind":"shape","id":"sh/id0vylkf","slide":2,"name":"片側の 2 つの角を丸めた四角形 37","bbox":[837.13,242.12,359.09,61.02]}
+{"kind":"textbox","id":"sh/wbidwb29","slide":2,"name":"テキスト ボックス 35","text":"研究の新規性（現時点）","textPreview":"研究の新規性（現時点）","textChars":11,"textLines":1,"bbox":[838.45,259.37,366.64,35.54]}
+{"kind":"textbox","id":"sh/je9crql0","slide":2,"name":"テキスト ボックス 38","text":"既存人流への新規誘引は不自然","textPreview":"既存人流への新規誘引は不自然","textChars":14,"textLines":1,"bbox":[97.74,314.86,303.74,61.39]}
+{"kind":"textbox","id":"sh/ru5cbqd4","slide":2,"name":"テキスト ボックス 39","text":"ミッドランド・200人は初期確認","textPreview":"ミッドランド・200人は初期確認","textChars":16,"textLines":1,"bbox":[97.74,376.26,303.67,61.39]}
+{"kind":"textbox","id":"sh/69wbilcj","slide":2,"name":"テキスト ボックス 40","text":"買い物継続を基本シナリオ化","textPreview":"買い物継続を基本シナリオ化","textChars":13,"textLines":1,"bbox":[97.67,436.35,302.38,61.39]}
+{"kind":"textbox","id":"sh/tw7ud0va","slide":2,"name":"テキスト ボックス 41","text":"名鉄利用者の全数変更へ移行","textPreview":"名鉄利用者の全数変更へ移行","textChars":13,"textLines":1,"bbox":[97.67,499.04,302.38,61.39]}
+{"kind":"textbox","id":"sh/fypcfqdg","slide":2,"name":"テキスト ボックス 43","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[67.46,326.82,43.62,38.78]}
+{"kind":"textbox","id":"sh/exgvmlcv","slide":2,"name":"テキスト ボックス 44","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[67.46,387.1,43.62,38.78]}
+{"kind":"textbox","id":"sh/107uh0v6","slide":2,"name":"テキスト ボックス 45","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[69.48,448.92,39.58,38.78]}
+{"kind":"textbox","id":"sh/gzydovul","slide":2,"name":"テキスト ボックス 46","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[69.48,509.55,39.58,38.78]}
+{"kind":"textbox","id":"sh/v2lc36dw","slide":2,"name":"テキスト ボックス 47","text":"2026/8/6 方針更新","textPreview":"2026/8/6 方針更新","textChars":13,"textLines":1,"bbox":[76.23,562.2,336.45,54.93]}
+{"kind":"textbox","id":"sh/a1cba1wb","slide":2,"name":"テキスト ボックス 48","text":"名鉄50m圏の買い物を抽出","textPreview":"名鉄50m圏の買い物を抽出","textChars":13,"textLines":1,"bbox":[483.32,314.86,303.74,61.39]}
+{"kind":"textbox","id":"sh/0vq1o36x","slide":2,"name":"テキスト ボックス 49","text":"到着＋次の出発地を連続変更","textPreview":"到着＋次の出発地を連続変更","textChars":13,"textLines":1,"bbox":[483.32,376.26,303.67,61.39]}
+{"kind":"textbox","id":"sh/1wzix87i","slide":2,"name":"テキスト ボックス 50","text":"Before / After CSVを生成","textPreview":"Before / After CSVを生成","textChars":21,"textLines":1,"bbox":[483.25,436.35,302.38,61.39]}
+{"kind":"textbox","id":"sh/et8zmto7","slide":2,"name":"テキスト ボックス 51","text":"Mobmapで実表示まで確認","textPreview":"Mobmapで実表示まで確認","textChars":14,"textLines":1,"bbox":[483.25,499.04,302.38,61.39]}
+{"kind":"textbox","id":"sh/zuh0vypc","slide":2,"name":"テキスト ボックス 52","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[453.03,326.82,43.62,38.78]}
+{"kind":"textbox","id":"sh/c76hk361","slide":2,"name":"テキスト ボックス 53","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[453.03,387.1,43.62,38.78]}
+{"kind":"textbox","id":"sh/d8zit87m","slide":2,"name":"テキスト ボックス 54","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[453.03,447.38,39.58,38.78]}
+{"kind":"textbox","id":"sh/q5ozitov","slide":2,"name":"テキスト ボックス 55","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[453.03,508.01,39.58,38.78]}
+{"kind":"textbox","id":"sh/r6x0rypg","slide":2,"name":"テキスト ボックス 56","text":"40 tests / chain integrity: ok","textPreview":"40 tests / chain integrity: ok","textChars":30,"textLines":1,"bbox":[467.3,562.2,336.45,32.31]}
+{"kind":"textbox","id":"sh/jix0niho","slide":2,"name":"テキスト ボックス 61","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[839.36,326.82,43.62,38.78]}
+{"kind":"textbox","id":"sh/ihozedgj","slide":2,"name":"テキスト ボックス 62","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[839.36,387.1,43.62,38.78]}
+{"kind":"textbox","id":"sh/cv2xgzet","slide":2,"name":"テキスト ボックス 75","text":"施設の時間変化を人流へ反映","textPreview":"施設の時間変化を人流へ反映","textChars":13,"textLines":1,"bbox":[879.95,314.86,303.74,61.39]}
+{"kind":"textbox","id":"sh/dwbe94fe","slide":2,"name":"テキスト ボックス 76","text":"個人の全トリップチェーンを更新","textPreview":"個人の全トリップチェーンを更新","textChars":15,"textLines":1,"bbox":[879.95,376.26,303.67,61.39]}
+{"kind":"textbox","id":"sh/2p0fapwr","slide":2,"name":"テキスト ボックス 77","text":"再配分と整合性を同時に検証","textPreview":"再配分と整合性を同時に検証","textChars":13,"textLines":1,"bbox":[879.88,436.35,302.38,61.39]}
+{"kind":"textbox","id":"sh/3q9w3uxc","slide":2,"name":"テキスト ボックス 78","text":"境界依存・時点差を明示する","textPreview":"境界依存・時点差を明示する","textChars":13,"textLines":1,"bbox":[879.88,499.04,302.38,61.39]}
+{"kind":"textbox","id":"sh/ipk7udcn","slide":2,"name":"テキスト ボックス 84","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[840.02,445.55,43.62,38.78]}
+{"kind":"textbox","id":"sh/5sbqpsve","slide":2,"name":"テキスト ボックス 85","text":"○","textPreview":"○","textChars":1,"textLines":1,"bbox":[840.02,505.83,43.62,38.78]}
+{"kind":"notes","id":"nt/hwbqtkby","slide":2,"text":"[Sources]\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/CURRENT.md\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/DECISIONS.md\n- /Users/yuuki/Desktop/syuron/mcd/mtg/20260722/summary.md\n[/Sources]"}
+{"kind":"slide","id":"sl/ofy9wn61","slide":3,"title":"データ範囲と名鉄利用者の暫定抽出条件","textShapes":5}
+{"kind":"textbox","id":"sh/cza94vmx","slide":3,"name":"タイトル 1","placeholder":"title","text":"データ範囲と名鉄利用者の暫定抽出条件","textPreview":"データ範囲と名鉄利用者の暫定抽出条件","textChars":18,"textLines":1,"bbox":[21.03,4,1084.14,87.4]}
+{"kind":"textbox","id":"sh/298ryl4v","slide":3,"name":"日付プレースホルダー 3","placeholder":"dateTime","text":"2026/8","textPreview":"2026/8","textChars":6,"textLines":1,"bbox":[88,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/83ulovat","slide":3,"name":"フッター プレースホルダー 12","placeholder":"footer","text":"関本・中居研究室","textPreview":"関本・中居研究室","textChars":8,"textLines":1,"bbox":[424,667.33,432,38.33]}
+{"kind":"textbox","id":"sh/a5c3ql8z","slide":3,"name":"スライド番号プレースホルダー 14","placeholder":"slideNumber","text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[904,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/pcjqtg36","slide":3,"name":"テキスト ボックス 6","text":"1,977人はサンプルではなく、現在の50m条件に該当した全人物。ただし実測来館者数ではない。","textPreview":"1,977人はサンプルではなく、現在の50m条件に該当した全人物。ただし実測来館者数ではない。","textChars":47,"textLines":1,"bbox":[88,141.3,1084.14,67.86]}
+{"kind":"table","id":"tb/eh0bmdcr","slide":3,"name":"表 5","rows":4,"cols":3,"preview":"項目 | 現在の条件・結果 | 研究上の解釈","bbox":[89.3,256.05,1104,317.5]}
+{"kind":"notes","id":"nt/ofy9wn61","slide":3,"text":"[Sources]\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/CURRENT.md\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/output/trip_chains/summary.json\n- https://pflowwp.sekilab.global/wp-content/uploads/Pseudo-PFLOW-Specification-ver2.01.pdf\n[/Sources]"}
+{"kind":"slide","id":"sl/jyx0ra1s","slide":4,"title":"名鉄の買い物訪問を抽出し、代替先までチェーン単位で再配分","textShapes":21}
+{"kind":"shape","id":"sh/8jq9c72t","slide":4,"name":"Rounded Rectangle 5","bbox":[424,526.34,449.22,142.7]}
+{"kind":"textbox","id":"sh/1cj2d8b6","slide":4,"name":"タイトル 1","placeholder":"title","text":"名鉄の買い物訪問を抽出し、代替先までチェーン単位で再配分","textPreview":"名鉄の買い物訪問を抽出し、代替先までチェーン単位で再配分","textChars":28,"textLines":1,"bbox":[21.03,0,1238.64,95.4]}
+{"kind":"textbox","id":"sh/rm1k7yt4","slide":4,"name":"日付プレースホルダー 3","placeholder":"dateTime","text":"2026/8","textPreview":"2026/8","textChars":6,"textLines":1,"bbox":[88,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/ql8jytsj","slide":4,"name":"フッター プレースホルダー 4","placeholder":"footer","text":"関本・中居研究室","textPreview":"関本・中居研究室","textChars":8,"textLines":1,"bbox":[424,667.33,432,38.33]}
+{"kind":"textbox","id":"sh/doj29oba","slide":4,"name":"スライド番号プレースホルダー 5","placeholder":"slideNumber","text":"4","textPreview":"4","textChars":1,"textLines":1,"bbox":[904,667.33,288,38.33]}
+{"kind":"shape","id":"sh/kfip0zyd","slide":4,"name":"Rounded Rectangle 16","bbox":[450.54,208.52,136.32,26.88]}
+{"kind":"textbox","id":"sh/lgr6t4zy","slide":4,"name":"TextBox 17","text":"入力位置","textPreview":"入力位置","textChars":4,"textLines":1,"bbox":[484.14,207.88,71.04,52.48]}
+{"kind":"shape","id":"sh/je9oruhs","slide":4,"name":"Rounded Rectangle 18","bbox":[706.44,208.92,136.32,26.88]}
+{"kind":"textbox","id":"sh/wrypwzy1","slide":4,"name":"TextBox 19","text":"再配分","textPreview":"再配分","textChars":3,"textLines":1,"bbox":[742.92,207.96,67.2,30.08]}
+{"kind":"shape","id":"sh/bqponuhg","slide":4,"name":"Rounded Rectangle 5","bbox":[903.25,238.33,353.79,130.87]}
+{"kind":"textbox","id":"sh/9o76lkzq","slide":4,"name":"TextBox 7","text":"1：対象抽出","textPreview":"1：対象抽出","textChars":6,"textLines":1,"bbox":[991.99,241.17,153.93,30.03]}
+{"kind":"shape","id":"sh/dknqdkji","slide":4,"name":"Rounded Rectangle 5","bbox":[904.49,373.28,353.79,123.21]}
+{"kind":"textbox","id":"sh/cjep4f2x","slide":4,"name":"TextBox 7","text":"2：代替先選択","textPreview":"2：代替先選択","textChars":7,"textLines":1,"bbox":[955.98,374.31,245.82,30.03]}
+{"kind":"shape","id":"sh/elw76pk3","slide":4,"name":"Rounded Rectangle 5","bbox":[905.88,501.79,353.79,167.25]}
+{"kind":"textbox","id":"sh/1o7qhkje","slide":4,"name":"TextBox 7","text":"3：チェーン更新・検証","textPreview":"3：チェーン更新・検証","textChars":11,"textLines":1,"bbox":[956.26,504.52,245.82,30.03]}
+{"kind":"textbox","id":"sh/nqp8ju1k","slide":4,"name":"コンテンツ プレースホルダー 2","text":"処理フローと暫定条件","textPreview":"処理フローと暫定条件","textChars":10,"textLines":1,"bbox":[931.02,207.88,296.24,42.48]}
+{"kind":"shape","id":"sh/25wzqtcb","slide":4,"name":"直線矢印コネクタ 14","bbox":[448.61,359.26,58.32,9.45]}
+{"kind":"shape","id":"sh/n650zydw","slide":4,"name":"直線矢印コネクタ 18","bbox":[460.1,455.54,58.6,12.12]}
+{"kind":"shape","id":"sh/03eho3ul","slide":4,"name":"直線矢印コネクタ 21","bbox":[509.25,359.26,14.57,96.28]}
+{"kind":"shape","id":"sh/14nyxovq","slide":4,"name":"直線矢印コネクタ 24","bbox":[531,457.9,58.6,12.12]}
+{"kind":"shape","id":"sh/e1wzmtcf","slide":4,"name":"直線矢印コネクタ 25","bbox":[492.71,290.16,10.05,64.13]}
+{"kind":"shape","id":"sh/f25gvyd0","slide":4,"name":"直線矢印コネクタ 28","bbox":[473.42,415.47,6.23,40.07]}
+{"kind":"shape","id":"sh/twnitsne","slide":4,"name":"直線矢印コネクタ 31","bbox":[698.96,360.79,58.32,9.45]}
+{"kind":"shape","id":"sh/8vehknmt","slide":4,"name":"直線矢印コネクタ 33","bbox":[710.45,457.06,58.6,12.12]}
+{"kind":"shape","id":"sh/7u50ri58","slide":4,"name":"直線矢印コネクタ 34","bbox":[759.6,360.79,14.57,96.28]}
+{"kind":"shape","id":"sh/6tczid4n","slide":4,"name":"直線矢印コネクタ 35","bbox":[781.35,459.42,58.6,12.12]}
+{"kind":"shape","id":"sh/ls3yp8n2","slide":4,"name":"直線矢印コネクタ 36","bbox":[743.06,291.69,10.05,64.13]}
+{"kind":"shape","id":"sh/kruhg3mx","slide":4,"name":"直線矢印コネクタ 37","bbox":[723.78,416.99,6.23,40.07]}
+{"kind":"shape","id":"sh/jqlgni5c","slide":4,"name":"直線矢印コネクタ 38","bbox":[735.03,368.73,5.68,43.43]}
+{"kind":"textbox","id":"sh/tsrqlc7u","slide":4,"name":"コンテンツ プレースホルダー 2","text":"対象者は買い物を継続すると仮定し、観測訪問数と距離を使う暫定Huff型重みで代替先を選択する。","textPreview":"対象者は買い物を継続すると仮定し、観測訪問数と距離を使う暫定Huff型重みで代替先を選択する。","textChars":47,"textLines":1,"bbox":[35.21,114.35,1149.03,42.48]}
+{"kind":"textbox","id":"sh/5ony1oj6","slide":4,"name":"コンテンツ プレースホルダー 2","text":"対象：旧・名鉄百貨店本店　暫定代表点50m","textPreview":"対象：旧・名鉄百貨店本店　暫定代表点50m","textChars":21,"textLines":1,"bbox":[5.59,202.79,419.58,42.48]}
+{"kind":"shape","id":"sh/18nu50nu","slide":4,"name":"右矢印 41","bbox":[633.43,375.78,37.36,19.19]}
+{"kind":"textbox","id":"sh/0netcvm9","slide":4,"name":"Rounded Rectangle 5","text":"Huff型の確率で代替先へ再配分","textPreview":"Huff型の確率で代替先へ再配分","textChars":16,"textLines":1,"bbox":[599.71,533.84,260.59,25.04]}
+{"kind":"textbox","id":"sh/rilczq5s","slide":4,"name":"Rounded Rectangle 5","text":"最低観測30件 / 距離下限300m\n距離指数1.5は暫定\n人物ID・トリップID・seed=42で再現可能","textPreview":"最低観測30件 / 距離下限300m | 距離指数1.5は暫定 | 人物ID・トリップID・seed=42で再現可能","textChars":54,"textLines":3,"bbox":[439.68,566.94,303.24,92.41]}
+{"kind":"textbox","id":"sh/qhcb6l47","slide":4,"name":"Rounded Rectangle 5","text":"目的100・50m以内","textPreview":"目的100・50m以内","textChars":11,"textLines":1,"bbox":[985.45,271.2,260.7,42.48]}
+{"kind":"textbox","id":"sh/dknu10ny","slide":4,"name":"Rounded Rectangle 5","text":"1,986件 / 1,977人","textPreview":"1,986件 / 1,977人","textChars":15,"textLines":1,"bbox":[916.9,319.22,260.7,44.68]}
+{"kind":"textbox","id":"sh/sjut8vmd","slide":4,"name":"Rounded Rectangle 5","text":"1,774候補 → 644地点","textPreview":"1,774候補 → 644地点","textChars":15,"textLines":1,"bbox":[984.42,405.4,260.7,30.03]}
+{"kind":"textbox","id":"sh/3elcv65w","slide":4,"name":"Rounded Rectangle 5","text":"時刻順序違反 0件","textPreview":"時刻順序違反 0件","textChars":9,"textLines":1,"bbox":[984.71,534.55,260.7,75.62]}
+{"kind":"textbox","id":"sh/7ih83mlo","slide":4,"name":"Rounded Rectangle 5","text":"重み＝観測買い物件数 ÷ 距離^1.5","textPreview":"重み＝観測買い物件数 ÷ 距離^1.5","textChars":19,"textLines":1,"bbox":[914.85,442.13,273.53,45.87]}
+{"kind":"textbox","id":"sh/gna9gr25","slide":4,"name":"Rounded Rectangle 5","text":"変更後接続ずれ 0件","textPreview":"変更後接続ずれ 0件","textChars":10,"textLines":1,"bbox":[916.24,615.47,273.53,45.87]}
+{"kind":"textbox","id":"sh/0ba143al","slide":4,"name":"テキスト ボックス 2","text":"※元SQLiteは読取専用、差分CSVのみ出力","textPreview":"※元SQLiteは読取専用、差分CSVのみ出力","textChars":23,"textLines":1,"bbox":[62.36,174,245.58,32.31]}
+{"kind":"image","id":"im/z6947u9c","slide":4,"name":"図 124","alt":"名鉄付近の入力位置図","bbox":[426.8,241.55,195.97,278.29]}
+{"kind":"image","id":"im/k325cjq1","slide":4,"name":"図 125","alt":"再配分結果を重ねたMobmap画面","bbox":[676.09,242.35,196.44,278.29]}
+{"kind":"image","id":"im/l4vmlorm","slide":4,"name":"図 30","alt":"再配分結果を重ねたMobmap画面","bbox":[677.15,243.08,195.97,278.29]}
+{"kind":"image","id":"im/fyxobito","slide":4,"name":"図 8","alt":"名鉄名古屋駅周辺の位置図","bbox":[64.13,234.09,312.9,430.54]}
+{"kind":"notes","id":"nt/jyx0ra1s","slide":4,"text":"[Sources]\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/20260806_名鉄閉店後の買い物目的地再配分初版.md\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/output/facility_closure/meitetsu_nagoya_closure_demo/summary.json\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/facility_closure_reallocation.py\n[/Sources]"}
+{"kind":"slide","id":"sl/i107q5of","slide":5,"title":"1,977人は施設境界ではなく代表点半径に強く依存","textShapes":5}
+{"kind":"textbox","id":"sh/dgbulwnm","slide":5,"name":"タイトル 1","placeholder":"title","text":"1,977人は施設境界ではなく代表点半径に強く依存","textPreview":"1,977人は施設境界ではなく代表点半径に強く依存","textChars":25,"textLines":1,"bbox":[21.03,4,1084.14,87.4]}
+{"kind":"textbox","id":"sh/z2tcnm5s","slide":5,"name":"日付プレースホルダー 3","placeholder":"dateTime","text":"2026/8","textPreview":"2026/8","textChars":6,"textLines":1,"bbox":[88,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/yhkbe1o7","slide":5,"name":"フッター プレースホルダー 4","placeholder":"footer","text":"関本・中居研究室","textPreview":"関本・中居研究室","textChars":8,"textLines":1,"bbox":[424,667.33,432,38.33]}
+{"kind":"textbox","id":"sh/l4bupwny","slide":5,"name":"スライド番号プレースホルダー 5","placeholder":"slideNumber","text":"5","textPreview":"5","textChars":1,"textLines":1,"bbox":[904,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/032tgr6d","slide":5,"name":"テキスト ボックス 6","text":"50mから75mで人数が急増する。目的地座標のクラスタを拾っており、正式な建物・営業区画境界が必要。","textPreview":"50mから75mで人数が急増する。目的地座標のクラスタを拾っており、正式な建物・営業区画境界が必要。","textChars":50,"textLines":1,"bbox":[88,128.48,1084.14,126.02]}
+{"kind":"table","id":"tb/adonexsj","slide":5,"name":"表 7","rows":5,"cols":2,"preview":"抽出半径 | 目的100の人物数と解釈","bbox":[88,269.93,1084.14,381.97]}
+{"kind":"notes","id":"nt/i107q5of","slide":5,"text":"[Sources]\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/CURRENT.md\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/20260806_名鉄閉店後の買い物目的地再配分初版.md\n- https://mds.e-meitetsu.com/event/eigyousyuryogonoosihrase.html\n[/Sources]"}
+{"kind":"slide","id":"sl/x8f69ofe","slide":6,"title":"全1,977人・1,986買い物訪問の再配分を完走","textShapes":5}
+{"kind":"textbox","id":"sh/yhg7epsj","slide":6,"name":"タイトル 1","placeholder":"title","text":"全1,977人・1,986買い物訪問の再配分を完走","textPreview":"全1,977人・1,986買い物訪問の再配分を完走","textChars":25,"textLines":1,"bbox":[21.03,4,1084.14,87.4]}
+{"kind":"textbox","id":"sh/87ipkzal","slide":6,"name":"日付プレースホルダー 3","placeholder":"dateTime","text":"2026/8","textPreview":"2026/8","textChars":6,"textLines":1,"bbox":[88,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/u1kbu1ov","slide":6,"name":"フッター プレースホルダー 12","placeholder":"footer","text":"関本・中居研究室","textPreview":"関本・中居研究室","textChars":8,"textLines":1,"bbox":[424,667.33,432,38.33]}
+{"kind":"textbox","id":"sh/47mt0b6x","slide":6,"name":"スライド番号プレースホルダー 14","placeholder":"slideNumber","text":"6","textPreview":"6","textChars":1,"textLines":1,"bbox":[904,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/7m98ru9g","slide":6,"name":"テキスト ボックス 6","text":"暫定50m条件に該当した全対象者を変更し、644地点への分散とトリップチェーン整合性を確認した。","textPreview":"暫定50m条件に該当した全対象者を変更し、644地点への分散とトリップチェーン整合性を確認した。","textChars":48,"textLines":1,"bbox":[88,141.3,1084.14,67.86]}
+{"kind":"table","id":"tb/snq1sf2l","slide":6,"name":"表 5","rows":4,"cols":3,"preview":"指標 | 検証済み結果 | 解釈・注意","bbox":[89.3,256.05,1104,317.5]}
+{"kind":"notes","id":"nt/x8f69ofe","slide":6,"text":"[Sources]\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/output/facility_closure/meitetsu_nagoya_closure_demo/summary.json\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/output/facility_closure/meitetsu_nagoya_closure_demo/coordinate_changes.csv\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/20260806_名鉄閉店後の買い物目的地再配分初版.md\n[/Sources]"}
+{"kind":"slide","id":"sl/gnmp4jqx","slide":7,"title":"Mobmapで変更対象のBefore / Afterを実表示","textShapes":21}
+{"kind":"shape","id":"sh/na9sz6tk","slide":7,"name":"Rounded Rectangle 5","bbox":[424,526.34,449.22,142.7]}
+{"kind":"textbox","id":"sh/cb2tkvap","slide":7,"name":"タイトル 1","placeholder":"title","text":"Mobmapで変更対象のBefore / Afterを実表示","textPreview":"Mobmapで変更対象のBefore / Afterを実表示","textChars":30,"textLines":1,"bbox":[21.03,0,1238.64,95.4]}
+{"kind":"textbox","id":"sh/ydkbm5sv","slide":7,"name":"日付プレースホルダー 3","placeholder":"dateTime","text":"2026/8","textPreview":"2026/8","textChars":6,"textLines":1,"bbox":[88,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/zedcfa9g","slide":7,"name":"フッター プレースホルダー 4","placeholder":"footer","text":"関本・中居研究室","textPreview":"関本・中居研究室","textChars":8,"textLines":1,"bbox":[424,667.33,432,38.33]}
+{"kind":"textbox","id":"sh/kzmdova1","slide":7,"name":"スライド番号プレースホルダー 5","placeholder":"slideNumber","text":"7","textPreview":"7","textChars":1,"textLines":1,"bbox":[904,667.33,288,38.33]}
+{"kind":"shape","id":"sh/t4z6d8rq","slide":7,"name":"Rounded Rectangle 16","bbox":[450.54,208.52,136.32,26.88]}
+{"kind":"textbox","id":"sh/83q5knq5","slide":7,"name":"TextBox 17","text":"Before","textPreview":"Before","textChars":6,"textLines":1,"bbox":[484.14,207.88,71.04,30.08]}
+{"kind":"shape","id":"sh/61onid8z","slide":7,"name":"Rounded Rectangle 18","bbox":[706.44,208.92,136.32,26.88]}
+{"kind":"textbox","id":"sh/l0f698re","slide":7,"name":"TextBox 19","text":"After","textPreview":"After","textChars":5,"textLines":1,"bbox":[742.92,207.96,67.2,30.08]}
+{"kind":"shape","id":"sh/yxonet83","slide":7,"name":"Rounded Rectangle 5","bbox":[903.25,238.33,353.79,130.87]}
+{"kind":"textbox","id":"sh/wv65c3qx","slide":7,"name":"TextBox 7","text":"1：訪問単位版","textPreview":"1：訪問単位版","textChars":7,"textLines":1,"bbox":[991.99,241.17,153.93,30.03]}
+{"kind":"shape","id":"sh/o3ml8z61","slide":7,"name":"Rounded Rectangle 5","bbox":[904.49,373.28,353.79,123.21]}
+{"kind":"textbox","id":"sh/94v2h476","slide":7,"name":"TextBox 7","text":"2：moving-only版","textPreview":"2：moving-only版","textChars":14,"textLines":1,"bbox":[955.98,374.31,245.82,30.03]}
+{"kind":"shape","id":"sh/zetkbup4","slide":7,"name":"Rounded Rectangle 5","bbox":[905.88,501.79,353.79,167.25]}
+{"kind":"textbox","id":"sh/0z2l4z6p","slide":7,"name":"TextBox 7","text":"3：可視化上の限界","textPreview":"3：可視化上の限界","textChars":9,"textLines":1,"bbox":[956.26,504.52,245.82,30.03]}
+{"kind":"textbox","id":"sh/q903y5on","slide":7,"name":"コンテンツ プレースホルダー 2","text":"Mobmap用CSVの使い分け","textPreview":"Mobmap用CSVの使い分け","textChars":15,"textLines":1,"bbox":[931.02,207.88,296.24,42.48]}
+{"kind":"textbox","id":"sh/e5o32lor","slide":7,"name":"コンテンツ プレースホルダー 2","text":"変更対象だけのCSVを読み込み、Before / Afterを各1,986 objectsとして認識。13:41時点の差分を確認した。","textPreview":"変更対象だけのCSVを読み込み、Before / Afterを各1,986 objectsとして認識。13:41時点の差分を確認した。","textChars":67,"textLines":1,"bbox":[35.21,114.35,1149.03,42.48]}
+{"kind":"textbox","id":"sh/2x8nqp83","slide":7,"name":"コンテンツ プレースホルダー 2","text":"実表示：Before＝青系 / After＝緑〜赤系","textPreview":"実表示：Before＝青系 / After＝緑〜赤系","textChars":26,"textLines":1,"bbox":[5.59,202.79,419.58,42.48]}
+{"kind":"textbox","id":"sh/vm58zi94","slide":7,"name":"Rounded Rectangle 5","text":"変更された移動だけを比較可能","textPreview":"変更された移動だけを比較可能","textChars":14,"textLines":1,"bbox":[599.71,533.84,260.59,25.04]}
+{"kind":"textbox","id":"sh/8jupo3ad","slide":7,"name":"Rounded Rectangle 5","text":"全系列版：各18,152点\n変更対象版：各7,518点\nmoving-only：3,759区間を2点化","textPreview":"全系列版：各18,152点 | 変更対象版：各7,518点 | moving-only：3,759区間を2点化","textChars":51,"textLines":3,"bbox":[439.68,566.94,303.24,92.41]}
+{"kind":"textbox","id":"sh/9k3qx8ry","slide":7,"name":"Rounded Rectangle 5","text":"各7,518点","textPreview":"各7,518点","textChars":7,"textLines":1,"bbox":[985.45,271.2,260.7,42.48]}
+{"kind":"textbox","id":"sh/mxc7mts7","slide":7,"name":"Rounded Rectangle 5","text":"1,986訪問ID・滞在も表示","textPreview":"1,986訪問ID・滞在も表示","textChars":15,"textLines":1,"bbox":[916.9,319.22,260.7,44.68]}
+{"kind":"textbox","id":"sh/7yl8vy9s","slide":7,"name":"Rounded Rectangle 5","text":"各7,518点 / 3,759 ID","textPreview":"各7,518点 / 3,759 ID","textChars":18,"textLines":1,"bbox":[984.42,405.4,260.7,30.03]}
+{"kind":"textbox","id":"sh/sfy907ah","slide":7,"name":"Rounded Rectangle 5","text":"道路・鉄道経路ではない","textPreview":"道路・鉄道経路ではない","textChars":11,"textLines":1,"bbox":[984.71,534.55,260.7,75.62]}
+{"kind":"textbox","id":"sh/obitsrup","slide":7,"name":"Rounded Rectangle 5","text":"各IDはorigin / destinationの2点","textPreview":"各IDはorigin / destinationの2点","textChars":27,"textLines":1,"bbox":[914.85,442.13,273.53,45.87]}
+{"kind":"textbox","id":"sh/betc36tg","slide":7,"name":"Rounded Rectangle 5","text":"リアルタイム観測ではない","textPreview":"リアルタイム観測ではない","textChars":12,"textLines":1,"bbox":[916.24,615.47,273.53,45.87]}
+{"kind":"textbox","id":"sh/dcbud0ra","slide":7,"name":"テキスト ボックス 2","text":"※線はOD直線補間、到着時刻は仮定速度による推定","textPreview":"※線はOD直線補間、到着時刻は仮定速度による推定","textChars":24,"textLines":1,"bbox":[62.36,174,245.58,32.31]}
+{"kind":"image","id":"im/a1ob6l0b","slide":7,"name":"図 124","alt":"Mobmapで確認したBeforeとAfterの実表示画面","bbox":[426.8,241.55,195.97,278.29]}
+{"kind":"image","id":"im/d8bapwzi","slide":7,"name":"図 125","alt":"Mobmapで確認したBeforeとAfterの実表示画面","bbox":[676.09,242.35,196.44,278.29]}
+{"kind":"image","id":"im/c72twbid","slide":7,"name":"図 30","alt":"Mobmapで確認したBeforeとAfterの実表示画面","bbox":[677.15,243.08,195.97,278.29]}
+{"kind":"image","id":"im/2d07qxgv","slide":7,"name":"図 8","alt":"Mobmapで確認したBeforeとAfterの実表示画面","bbox":[64.13,234.09,312.9,430.54]}
+{"kind":"notes","id":"nt/gnmp4jqx","slide":7,"text":"[Sources]\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/output/facility_closure/meitetsu_nagoya_closure_demo/mobmap_changed_trips_display.jpg\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/output/facility_closure/meitetsu_nagoya_closure_demo/Mobmapでの確認方法.md\n- https://mobmap.locationmind.com/doc/\n- https://mobmap.locationmind.com/mm/tour.html\n[/Sources]"}
+{"kind":"slide","id":"sl/fu1gfa1s","slide":8,"title":"次に確定すべきことは「境界」と「現在の代替施設」","textShapes":6}
+{"kind":"textbox","id":"sh/18byd4zy","slide":8,"name":"タイトル 1","placeholder":"title","text":"次に確定すべきことは「境界」と「現在の代替施設」","textPreview":"次に確定すべきことは「境界」と「現在の代替施設」","textChars":24,"textLines":1,"bbox":[21.03,4,1084.14,87.4]}
+{"kind":"textbox","id":"sh/g72x4zyd","slide":8,"name":"コンテンツ プレースホルダー 2","text":"1. 最優先：名鉄利用者の抽出境界\n旧本店の正式な建物・営業区画ポリゴンを取得\n建物内 / ＋50m / ＋100mの件数と混入を比較\n名古屋市外居住者を含めるデータ範囲を確認","textPreview":"1. 最優先：名鉄利用者の抽出境界 | 旧本店の正式な建物・営業区画ポリゴンを取得 | 建物内 / ＋50m / ＋100mの件数と混入を比較 | 名古屋市外居住者を含めるデータ範囲を確認","textChars":88,"textLines":4,"bbox":[63.56,112.72,1104,253.59]}
+{"kind":"textbox","id":"sh/ri9g7uhw","slide":8,"name":"日付プレースホルダー 3","placeholder":"dateTime","text":"2026/8","textPreview":"2026/8","textChars":6,"textLines":1,"bbox":[88,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/6h0fypgb","slide":8,"name":"フッター プレースホルダー 4","placeholder":"footer","text":"関本・中居研究室","textPreview":"関本・中居研究室","textChars":8,"textLines":1,"bbox":[424,667.33,432,38.33]}
+{"kind":"textbox","id":"sh/tkby9kzm","slide":8,"name":"スライド番号プレースホルダー 5","placeholder":"slideNumber","text":"8","textPreview":"8","textChars":1,"textLines":1,"bbox":[904,667.33,288,38.33]}
+{"kind":"textbox","id":"sh/id0fu50z","slide":8,"name":"コンテンツ プレースホルダー 2","text":"2. 次段階：代替先とモデルの妥当性\n1,774候補を現在営業中の商業施設へ対応付け\n距離指数1.5・最低30件・距離下限300mを感度分析\n買い物中止 / オンライン、交通手段、所要時間を分岐\n次回MTGで確認：施設境界、市外データ範囲、外部検証の優先順位","textPreview":"2. 次段階：代替先とモデルの妥当性 | 1,774候補を現在営業中の商業施設へ対応付け | 距離指数1.5・最低30件・距離下限300mを感度分析 | 買い物中止 / オンライン、交通手段、所要時間を分岐 | 次回MTGで確認：施設境界、市外データ範囲、外部検証の優先順位","textChars":129,"textLines":5,"bbox":[63.56,383.62,1104,269.8]}
+{"kind":"notes","id":"nt/fu1gfa1s","slide":8,"text":"[Sources]\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/NEXT.md\n- /Users/yuuki/Desktop/syuron/ppflow_change_automatic/docs/progress/CURRENT.md\n[/Sources]"}

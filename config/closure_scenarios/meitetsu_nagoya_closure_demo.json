@@ -1,0 +1,45 @@
+{
+  "scenario_id": "meitetsu_nagoya_closure_demo",
+  "name": "名鉄百貨店本店閉店・買い物目的地再配分デモ",
+  "source_facility": {
+    "label": "旧・名鉄百貨店本店付近（暫定抽出範囲）",
+    "longitude": 136.88397984,
+    "latitude": 35.16967402,
+    "radius_m": 50.0,
+    "eligible_trip_purpose_codes": ["100"]
+  },
+  "changed_person_count": null,
+  "changed_person_count_role": "nullは抽出条件に該当する全人物を変更する",
+  "random_seed": 42,
+  "alternative_destinations": {
+    "coordinate_rounding_decimals": 5,
+    "minimum_observed_shopping_trips": 30,
+    "attractiveness_exponent": 1.0,
+    "distance_decay_exponent": 1.5,
+    "minimum_distance_m": 300.0,
+    "selection_method": "observed shopping destination frequency and origin-distance weighted choice"
+  },
+  "chain_update": {
+    "replace_incoming_destination": true,
+    "replace_next_trip_origin_within_analysis_segment": true,
+    "keep_departure_times": true,
+    "keep_transport_modes_provisionally": true,
+    "keep_shopping_purpose": true
+  },
+  "mobmap": {
+    "base_date": "2000-01-01",
+    "export_selected_analysis_segment": true,
+    "note": "Pseudo-PFLOWはODデータのため、Mobmap上の線は実道路軌跡ではなくOD間の補間表示"
+  },
+  "status": "initial_hypothesis_pending_supervisor_review",
+  "sources": {
+    "store_closure": "https://www.meitetsu.co.jp/ir/stock_info/meeting/__icsFiles/afieldfile/2026/05/28/162shosyu_1.pdf",
+    "mobmap_documentation": "https://mobmap.locationmind.com/doc/",
+    "mobmap_csv_rules": "https://mobmap.locationmind.com/mm/tour.html"
+  },
+  "limitations": [
+    "Pseudo-PFLOWに施設IDがないため、代表点50m内の買い物到着を名鉄利用の代理変数とする。",
+    "代替先は施設名ではなく、既存の買い物目的地座標の集積点として推定する。",
+    "変更人数は実測来館者数ではなく、Pseudo-PFLOW上で暫定抽出条件に該当した全人物である。"
+  ]
+}

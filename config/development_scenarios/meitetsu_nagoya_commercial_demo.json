@@ -1,0 +1,36 @@
+{
+  "scenario_id": "meitetsu_nagoya_commercial_demo",
+  "name": "名鉄名古屋駅地区・商業施設目的地置換デモ",
+  "target": {
+    "label": "旧・名鉄百貨店本店付近（暫定代表点）",
+    "longitude": 136.88397984,
+    "latitude": 35.16967402,
+    "address": "愛知県名古屋市中村区名駅一丁目2番1号",
+    "exclude_existing_destination_radius_m": 50.0
+  },
+  "reference_facility_id": "midland_square",
+  "candidate_score_threshold": 1.1,
+  "eligible_trip_purpose_codes": ["100", "200"],
+  "excluded_trip_purpose_codes": ["400"],
+  "target_visitor_count": null,
+  "target_visitor_count_source": "round(sum(estimated_visit_probability for eligible purpose candidates))",
+  "selection_method": "deterministic weighted sampling without replacement",
+  "random_seed": 42,
+  "chain_update": {
+    "replace_incoming_destination": true,
+    "replace_next_trip_origin_within_analysis_segment": true,
+    "keep_departure_times": true,
+    "keep_transport_modes_provisionally": true
+  },
+  "status": "hypothetical_demo_pending_supervisor_review",
+  "notes": [
+    "名古屋駅地区再開発計画は見直し中のため、現行計画の確定敷地・規模を表さない。",
+    "自由行動400は商業利用か判別できないため初版の置換対象から除外する。",
+    "置換人数は自由行動400を除いた買い物・外食候補の期待来訪確率合計から算出する。",
+    "到着時刻がないため営業時間によるハードフィルタは適用しない。"
+  ],
+  "sources": {
+    "former_store_access": "https://www.e-meitetsu.com/mds/access/",
+    "redevelopment_review": "https://www.meitetsu.co.jp/ir/reference/results_briefing/__icsFiles/afieldfile/2026/05/13/kaiken20260515_1.pdf"
+  }
+}

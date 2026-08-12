@@ -1,0 +1,32 @@
+{
+  "facility_id": "midland_square",
+  "name": "ミッドランドスクエア",
+  "role": "商業施設モデルの暫定参照施設",
+  "address": "愛知県名古屋市中村区名駅四丁目7番1号",
+  "representative_point": {
+    "longitude": 136.8852305,
+    "latitude": 35.1698452
+  },
+  "boundary_geojson": "data/reference_facilities/midland_square.geojson",
+  "destination_buffer_m": 50.0,
+  "commercial_purpose_codes": ["100", "200", "400"],
+  "standard_business_hours": {
+    "shops": "11:00-20:00",
+    "restaurants": "11:00-23:00",
+    "note": "一部店舗・施設は異なる"
+  },
+  "official_sources": {
+    "hours": "https://www.midland-square.com/open/",
+    "access": "https://mlh.midland-square.com/access/",
+    "categories": "https://www.midland-square.com/category/"
+  },
+  "boundary_source": {
+    "provider": "OpenStreetMap contributors",
+    "osm_type": "way",
+    "osm_id": 199919504,
+    "url": "https://www.openstreetmap.org/way/199919504",
+    "license": "ODbL 1.0",
+    "retrieved_at": "2026-08-02"
+  },
+  "status": "provisional_until_supervisor_review"
+}

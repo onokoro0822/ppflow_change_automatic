@@ -23,7 +23,7 @@ import urllib.request
 from dataclasses import asdict, dataclass, replace
 from html import escape
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Iterator
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -183,21 +183,19 @@ def read_scenario_text(args: argparse.Namespace) -> str:
     raise FileNotFoundError("Scenario text was not provided and no default scenario file exists.")
 
 
-def load_trips(path: Path) -> list[Trip]:
-    if not path.exists():
-        raise FileNotFoundError(f"Input CSV not found: {path}")
-
-    trips: list[Trip] = []
-    with path.open("r", encoding="utf-8", newline="") as f:
-        reader = csv.reader(f)
-        for line_no, row in enumerate(reader, start=1):
-            if not row:
-                continue
-            if len(row) < len(TRIP_COLUMNS):
-                raise ValueError(f"Line {line_no}: expected 9 columns, got {len(row)}")
-            try:
-                trips.append(
-                    Trip(
+def iter_trips(paths: Iterable[Path]) -> Iterator[Trip]:
+    for path in paths:
+        if not path.exists():
+            raise FileNotFoundError(f"Input CSV not found: {path}")
+        with path.open("r", encoding="utf-8", newline="") as f:
+            reader = csv.reader(f)
+            for line_no, row in enumerate(reader, start=1):
+                if not row:
+                    continue
+                if len(row) < len(TRIP_COLUMNS):
+                    raise ValueError(f"{path.name} line {line_no}: expected 9 columns, got {len(row)}")
+                try:
+                    yield Trip(
                         person_id=row[0],
                         departure_time_sec=int(float(row[1])),
                         origin_lon=float(row[2]),
@@ -208,11 +206,14 @@ def load_trips(path: Path) -> list[Trip]:
                         trip_purpose=row[7],
                         employment_status=row[8],
                     )
-                )
-            except ValueError:
-                if line_no == 1:
-                    continue
-                raise
+                except ValueError:
+                    if line_no == 1:
+                        continue
+                    raise
+
+
+def load_trips(path: Path) -> list[Trip]:
+    trips = list(iter_trips([path]))
 
     if not trips:
         raise ValueError(f"No trips were loaded from {path}")
@@ -234,6 +235,11 @@ def infer_target_from_destinations(trips: list[Trip], grid_size: float = 0.01) -
 
 def infer_target_label(text: str) -> str:
     explicit_places = [
+        ("名鉄百貨店本店", "名鉄百貨店本店"),
+        ("名古屋駅前", "名古屋駅"),
+        ("名古屋駅", "名古屋駅"),
+        ("栄駅前", "栄駅"),
+        ("栄駅", "栄駅"),
         ("千葉駅", "千葉駅"),
         ("千葉駅前", "千葉駅"),
         ("千葉市", "千葉市"),
@@ -248,6 +254,9 @@ def infer_target_label(text: str) -> str:
 
     if "柏の葉キャンパス駅" in text:
         return "柏の葉キャンパス駅前"
+    place_match = re.search(r"([^\s、。]{1,24}(?:駅前|駅|百貨店本店|百貨店))", text)
+    if place_match:
+        return place_match.group(1).removesuffix("前") if place_match.group(1).endswith("駅前") else place_match.group(1)
     if "駅前" in text:
         return "駅前"
     if "商業施設" in text:
