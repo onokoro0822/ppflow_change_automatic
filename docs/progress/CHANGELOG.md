@@ -1,5 +1,10 @@
 # 進捗記録の更新履歴
 
+## 2026-09-30
+
+- `run_pflow_target_arrivals.sh`の出力先を`$PFLOW_HOME/output/calibrated_target/sf<標本率>/`へ変更し、校正JSON・レポートも同じ出力先に置くようにした。従来は`PFLOW_HOME`をSSDにしても内蔵`.local/`へ出力され、全数実行が2%の結果と校正レポートを上書きする状態だった。
+- 完了済み出力先への再実行と、全数出力の内蔵`.local/`への書込みを拒否するようにした。dry-run、拒否条件、既存完了ランの保護を確認した。
+
 ## 2026-09-29
 
 - `nagoya_caluclation/scenario_distributions.py`の推定到着数を読み、既存10ケースからメッシュ倍率と施設capacityを1回で逆算する`pflow_capacity_calibration.py`を追加した。

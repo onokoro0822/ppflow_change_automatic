@@ -611,6 +611,11 @@ PFLOW_HOME=/Volumes/PFLOW_SSD/PFLOW \
   scripts/run_pflow_target_arrivals.sh --sample-factor 1 --skip-compile
 ```
 
+出力は既定で`$PFLOW_HOME/output/calibrated_target/sf<標本率>/`に保存され、校正JSONとレポートも
+同じフォルダの`calibration/`に置かれる。標本率ごとにフォルダが分かれるため、全数実行で2%の結果を
+上書きしない。完了済みの実行がある出力先は再実行を拒否し、全数（`--sample-factor 1`）を内蔵の
+`.local/`へ出力しようとした場合も拒否する。
+
 25,284件ではメッシュ倍率15.681、施設capacity 9,750,000を推定した。2%の単一実行は515件、
 全数換算25,750件で、目標との差+466件・絶対誤差率1.84%だった。capacityだけでは対象行政界の
 需要上限を超えられないため、到達不能な目標は実行前にエラーとする。

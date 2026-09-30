@@ -11,8 +11,9 @@ CALIBRATION_SAMPLE_FACTOR=50
 EXECUTION_SAMPLE_FACTOR=50
 FACILITY_SHARE=0.70
 SEED=42
-OUTPUT_ROOT="$PROJECT_ROOT/.local/pflow/output/calibrated_target"
-CALIBRATION_DIR="$PROJECT_ROOT/.local/pflow/calibration"
+PFLOW_HOME_VALUE="${PFLOW_HOME:-$PROJECT_ROOT/.local/pflow}"
+INTERNAL_ROOT="$PROJECT_ROOT/.local"
+OUTPUT_ROOT=""
 DRY_RUN=0
 SKIP_COMPILE=0
 
@@ -25,7 +26,9 @@ Usage: scripts/run_pflow_target_arrivals.sh [options]
   --sample-factor N                Sample factor for this one execution (default: 50; full=1)
   --facility-share R               Preferred facility share in target mesh (default: 0.70)
   --seed N                         Pseudo-PFLOW seed (default: 42)
+  --pflow-home PATH                Input root (default: $PFLOW_HOME or .local/pflow)
   --output-root PATH               Output root for the single calibrated run
+                                   (default: <pflow-home>/output/calibrated_target/sf<N>)
   --skip-compile                   Reuse compiled Pseudo-PFLOW classes
   --dry-run                        Generate calibration and print execution commands only
 EOF
@@ -39,6 +42,7 @@ while [[ $# -gt 0 ]]; do
     --sample-factor) EXECUTION_SAMPLE_FACTOR="$2"; shift 2 ;;
     --facility-share) FACILITY_SHARE="$2"; shift 2 ;;
     --seed) SEED="$2"; shift 2 ;;
+    --pflow-home) PFLOW_HOME_VALUE="$2"; shift 2 ;;
     --output-root) OUTPUT_ROOT="$2"; shift 2 ;;
     --skip-compile) SKIP_COMPILE=1; shift ;;
     --dry-run) DRY_RUN=1; shift ;;
@@ -47,14 +51,40 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-mkdir -p "$CALIBRATION_DIR" "$OUTPUT_ROOT"
+[[ -d "$PFLOW_HOME_VALUE" ]] || { echo "PFLOW home not found: $PFLOW_HOME_VALUE" >&2; exit 1; }
+PFLOW_HOME_VALUE="$(cd "$PFLOW_HOME_VALUE" && pwd)"
+if [[ -z "$OUTPUT_ROOT" ]]; then
+  # Separate each sample factor so a full run never overwrites the 2% run.
+  OUTPUT_ROOT="$PFLOW_HOME_VALUE/output/calibrated_target/sf$EXECUTION_SAMPLE_FACTOR"
+fi
+mkdir -p "$OUTPUT_ROOT"
 OUTPUT_ROOT="$(cd "$OUTPUT_ROOT" && pwd)"
+
+if [[ "$EXECUTION_SAMPLE_FACTOR" -eq 1 ]]; then
+  case "$OUTPUT_ROOT/" in
+    "$INTERNAL_ROOT"/*)
+      rmdir "$OUTPUT_ROOT" 2>/dev/null || true
+      echo "Refusing full-population output into internal .local; use --pflow-home or --output-root on the SSD." >&2
+      exit 1 ;;
+  esac
+fi
+if [[ "$DRY_RUN" -eq 0 && -f "$OUTPUT_ROOT/calibrated_target/.complete" ]]; then
+  echo "A completed run already exists: $OUTPUT_ROOT/calibrated_target" >&2
+  echo "Choose another --output-root to keep it." >&2
+  exit 1
+fi
+
+# Keep the calibration inputs and report next to the run they describe.
+CALIBRATION_DIR="$OUTPUT_ROOT/calibration"
+mkdir -p "$CALIBRATION_DIR"
+SUMMARY_FILE="$PFLOW_HOME_VALUE/output/capacity_experiment/summary/capacity_sweep_summary.csv"
 SCENARIO_FILE="$CALIBRATION_DIR/calibrated_target.json"
 REPORT_FILE="$CALIBRATION_DIR/calibration_report.json"
 
 calibration_args=(
   "$PROJECT_ROOT/pflow_capacity_calibration.py"
   --demand-json "$DEMAND_JSON"
+  --summary "$SUMMARY_FILE"
   --calibration-sample-factor "$CALIBRATION_SAMPLE_FACTOR"
   --facility-share "$FACILITY_SHARE"
   --output-scenario "$SCENARIO_FILE"
@@ -68,6 +98,7 @@ fi
 run_args=(
   "$PROJECT_ROOT/scripts/run_pflow_capacity_sweep.sh"
   --scenario-file "$SCENARIO_FILE"
+  --pflow-home "$PFLOW_HOME_VALUE"
   --output-root "$OUTPUT_ROOT"
   --sample-factor "$EXECUTION_SAMPLE_FACTOR"
   --seed "$SEED"
