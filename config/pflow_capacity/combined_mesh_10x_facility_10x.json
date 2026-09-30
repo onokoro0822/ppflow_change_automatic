@@ -1,0 +1,16 @@
+{
+  "scenarioId": "combined_mesh_10x_facility_10x",
+  "transition": "SHOPPING",
+  "target": {
+    "meshCode": "52366700",
+    "gcode": "23105"
+  },
+  "meshCapacityMultiplier": 10.0,
+  "injectFacility": true,
+  "facility": {
+    "id": 900000001,
+    "longitude": 136.88397984,
+    "latitude": 35.16967402,
+    "capacity": 100000.0
+  }
+}

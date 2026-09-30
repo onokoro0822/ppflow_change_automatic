@@ -1,0 +1,32 @@
+{
+  "scenario_id": "meitetsu_origin_distribution_commercial",
+  "name": "旧・名鉄百貨店本店跡地・全商業型（出発地分布反映）",
+  "status": "hypothetical_sensitivity_scenario",
+  "facility_use_key": "commercial",
+  "destination_middle_zone": "5",
+  "target": {
+    "label": "旧・名鉄百貨店本店付近（暫定代表点）",
+    "longitude": 136.88397984,
+    "latitude": 35.16967402,
+    "address": "愛知県名古屋市中村区名駅一丁目2番1号",
+    "exclude_existing_destination_radius_m": 50.0
+  },
+  "target_arrival_trip_count": 25284,
+  "target_arrival_trip_count_source": "nagoya_three_development_scenario_distributions.json / all_commercial / commercial / estimated_arrivals",
+  "eligible_trip_purpose_codes": ["100"],
+  "eligible_trip_purpose_label": "買物",
+  "random_seed": 20260909,
+  "chain_update": {
+    "replace_incoming_destination": true,
+    "replace_next_trip_origin_within_analysis_segment": true,
+    "keep_departure_times": true,
+    "keep_transport_modes_provisionally": true,
+    "write_delta_only": true
+  },
+  "notes": [
+    "需要量25,284到着トリップ/日は旧本店売場面積相当54,374平方メートルを全商業用途とした比較用暫定値であり、確定計画ではない。",
+    "出発地分布は名鉄跡地単体の観測値ではなく、到着中ゾーン5の商業用途代理分布を移植する。",
+    "初版のPseudo-PFLOW候補は品質基準適合かつ買物目的100に限定する。",
+    "元SQLiteは変更せず、変更対象OD行と座標差分を別ファイルへ出力する。"
+  ]
+}

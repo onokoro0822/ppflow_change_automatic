@@ -132,6 +132,53 @@ python3 run_prototype.py --yes
 - `comparison_summary.json`: 件数や平均距離などの要約
 - `comparison.html`: ブラウザで開ける前後比較レポート。Leaflet と OpenStreetMap タイルで背景地図を表示します。
 
+## 中京PTから用途別の出発地分布を作る
+
+第6回中京都市圏PT調査のOD集計表から、名鉄名古屋周辺を含む到着中ゾーン5について、
+商業・オフィス・ホテル別の出発中ゾーン分布を作ります。
+
+初回はプロジェクト専用のPython環境を作成します。
+
+```bash
+./setup_analysis_env.command
+```
+
+構築した環境で集計と図表生成を実行します。
+
+```bash
+.venv/bin/python chukyo_pt_origin_distribution.py
+```
+
+出力は`output/chukyo_pt_origin_distribution/`のPNG・SVG・CSV・JSONです。3用途の比較図、
+用途別の個別図、上位15ゾーンの要約表、全ゾーンの縦長表を生成します。別の到着中ゾーンを対象にする場合は
+`--destination-zone`を指定します。複数ゾーンも指定できます。
+
+```bash
+.venv/bin/python chukyo_pt_origin_distribution.py \
+  --destination-zone 5 \
+  --output-dir output/chukyo_pt_origin_distribution
+```
+
+現在の`chukyo_pt_2022_od_purpose_mode_raw.csv`には到着施設列がないため、用途別の目的集合を使う
+暫定的な`purpose_proxy`です。`到着施設`列を含む同形式の明細CSVを入力すると、施設名と目的の両方で
+集計する`destination_facility_and_purpose`へ自動的に切り替わります。出発地は居住地ではなく、
+施設へ向かう直前活動の中ゾーンです。詳しい式と制約は
+[中京PT用途別出発地分布 初版](docs/progress/20260909_中京PT用途別出発地分布初版.md)を参照してください。
+
+## 名鉄跡地のOD差分を生成する
+
+用途別出発地分布を作成後、全商業型25,284到着トリップの初版を実行します。
+
+```bash
+.venv/bin/python meitetsu_origin_distribution_replacement.py
+```
+
+元のSQLiteは変更しません。出力はoutput/meitetsu_origin_distribution_replacement/commercial/に保存し、
+教授説明用のPNG・SVG、選択した到着トリップ、変更対象OD行、座標差分、分布比較、監査JSONを生成します。
+初版は買物目的100を一人一到着まで選び、到着目的地と後続トリップ出発地を名鉄跡地代表点へ変更します。
+詳しい結果と限界は
+[名鉄跡地への出発地分布反映とOD変更 初版](docs/progress/20260909_名鉄跡地OD分布反映初版.md)を参照してください。
+
 ## おすすめプロンプト
 
 入力データは千葉市中央区周辺のトリップが中心なので、しっかり影響を見たい場合は千葉駅、千葉中央駅、蘇我駅などデータに近い地点を指定します。
@@ -518,3 +565,59 @@ Employment status codes:
 - The default destination movement strength is `0.28`, so destinations are not moved all the way to the facility. The default influence radius for a large facility is about `3 km`.
 - `comparison.html` loads OpenStreetMap tiles from the browser. If the browser has no network connection, only points and lines are displayed.
 - `01_make_rule_ollama.py`, `02_apply_scenario.py`, and `03_make_maps.py` are early experiment scripts. Use `run_prototype.py` for the shortest demo path.
+
+## Pseudo-PFLOWキャパシティ感度実験（2026-09-29）
+
+外付けSSD到着前は、Git対象外の`.local/pflow/`へ愛知県の最小入力だけを置いて2%標本を実行する。
+内蔵側の上限は10 GiB、空き下限は20 GiBで、スクリプトが開始前後に検査する。
+
+```bash
+# 取得対象だけ確認してから、愛知県最小入力を取得
+scripts/download_pflow_inputs.sh --scope aichi-minimal --dry-run
+scripts/download_pflow_inputs.sh --scope aichi-minimal
+
+# baseline 1件、または全10件を実行
+scripts/run_pflow_capacity_sweep.sh --scenario baseline
+scripts/run_pflow_capacity_sweep.sh --all --resume
+
+# 事前コンパイル済みの複数ケースを別プロセスで回す場合
+scripts/run_pflow_capacity_sweep.sh --scenario mesh_2x --skip-compile
+
+# 結果を集計
+python3 pflow_capacity_analysis.py \
+  --input-root .local/pflow/output/capacity_experiment \
+  --output-dir .local/pflow/output/capacity_experiment/summary
+```
+
+同一seedのbaselineを2回実行し、207 CSV・31,788,077 bytesの完全一致を確認済みです。
+感度実験では全10ケースの活動数・motif・対象行政界到着が一致し、capacity差分は対象行政界内の
+メッシュ・施設配分だけを変更しました。
+
+### 目標来訪人数からcapacityを一度で逆算する
+
+来訪需要は`../nagoya_caluclation/scenario_distributions.py`で計算され、全商業型25,284件は
+`config/development_scenarios/meitetsu_origin_distribution_commercial.json`へ接続されています。
+既存10ケースからメッシュ選択率と施設選択率を逆算し、1ケースだけ実行するには次を使います。
+
+```bash
+# capacityと実行コマンドだけ確認
+scripts/run_pflow_target_arrivals.sh --dry-run --skip-compile
+
+# 内蔵ディスクで2%を1回実行
+scripts/run_pflow_target_arrivals.sh --skip-compile
+
+# SSD上で全数を1回実行
+PFLOW_HOME=/Volumes/PFLOW_SSD/PFLOW \
+  scripts/run_pflow_target_arrivals.sh --sample-factor 1 --skip-compile
+```
+
+25,284件ではメッシュ倍率15.681、施設capacity 9,750,000を推定した。2%の単一実行は515件、
+全数換算25,750件で、目標との差+466件・絶対誤差率1.84%だった。capacityだけでは対象行政界の
+需要上限を超えられないため、到達不能な目標は実行前にエラーとする。
+
+SSD到着後は`PFLOW_SSD`をAPFSで用意し、`scripts/migrate_pflow_to_ssd.sh`でコピー・照合する。
+その後`PFLOW_HOME=/Volumes/PFLOW_SSD/PFLOW`として、`download_pflow_inputs.sh --scope full-processing`
+をまず`--dry-run`、次に実行する。どの処理も`--delete`は使わず、SSD側の動作確認前に内蔵データを消さない。
+
+scenario JSONは`config/pflow_capacity/`、詳しい設計・データ範囲・勝谷さんへの確認事項は
+[`mcd/mtg/20260924/capacity_experiment_aws_plan.md`](mcd/mtg/20260924/capacity_experiment_aws_plan.md)に記録した。

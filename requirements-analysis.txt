@@ -1,0 +1,2 @@
+matplotlib==3.11.1
+shapely==2.1.2

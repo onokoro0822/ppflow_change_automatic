@@ -1,0 +1,10 @@
+{
+  "scenarioId": "baseline",
+  "transition": "SHOPPING",
+  "target": {
+    "meshCode": "52366700",
+    "gcode": "23105"
+  },
+  "meshCapacityMultiplier": 1.0,
+  "injectFacility": false
+}
