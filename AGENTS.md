@@ -25,3 +25,7 @@ After meaningful implementation, research, or direction changes:
 5. Add newly used papers, meeting notes, or specifications to `SOURCES.md`.
 
 Use Asia/Tokyo dates. Keep completed work, pending work, and hypotheses clearly separated. Do not claim that an implementation or test is complete without verifying it.
+
+## Weekly report
+
+Also log meaningful work in the weekly report at `../weekly_reports/` (the newest `YYYYMMDD.md`, created from `TEMPLATE.md` if missing). See `../AGENTS.md` and `../weekly_reports/README.md` for the format and for how to build the weekly pptx.
