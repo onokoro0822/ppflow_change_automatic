@@ -13,6 +13,11 @@ the Chukyo PT shopping origin distribution:
 3. Facility arrivals that exceed their unit's allocation are released back to
    the location they had in the baseline run (same person and activity row).
 
+Optionally only arrivals whose schedule still works at the facility are
+eligible: Pseudo-PFLOW's TripGenerator departs at ``next.start - distance /
+speed``, so the straight-line trip from the preceding activity must fit in that
+activity's duration and the trip to the next activity in the shopping stay.
+
 Activity rows carry their own location, so moving one shopping activity changes
 both the inbound and the outbound trip. Times, purposes and attributes are kept.
 """
@@ -23,7 +28,7 @@ import hashlib
 import json
 import math
 from collections import Counter, defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Mapping, Sequence
 
@@ -45,6 +50,7 @@ PROJECT_DIR = Path(__file__).resolve().parent
 DEFAULT_PFLOW_HOME = PROJECT_DIR / ".local" / "pflow"
 DEFAULT_OUTPUT_DIR = PROJECT_DIR / "output" / "pflow_combined_origin"
 DEFAULT_SEED = 42
+DEFAULT_FEASIBILITY_SPEED_KMH = 20.0  # pseudo.res.Speed.CAR
 FACILITY_LON_TEXT = "136.883980"
 FACILITY_LAT_TEXT = "35.169674"
 
@@ -66,6 +72,10 @@ class Candidate:
     previous_lat: float
     lon: float
     lat: float
+    previous_duration: int = 0
+    duration: int = 0
+    next_lon: float | None = None
+    next_lat: float | None = None
 
     @property
     def key(self) -> str:
@@ -109,29 +119,48 @@ def check_aligned(calibrated: Sequence[ActivityFile], baseline: Sequence[Activit
 def collect_candidates(files: Sequence[ActivityFile], units: ComparisonUnits) -> list[Candidate]:
     candidates = []
     for file_index, activity_file in enumerate(files):
-        previous_by_person: dict[str, list[str]] = {}
-        for row_index, fields in enumerate(activity_file.rows):
-            person_id = fields[0]
-            previous = previous_by_person.get(person_id)
-            previous_by_person[person_id] = fields
-            if int(fields[6]) != SHOPPING_PURPOSE or previous is None:
+        rows = activity_file.rows
+        for row_index, fields in enumerate(rows):
+            if row_index == 0 or int(fields[6]) != SHOPPING_PURPOSE:
                 continue
+            previous = rows[row_index - 1]
+            if previous[0] != fields[0]:
+                continue  # first activity of this person
             if is_facility(previous):
                 continue  # the preceding activity is already at the facility
+            following = rows[row_index + 1] if row_index + 1 < len(rows) else None
+            if following is not None and following[0] != fields[0]:
+                following = None
             candidates.append(
                 Candidate(
                     file_index=file_index,
                     row_index=row_index,
-                    person_id=person_id,
+                    person_id=fields[0],
                     unit=units.unit_for_gcode(previous[9]),
                     at_facility=is_facility(fields),
                     previous_lon=float(previous[7]),
                     previous_lat=float(previous[8]),
                     lon=float(fields[7]),
                     lat=float(fields[8]),
+                    previous_duration=int(previous[5]),
+                    duration=int(fields[5]),
+                    next_lon=float(following[7]) if following else None,
+                    next_lat=float(following[8]) if following else None,
                 )
             )
     return candidates
+
+
+def fits_schedule_at_facility(candidate: Candidate, speed_kmh: float) -> bool:
+    """True when straight-line trips to and from the facility fit the schedule."""
+    speed = speed_kmh * 1000 / 3600
+    inbound = haversine_m(candidate.previous_lon, candidate.previous_lat, TARGET_LON, TARGET_LAT) / speed
+    if inbound > candidate.previous_duration:
+        return False
+    if candidate.next_lon is None:
+        return True
+    outbound = haversine_m(TARGET_LON, TARGET_LAT, candidate.next_lon, candidate.next_lat) / speed
+    return outbound <= candidate.duration
 
 
 def priority(seed: int, candidate: Candidate) -> int:
@@ -140,13 +169,23 @@ def priority(seed: int, candidate: Candidate) -> int:
 
 
 def select(
-    candidates: Sequence[Candidate], weights: Mapping[str, float], total: int, seed: int
+    candidates: Sequence[Candidate],
+    weights: Mapping[str, float],
+    total: int,
+    seed: int,
+    *,
+    feasibility_speed_kmh: float | None = None,
 ) -> tuple[list[Candidate], dict[str, object]]:
     """Choose `total` arrivals, one per person, following unit weights."""
     by_unit: dict[str, list[Candidate]] = defaultdict(list)
+    excluded = Counter()
     for candidate in candidates:
-        if candidate.unit != OUTSIDE_AICHI:
-            by_unit[candidate.unit].append(candidate)
+        if candidate.unit == OUTSIDE_AICHI:
+            continue
+        if feasibility_speed_kmh and not fits_schedule_at_facility(candidate, feasibility_speed_kmh):
+            excluded["facility" if candidate.at_facility else "other"] += 1
+            continue
+        by_unit[candidate.unit].append(candidate)
     for unit_candidates in by_unit.values():
         # Facility arrivals chosen by the capacity run come first.
         unit_candidates.sort(key=lambda c: (not c.at_facility, priority(seed, c)))
@@ -172,6 +211,8 @@ def select(
         "allocated": allocation,
         "units_without_candidates": sorted(set(weights) - set(by_unit)),
         "shortfall": shortfall,
+        "excluded_by_schedule": dict(excluded),
+        "feasibility_speed_kmh": feasibility_speed_kmh,
     }
     return selected, audit
 
@@ -181,9 +222,18 @@ def apply_selection(
     baseline: Sequence[ActivityFile],
     candidates: Sequence[Candidate],
     selected: Sequence[Candidate],
+    *,
+    start_from_baseline: bool = False,
 ) -> tuple[list[ActivityFile], dict[str, int]]:
+    """Write the selection onto the calibrated run, or onto the baseline run.
+
+    Starting from the baseline keeps only the facility moves: side effects of the
+    capacity run (other shops in the boosted mesh, random-number cascades) are
+    dropped, so the scenario differs from the baseline in exactly the selected rows.
+    """
     selected_keys = {c.key for c in selected}
-    output = [ActivityFile(f.relative_path, [list(row) for row in f.rows]) for f in calibrated]
+    source = baseline if start_from_baseline else calibrated
+    output = [ActivityFile(f.relative_path, [list(row) for row in f.rows]) for f in source]
     counts = Counter()
     for candidate in candidates:
         fields = output[candidate.file_index].rows[candidate.row_index]
@@ -235,6 +285,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--target-count", type=int, help="default: facility arrivals in the calibrated run")
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
+    parser.add_argument(
+        "--start-from-baseline", action="store_true",
+        help="apply only the facility moves to the baseline run (drop capacity-run side effects)",
+    )
+    parser.add_argument(
+        "--feasibility-speed-kmh", type=float, default=0.0,
+        help="exclude arrivals whose trips to/from the facility do not fit at this speed (0 = off)",
+    )
     parser.add_argument("--pt-csv", type=Path, default=pt.DEFAULT_INPUT)
     parser.add_argument("--zone-xlsx", type=Path, default=pt.DEFAULT_ZONE_CODE_XLSX)
     args = parser.parse_args(argv)
@@ -255,11 +313,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     calibrated = read_activity_files(calibrated_dir / "23")
     baseline = read_activity_files(baseline_dir / "23")
     check_aligned(calibrated, baseline)
-    candidates = collect_candidates(calibrated, units)
+    if args.start_from_baseline:
+        # Origins and schedules come from the baseline rows that will be edited; the
+        # capacity run only marks which arrivals it already sent to the facility.
+        candidates = [
+            replace(c, at_facility=is_facility(calibrated[c.file_index].rows[c.row_index]))
+            for c in collect_candidates(baseline, units)
+        ]
+    else:
+        candidates = collect_candidates(calibrated, units)
     facility_before = [c for c in candidates if c.at_facility]
     total = args.target_count if args.target_count is not None else len(facility_before)
-    selected, audit = select(candidates, weights, total, args.seed)
-    adjusted, change_counts = apply_selection(calibrated, baseline, candidates, selected)
+    selected, audit = select(
+        candidates, weights, total, args.seed, feasibility_speed_kmh=args.feasibility_speed_kmh or None
+    )
+    adjusted, change_counts = apply_selection(
+        calibrated, baseline, candidates, selected, start_from_baseline=args.start_from_baseline
+    )
     write_activity_files(adjusted, activity_output_dir / "23")
 
     distributions = dict(pt_counts)
@@ -270,6 +340,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     added = [c for c in selected if not c.at_facility]
     comparison["adjustment"] = {
         "seed": args.seed,
+        "start_from_baseline": args.start_from_baseline,
         "target_count": total,
         "facility_arrivals_before": len(facility_before),
         "changes": change_counts,

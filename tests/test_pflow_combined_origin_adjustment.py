@@ -71,5 +71,55 @@ class ApplySelectionTest(unittest.TestCase):
             combined.check_aligned(a, b)
 
 
+class ScheduleTest(unittest.TestCase):
+    def make(self, previous_lon, previous_duration, duration, next_lon=None):
+        return Candidate(
+            file_index=0, row_index=1, person_id="p", unit="u", at_facility=False,
+            previous_lon=previous_lon, previous_lat=combined.TARGET_LAT, lon=0.0, lat=0.0,
+            previous_duration=previous_duration, duration=duration,
+            next_lon=next_lon, next_lat=combined.TARGET_LAT if next_lon is not None else None,
+        )
+
+    def test_inbound_trip_must_fit_previous_activity(self):
+        far = combined.TARGET_LON + 0.11  # about 10 km east: 30 minutes at 20 km/h
+        self.assertFalse(combined.fits_schedule_at_facility(self.make(far, 20 * 60, 3600), 20))
+        self.assertTrue(combined.fits_schedule_at_facility(self.make(far, 40 * 60, 3600), 20))
+
+    def test_outbound_trip_must_fit_shopping_stay(self):
+        far = combined.TARGET_LON + 0.11
+        near = combined.TARGET_LON
+        self.assertFalse(combined.fits_schedule_at_facility(self.make(near, 3600, 20 * 60, far), 20))
+        self.assertTrue(combined.fits_schedule_at_facility(self.make(near, 3600, 40 * 60, far), 20))
+
+    def test_select_excludes_arrivals_that_do_not_fit(self):
+        far = combined.TARGET_LON + 0.11
+        candidates = [self.make(far, 60, 3600), self.make(combined.TARGET_LON, 3600, 3600)]
+        candidates[1] = Candidate(**{**candidates[1].__dict__, "person_id": "q", "row_index": 2})
+        selected, audit = combined.select(candidates, {"u": 1.0}, 1, seed=1, feasibility_speed_kmh=20)
+        self.assertEqual([c.person_id for c in selected], ["q"])
+        self.assertEqual(audit["excluded_by_schedule"], {"other": 1})
+
+
+class StartFromBaselineTest(unittest.TestCase):
+    def test_capacity_side_effects_are_dropped(self):
+        baseline = [ActivityFile(Path("p.csv"), [
+            ["1", "30", "1", "1", "0", "100", "1", "136.900000", "35.100000", "23110"],
+            ["1", "30", "1", "1", "100", "100", "100", "136.950000", "35.150000", "23106"],
+            ["2", "40", "2", "1", "0", "100", "1", "136.800000", "35.200000", "23203"],
+            ["2", "40", "2", "1", "100", "100", "100", "136.700000", "35.300000", "23203"],
+        ])]
+        calibrated = [ActivityFile(Path("p.csv"), [
+            baseline[0].rows[0], baseline[0].rows[1], baseline[0].rows[2],
+            ["2", "40", "2", "1", "100", "100", "100", "136.884000", "35.170000", "23105"],
+        ])]
+        added = candidate(1, "1", "中川区", False)
+        output, _ = combined.apply_selection(
+            calibrated, baseline, [added], [added], start_from_baseline=True
+        )
+        rows = output[0].rows
+        self.assertEqual(rows[1][7:], [*FAC, combined.TARGET_GCODE])
+        self.assertEqual(rows[3], baseline[0].rows[3])
+
+
 if __name__ == "__main__":
     unittest.main()
