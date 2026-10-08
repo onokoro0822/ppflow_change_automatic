@@ -76,6 +76,9 @@ class Candidate:
     duration: int = 0
     next_lon: float | None = None
     next_lat: float | None = None
+    age: int = 0
+    gender: str = ""
+    start: int = 0
 
     @property
     def key(self) -> str:
@@ -146,6 +149,9 @@ def collect_candidates(files: Sequence[ActivityFile], units: ComparisonUnits) ->
                     duration=int(fields[5]),
                     next_lon=float(following[7]) if following else None,
                     next_lat=float(following[8]) if following else None,
+                    age=int(fields[1]),
+                    gender=fields[2],
+                    start=int(fields[4]),
                 )
             )
     return candidates
@@ -211,6 +217,75 @@ def select(
         "allocated": allocation,
         "units_without_candidates": sorted(set(weights) - set(by_unit)),
         "shortfall": shortfall,
+        "excluded_by_schedule": dict(excluded),
+        "feasibility_speed_kmh": feasibility_speed_kmh,
+    }
+    return selected, audit
+
+
+def select_matching_attributes(
+    candidates: Sequence[Candidate],
+    targets: Mapping[str, Mapping[str, float]],
+    total: int,
+    seed: int,
+    *,
+    feasibility_speed_kmh: float | None = None,
+) -> tuple[list[Candidate], dict[str, object]]:
+    """Choose `total` arrivals matching several marginal distributions at once.
+
+    `targets` maps each dimension ("origin", "age_gender", "hour") to reference
+    weights. The joint distribution is unknown, so arrivals are picked greedily:
+    each step takes an arrival from the (origin, age x gender, hour) cell whose
+    dimensions are furthest below their target counts, relative to the target.
+    Within a cell, arrivals the capacity run sent to the facility come first.
+    """
+    from pflow_combined_validation import GENDERS, age_band
+
+    def keys(c: Candidate) -> tuple[str, str, str]:
+        return (c.unit, f"{age_band(c.age)}|{GENDERS.get(c.gender, 'other')}", str(c.start // 3600))
+
+    dimensions = ("origin", "age_gender", "hour")
+    target_counts = {dim: largest_remainder_counts(dict(targets[dim]), total) for dim in dimensions}
+    cells: dict[tuple[str, str, str], list[Candidate]] = defaultdict(list)
+    excluded = Counter()
+    for candidate in candidates:
+        if candidate.unit == OUTSIDE_AICHI:
+            continue
+        if feasibility_speed_kmh and not fits_schedule_at_facility(candidate, feasibility_speed_kmh):
+            excluded["facility" if candidate.at_facility else "other"] += 1
+            continue
+        cells[keys(candidate)].append(candidate)
+    for members in cells.values():
+        members.sort(key=lambda c: (not c.at_facility, priority(seed, c)), reverse=True)  # pop() takes the best
+
+    selected_counts = {dim: Counter() for dim in dimensions}
+    selected: list[Candidate] = []
+    used_people: set[str] = set()
+
+    def score(cell: tuple[str, str, str]) -> float:
+        value = 0.0
+        for dim, key in zip(dimensions, cell):
+            target = target_counts[dim].get(key, 0)
+            value += (target - selected_counts[dim][key]) / max(target, 1)
+        return value
+
+    while len(selected) < total:
+        live = [cell for cell, members in cells.items() if members]
+        if not live:
+            break
+        best = max(live, key=lambda cell: (score(cell), cells[cell][-1].at_facility, cell))
+        candidate = cells[best].pop()
+        if candidate.person_id in used_people:
+            continue
+        used_people.add(candidate.person_id)
+        selected.append(candidate)
+        for dim, key in zip(dimensions, best):
+            selected_counts[dim][key] += 1
+    audit = {
+        "method": "greedy_multi_marginal",
+        "requested": {dim: target_counts[dim] for dim in dimensions},
+        "allocated": {dim: dict(selected_counts[dim]) for dim in dimensions},
+        "shortfall": total - len(selected),
         "excluded_by_schedule": dict(excluded),
         "feasibility_speed_kmh": feasibility_speed_kmh,
     }
@@ -293,6 +368,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         "--feasibility-speed-kmh", type=float, default=0.0,
         help="exclude arrivals whose trips to/from the facility do not fit at this speed (0 = off)",
     )
+    parser.add_argument(
+        "--match-attributes", action="store_true",
+        help="also match Chukyo PT age x gender and arrival hours (greedy multi-marginal selection)",
+    )
     parser.add_argument("--pt-csv", type=Path, default=pt.DEFAULT_INPUT)
     parser.add_argument("--zone-xlsx", type=Path, default=pt.DEFAULT_ZONE_CODE_XLSX)
     args = parser.parse_args(argv)
@@ -324,9 +403,21 @@ def main(argv: Sequence[str] | None = None) -> int:
         candidates = collect_candidates(calibrated, units)
     facility_before = [c for c in candidates if c.at_facility]
     total = args.target_count if args.target_count is not None else len(facility_before)
-    selected, audit = select(
-        candidates, weights, total, args.seed, feasibility_speed_kmh=args.feasibility_speed_kmh or None
-    )
+    if args.match_attributes:
+        from pflow_combined_validation import DEFAULT_AGE_GENDER, DEFAULT_ARRIVAL_HOURS, load_pt_references
+
+        references = load_pt_references(DEFAULT_AGE_GENDER, DEFAULT_ARRIVAL_HOURS)
+        selected, audit = select_matching_attributes(
+            candidates,
+            {"origin": weights, "age_gender": references["age_gender"], "hour": references["hour"]},
+            total,
+            args.seed,
+            feasibility_speed_kmh=args.feasibility_speed_kmh or None,
+        )
+    else:
+        selected, audit = select(
+            candidates, weights, total, args.seed, feasibility_speed_kmh=args.feasibility_speed_kmh or None
+        )
     adjusted, change_counts = apply_selection(
         calibrated, baseline, candidates, selected, start_from_baseline=args.start_from_baseline
     )
@@ -341,6 +432,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     comparison["adjustment"] = {
         "seed": args.seed,
         "start_from_baseline": args.start_from_baseline,
+        "match_attributes": args.match_attributes,
         "target_count": total,
         "facility_arrivals_before": len(facility_before),
         "changes": change_counts,

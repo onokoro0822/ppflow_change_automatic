@@ -121,5 +121,41 @@ class StartFromBaselineTest(unittest.TestCase):
         self.assertEqual(rows[3], baseline[0].rows[3])
 
 
+class MatchAttributesTest(unittest.TestCase):
+    def make(self, index, person, unit, age, gender, hour, at_facility=False):
+        return Candidate(
+            file_index=0, row_index=index, person_id=person, unit=unit, at_facility=at_facility,
+            previous_lon=136.9, previous_lat=35.1, lon=136.95, lat=35.15,
+            age=age, gender=gender, start=hour * 3600,
+        )
+
+    def test_matches_all_marginals_when_candidates_allow(self):
+        candidates = [
+            self.make(1, "a", "中村区", 35, "1", 10),
+            self.make(2, "b", "中村区", 72, "2", 14),
+            self.make(3, "c", "一宮市", 35, "1", 14),
+            self.make(4, "d", "一宮市", 72, "2", 10),
+            self.make(5, "e", "中村区", 35, "1", 10, at_facility=True),
+        ]
+        targets = {
+            "origin": {"中村区": 0.5, "一宮市": 0.5},
+            "age_gender": {"70～79歳|female": 1.0},
+            "hour": {"10": 0.5, "14": 0.5},
+        }
+        selected, audit = combined.select_matching_attributes(candidates, targets, 2, seed=1)
+        self.assertEqual({c.person_id for c in selected}, {"b", "d"})
+        self.assertEqual(audit["shortfall"], 0)
+        self.assertEqual(audit["allocated"]["hour"], {"14": 1, "10": 1})
+
+    def test_prefers_capacity_arrivals_within_a_cell(self):
+        candidates = [
+            self.make(1, "a", "中村区", 35, "1", 10),
+            self.make(2, "b", "中村区", 35, "1", 10, at_facility=True),
+        ]
+        targets = {"origin": {"中村区": 1.0}, "age_gender": {"30～39歳|male": 1.0}, "hour": {"10": 1.0}}
+        selected, _ = combined.select_matching_attributes(candidates, targets, 1, seed=1)
+        self.assertEqual(selected[0].person_id, "b")
+
+
 if __name__ == "__main__":
     unittest.main()
