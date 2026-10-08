@@ -13,6 +13,7 @@ RESUME=0
 SKIP_COMPILE=0
 SEED=42
 SAMPLE_FACTOR=50
+EXTRA_ARGS=""
 
 usage() {
   cat <<'EOF'
@@ -27,6 +28,7 @@ Usage: scripts/run_pflow_capacity_sweep.sh [options]
   --seed N                  Deterministic seed (default: 42)
   --resume                  Skip scenarios with a .complete marker
   --skip-compile            Reuse an already compiled Pseudo-PFLOW-v3 checkout
+  --pflow-args "ARGS"       Extra Pseudo-PFLOW options, e.g. "--shopping-attraction-beta 0.5"
   --dry-run                 Print commands only
 EOF
 }
@@ -43,6 +45,7 @@ while [[ $# -gt 0 ]]; do
     --seed) SEED="$2"; shift 2 ;;
     --resume) RESUME=1; shift ;;
     --skip-compile) SKIP_COMPILE=1; shift ;;
+    --pflow-args) EXTRA_ARGS="$2"; shift 2 ;;
     --dry-run) DRY_RUN=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1" >&2; usage >&2; exit 2 ;;
@@ -85,7 +88,7 @@ for scenario in "${scenarios[@]}"; do
   mkdir -p "$scenario_output/logs"
   for main_class in "${mains[@]}"; do
     role="${main_class##*.}"
-    exec_args="--prefectures 23 --sample-factor $SAMPLE_FACTOR --seed $SEED --scenario $scenario --output-dir $scenario_output"
+    exec_args="--prefectures 23 --sample-factor $SAMPLE_FACTOR --seed $SEED --scenario $scenario --output-dir $scenario_output${EXTRA_ARGS:+ $EXTRA_ARGS}"
     if [[ "$DRY_RUN" -eq 1 ]]; then
       printf 'PFLOW_HOME=%q mvn -q -DskipTests exec:java -Dexec.mainClass=%q -Dexec.args=%q\n' \
         "$PFLOW_HOME_VALUE" "$main_class" "$exec_args"
