@@ -63,25 +63,33 @@ def city_type(population: float) -> int:
 
 def load_cities(facilities: Path, prefix: str = "23") -> dict[str, dict[str, float]]:
     cities = {}
+    valid_city_codes = set()
     with (facilities / "city_boundary.csv").open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
+            valid_city_codes.add(row["n03_007"])
             if row["n03_007"].startswith(prefix):
                 cities[row["n03_007"]] = {
                     "type": city_type(float(row["city_pop"])), "area": float(row["area"]),
                     "pop_ratio": float(row["pop_ratio"]), "office_ratio": float(row["office_ratio"]),
                     "lon": float(row["st_x"]), "lat": float(row["st_y"]),
                 }
-    # Shopping capacity = economic-census column index 4, first row per mesh wins (as in Java).
-    seen: set[str] = set()
-    retail = Counter()
+    # Java keeps one GMesh value (first valid-city row) but registers that
+    # shared object with EVERY city containing the mesh. Do not assign the
+    # capacity exclusively to the first city, including across prefectures.
+    mesh_capacity = {}
+    city_meshes = defaultdict(set)
     with (facilities / "mesh_ecensus.csv").open(newline="", encoding="utf-8") as handle:
         reader = csv.reader(handle)
         next(reader)
         for row in reader:
             mesh, gcode = row[0], row[1]
-            if gcode in cities and mesh not in seen:
-                retail[gcode] += float(row[2 + 4])
-            seen.add(mesh)
+            if gcode not in valid_city_codes:
+                continue
+            mesh_capacity.setdefault(mesh, float(row[2 + 4]))
+            if gcode in cities:
+                city_meshes[gcode].add(mesh)
+    retail = {gcode: sum(mesh_capacity[mesh] for mesh in sorted(city_meshes[gcode]))
+              for gcode in cities}
     stores = Counter()
     with (facilities / "city_retail.csv").open(encoding="utf-8", errors="replace", newline="") as handle:
         reader = csv.reader(handle)
