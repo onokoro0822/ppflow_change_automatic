@@ -1,0 +1,16 @@
+{
+  "scenarioId": "estmnl_m5_f8320000",
+  "transition": "SHOPPING",
+  "target": {
+    "meshCode": "52366700",
+    "gcode": "23105"
+  },
+  "meshCapacityMultiplier": 5.0,
+  "injectFacility": true,
+  "facility": {
+    "id": 900000001,
+    "longitude": 136.88397984,
+    "latitude": 35.16967402,
+    "capacity": 8320000.0
+  }
+}
