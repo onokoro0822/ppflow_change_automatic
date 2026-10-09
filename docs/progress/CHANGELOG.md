@@ -1,5 +1,10 @@
 # 進捗記録の更新履歴
 
+## 2026-10-09
+
+- 最終目標をA（モデル改良でcapacity変更だけで人流を変える）とする方針へ本人決定で変更した。Bは比較対象とする。
+- Pseudo-PFLOW-v3の改修ブランチ`feature/capacity-scenario`を非公開リポジトリ`onokoro0822/Pseudo-PFLOW-v3`へpushした。
+
 ## 2026-10-08
 
 - 簡易版Aとして、Pseudo-PFLOW-v3の行政界MNLへ商業量の項（`--shopping-attraction-beta`）を追加し、β=0〜2を比較する`pflow_attraction_calibration.py`を追加した。β=0は従来と完全一致。出発地TVDは改善せず、capacity適用で施設到着は増えるが来訪者構成はPTから離れた。
