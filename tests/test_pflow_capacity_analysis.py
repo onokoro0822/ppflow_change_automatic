@@ -32,10 +32,12 @@ class PflowCapacityAnalysisTest(unittest.TestCase):
             self.assertEqual(result["target_mesh_other_facilities"], 1)
             self.assertEqual(result["target_mesh_inflow_by_previous_gcode"], {"23106": 1, "23201": 1})
 
-    def test_ten_scenarios_are_complete(self):
+    def test_original_sweep_present_and_all_scenarios_valid(self):
         scenario_dir = Path(__file__).parents[1] / "config" / "pflow_capacity"
         paths = sorted(scenario_dir.glob("*.json"))
-        self.assertEqual(len(paths), 10)
+        required = {"baseline", "facility_1x", "facility_10x", "facility_100x",
+                    "mesh_2x", "mesh_5x", "mesh_10x", "combined_mesh_2x_facility_10x",
+                    "combined_mesh_5x_facility_10x", "combined_mesh_10x_facility_10x"}
         ids = set()
         for path in paths:
             data = json.loads(path.read_text())
@@ -44,8 +46,8 @@ class PflowCapacityAnalysisTest(unittest.TestCase):
             self.assertGreater(data["meshCapacityMultiplier"], 0)
             if data["injectFacility"]:
                 self.assertGreater(data["facility"]["capacity"], 0)
-        self.assertIn("baseline", ids)
-        self.assertEqual(len(ids), 10)
+        self.assertTrue(required.issubset(ids), required - ids)
+        self.assertEqual(len(ids), len(paths))
 
 
 if __name__ == "__main__":

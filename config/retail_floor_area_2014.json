@@ -1,0 +1,41 @@
+{
+  "source_url": "https://www.stat.go.jp/data/nenkan/67nenkan/zuhyou/y671405000.xls",
+  "source_sha256": "c7c46336ece3eb7f5e71846bf5935825b1d5bdda8c5a11696c8f2457baf00977",
+  "sheet": "y1405000",
+  "reference_date": "2014-07-01",
+  "area_unit_m2": 1000,
+  "employee_definition": "Commercial census employees excluding temporary employees; not identical to 2016 economic census employees.",
+  "status": "provisional proxy; not a validated development forecast",
+  "sales_floor_area_m2": 54374,
+  "selected_category": "large_department_store",
+  "rows": [
+    {
+      "category": "department_store",
+      "label": "百貨店",
+      "employees": 66683,
+      "sales_floor_area_1000m2": 4762,
+      "source_row": 11
+    },
+    {
+      "category": "large_department_store",
+      "label": "大型百貨店",
+      "employees": 65068,
+      "sales_floor_area_1000m2": 4743,
+      "source_row": 12
+    },
+    {
+      "category": "supermarket",
+      "label": "総合スーパー",
+      "employees": 265956,
+      "sales_floor_area_1000m2": 12547,
+      "source_row": 14
+    },
+    {
+      "category": "large_supermarket",
+      "label": "大型総合スーパー",
+      "employees": 243544,
+      "sales_floor_area_1000m2": 11982,
+      "source_row": 15
+    }
+  ]
+}
