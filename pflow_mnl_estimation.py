@@ -82,8 +82,22 @@ def load_cities(facilities: Path, prefix: str = "23") -> dict[str, dict[str, flo
             if gcode in cities and mesh not in seen:
                 retail[gcode] += float(row[2 + 4])
             seen.add(mesh)
+    stores = Counter()
+    with (facilities / "city_retail.csv").open(encoding="utf-8", errors="replace", newline="") as handle:
+        reader = csv.reader(handle)
+        next(reader)
+        for row in reader:
+            # Same validity rule as DataAccessor.loadRetailData (TelePoint retail stores).
+            if len(row) > 21 and row[7] in cities:
+                try:
+                    float(row[20]), float(row[21])
+                except ValueError:
+                    continue
+                stores[row[7]] += 1
     for gcode, city in cities.items():
-        city["ln_retail"] = math.log1p(retail[gcode])
+        city["ln_wholesale_retail_employees"] = math.log1p(retail[gcode])
+        city["ln_retail_stores"] = math.log1p(stores[gcode])
+        city["ln_retail"] = city["ln_wholesale_retail_employees"]
     return cities
 
 
@@ -231,6 +245,54 @@ def maximize(model, od, *, estimate_distance: bool) -> dict[str, float]:
             "beta_se": math.sqrt(-1 / second) if second < 0 else float("nan")}
 
 
+def scaled_params(params, area: float, pop: float, office: float):
+    """Lab coefficients with the destination terms (area, popRatio, officeRatio) multiplied."""
+    return {kind: {ctype: p[:4] + [p[4] * area, p[5] * pop, p[6] * office] for ctype, p in by_type.items()}
+            for kind, by_type in params.items()}
+
+
+def maximize_destination_terms(cities, params, weights, units, od, *, time_limit_s: float = 300.0):
+    """Also re-scale the lab's destination terms, keeping distance and same-city from the lab.
+
+    Coordinate search over beta, the distance multiplier and multipliers on the area,
+    popRatio and officeRatio coefficients. No standard errors are reported.
+    """
+    import time
+
+    x = {"beta": 0.0, "distance_scale": 1.0, "area": 1.0, "pop": 1.0, "office": 1.0}
+    models: dict[tuple, DestinationModel] = {}
+
+    def model_for(values):
+        key = (values["area"], values["pop"], values["office"])
+        if key not in models:
+            models.clear()
+            models[key] = DestinationModel(cities, scaled_params(params, *key), weights, units)
+        return models[key]
+
+    def ll(values):
+        return log_likelihood(model_for(values), od, values["beta"], values["distance_scale"])[0]
+
+    best = ll(x)
+    step = {"beta": 0.5, "distance_scale": 0.25, "area": 0.5, "pop": 0.5, "office": 0.5}
+    started = time.time()
+    while max(step.values()) > 0.01 and time.time() - started < time_limit_s:
+        improved = False
+        for key in step:
+            for delta in (step[key], -step[key]):
+                candidate = dict(x)
+                candidate[key] = x[key] + delta
+                if key == "distance_scale" and candidate[key] <= 0.05:
+                    continue
+                value = ll(candidate)
+                if value > best:
+                    best, x, improved = value, candidate, True
+        if not improved:
+            step = {key: value / 2 for key, value in step.items()}
+    model = model_for(x)
+    return {**{f"{k}_multiplier" if k in ("area", "pop", "office") else k: v for k, v in x.items()},
+            "log_likelihood": best, **fit_summary(model, od, x["beta"], x["distance_scale"])}
+
+
 def fit_summary(model, od, beta, scale) -> dict[str, float]:
     """How well the implied unit OD matches PT: overall destinations and Nakamura's origins."""
     prob = model.unit_probabilities(beta, scale)
@@ -254,6 +316,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--pflow-home", type=Path, default=DEFAULT_PFLOW_HOME)
     parser.add_argument("--baseline-dir", type=Path)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument(
+        "--attraction", choices=("ln_wholesale_retail_employees", "ln_retail_stores"),
+        default="ln_wholesale_retail_employees",
+        help="city attraction measure: mesh capacity (census wholesale+retail employees, as Pseudo-PFLOW) or TelePoint retail store count",
+    )
     parser.add_argument("--pt-csv", type=Path, default=pt.DEFAULT_INPUT)
     parser.add_argument("--zone-xlsx", type=Path, default=pt.DEFAULT_ZONE_CODE_XLSX)
     args = parser.parse_args(argv)
@@ -261,7 +328,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     facilities = args.pflow_home / "data" / "facilities"
     baseline_dir = args.baseline_dir or args.pflow_home / "output" / "capacity_experiment" / "baseline" / "23"
     units = ComparisonUnits(pt.load_middle_zone_labels(args.zone_xlsx))
-    model = DestinationModel(load_cities(facilities), load_params(facilities / "mnl"),
+    cities = load_cities(facilities)
+    for city in cities.values():
+        city["ln_retail"] = city[args.attraction]
+    model = DestinationModel(cities, load_params(facilities / "mnl"),
                              chooser_weights(baseline_dir), units)
     od = pt_unit_od(args.pt_csv, units, model.unit_names)
 
@@ -272,10 +342,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     for name, estimate_distance in (("beta_only", False), ("beta_and_distance", True)):
         fit = maximize(model, od, estimate_distance=estimate_distance)
         results[name] = {**fit, **fit_summary(model, od, fit["beta"], fit["distance_scale"])}
+    results["beta_distance_and_destination_terms"] = maximize_destination_terms(
+        cities, load_params(facilities / "mnl"), chooser_weights(baseline_dir), units, od
+    )
     results["pt_trips_unreachable_within_20km_share"] = unreachable
     results["pt_shopping_trips_aichi"] = float(od.sum())
+    results["attraction"] = args.attraction
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    (args.output_dir / "mnl_estimation.json").write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+    (args.output_dir / f"mnl_estimation_{args.attraction}.json").write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(results, ensure_ascii=False, indent=1))
     return 0
 
