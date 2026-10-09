@@ -1,0 +1,17 @@
+{
+  "scenarioId": "plan_add6000_f8000000",
+  "transition": "SHOPPING",
+  "target": {
+    "meshCode": "52366700",
+    "gcode": "23105"
+  },
+  "meshCapacityMultiplier": 1.0,
+  "injectFacility": true,
+  "facility": {
+    "id": 900000001,
+    "longitude": 136.88397984,
+    "latitude": 35.16967402,
+    "capacity": 8000000.0
+  },
+  "meshCapacityAdd": 6000.0
+}
