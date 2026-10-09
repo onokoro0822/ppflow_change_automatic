@@ -2,6 +2,7 @@
 
 ## 2026-10-09
 
+- 研究室の行先選択MNLを再現し、商業量の係数を中京PT買物ODで最尤推定する`pflow_mnl_estimation.py`とテスト3件を追加した。β=-0.027（SE 0.0009）でほぼ0、中村区への出発地のずれは改善しなかった。買物capacity列を`t000917029`へ訂正した。
 - 最終目標をA（モデル改良でcapacity変更だけで人流を変える）とする方針へ本人決定で変更した。Bは比較対象とする。
 - Pseudo-PFLOW-v3の改修ブランチ`feature/capacity-scenario`を非公開リポジトリ`onokoro0822/Pseudo-PFLOW-v3`へpushした。
 
