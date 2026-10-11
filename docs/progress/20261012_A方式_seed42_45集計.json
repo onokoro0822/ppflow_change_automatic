@@ -1,0 +1,131 @@
+{
+  "rows": [
+    {
+      "seed": 42,
+      "facility": 371,
+      "target_error_pct": 3.0555555555555447,
+      "mesh_before": 542,
+      "mesh_after": 548,
+      "admin_before": 985,
+      "admin_after": 985,
+      "origin_tvd_aichi": 0.3749719934549553,
+      "class_shares": {
+        "名古屋市内（中村区以外）": 0.5067385444743936,
+        "中村区内": 0.3261455525606469,
+        "名古屋市外の愛知県": 0.16711590296495954
+      },
+      "log_error_counts": {
+        "baseline": {
+          "Commuter": 0,
+          "Student": 70,
+          "NonCommuter": 0
+        },
+        "plan_dept2014_f8000000": {
+          "Commuter": 0,
+          "Student": 70,
+          "NonCommuter": 0
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "facility": 406,
+      "target_error_pct": 12.777777777777777,
+      "mesh_before": 569,
+      "mesh_after": 582,
+      "admin_before": 977,
+      "admin_after": 977,
+      "origin_tvd_aichi": 0.4483572917571441,
+      "class_shares": {
+        "中村区内": 0.2857142857142857,
+        "名古屋市内（中村区以外）": 0.5221674876847292,
+        "名古屋市外の愛知県": 0.19211822660098518
+      },
+      "log_error_counts": {
+        "baseline": {
+          "Commuter": 0,
+          "Student": 69,
+          "NonCommuter": 0
+        },
+        "plan_dept2014_f8000000": {
+          "Commuter": 0,
+          "Student": 69,
+          "NonCommuter": 0
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "facility": 375,
+      "target_error_pct": 4.166666666666674,
+      "mesh_before": 542,
+      "mesh_after": 553,
+      "admin_before": 1005,
+      "admin_after": 1004,
+      "origin_tvd_aichi": 0.4063282955499581,
+      "class_shares": {
+        "名古屋市内（中村区以外）": 0.544,
+        "中村区内": 0.30666666666666664,
+        "名古屋市外の愛知県": 0.14933333333333337
+      },
+      "log_error_counts": {
+        "baseline": {
+          "Commuter": 0,
+          "Student": 68,
+          "NonCommuter": 0
+        },
+        "plan_dept2014_f8000000": {
+          "Commuter": 0,
+          "Student": 68,
+          "NonCommuter": 0
+        }
+      }
+    },
+    {
+      "seed": 45,
+      "facility": 388,
+      "target_error_pct": 7.777777777777772,
+      "mesh_before": 564,
+      "mesh_after": 585,
+      "admin_before": 1032,
+      "admin_after": 1034,
+      "origin_tvd_aichi": 0.41194103975693996,
+      "class_shares": {
+        "名古屋市内（中村区以外）": 0.515463917525773,
+        "中村区内": 0.29381443298969073,
+        "名古屋市外の愛知県": 0.1907216494845361
+      },
+      "log_error_counts": {
+        "baseline": {
+          "Commuter": 0,
+          "Student": 65,
+          "NonCommuter": 0
+        },
+        "plan_dept2014_f8000000": {
+          "Commuter": 0,
+          "Student": 65,
+          "NonCommuter": 0
+        }
+      }
+    }
+  ],
+  "summary": {
+    "facility_min": 371,
+    "facility_max": 406,
+    "facility_mean": 385,
+    "facility_sample_sd": 15.769168230019828,
+    "mean_target_error_pct": 6.944444444444442,
+    "tvd_min": 0.3749719934549553,
+    "tvd_max": 0.4483572917571441
+  },
+  "scenario_sha256": "2cb27d307a55d92a3615b34276ec0e80f5fbbbf46ac9489c4eabbed1266adfc7",
+  "pflow_commit": "da7768a12bfba823b005fb0295435595b21522e8",
+  "sample_factor": 50,
+  "target_sample": 360,
+  "pflow_args": "--shopping-attraction-beta 0.40625 --shopping-mnl-multipliers 0.90625,-0.0625,-4.65625,-0.453125 --shopping-local-mesh-capacity raw",
+  "notes": [
+    "Four seeds are a limited sensitivity check, not independent validation.",
+    "PT reference is ward-level shopping, not facility-conditioned.",
+    "Unchanged ward totals do not establish unchanged individual OD."
+  ]
+}
