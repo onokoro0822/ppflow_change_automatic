@@ -1,22 +1,22 @@
 # 次に取り組むこと
 
-最終更新: 2026-10-09 JST
+最終更新: 2026-10-11 JST
 
 根拠: [2026年9月24日MTG要約](../../mcd/mtg/20260924/summary.md)、
 2026年9月8日の本人確認、
 [最新進捗PPTX](../../output/presentations/20260826/jp_26_0826_進捗報告.pptx)、
 [2026年8月7日MTG文字起こし](/Users/yuuki/Desktop/syuron/mcd/mtg/20260807.txt)
 
-## 最新の再開地点（2026-10-09）
+## 最新の再開地点（2026-10-11）
 
-- 原単位算定・共有メッシュ集計修正・再推定・新係数での2ケース確認まで完了。
-- 新係数: `--shopping-attraction-beta 0.40625 --shopping-mnl-multipliers 0.90625,-0.0625,-4.65625,-0.453125 --shopping-local-mesh-capacity raw`。
-- 加算745.943人・施設capacity800万で施設371件（目標360件に対し+3.1%）。中村区の買物はbaselineと同じ985件。
-- 完了出力: `.local/pflow/output/retail_floor_area_20261009/shared_mesh_fixed/seed42/`。
-  集計: `output/retail_floor_area_20261009/shared_mesh_fixed_seed42.json`。
-- 次は800万設定を固定してseed43〜45。新係数の安定性は未確認。
+- seed43の施設なし／あり比較まで完了。施設406件（目標360件に対し+12.8%）、中村区買物977→977件。
+- seed42は施設371件（+3.1%）。施設出発地TVDはseed42/43で0.374972/0.448357と変動。
+- 次は同じ設定を固定してseed44、続いて45。2つのseedでは安定性未確定。capacity調整は残りの結果を見て判断する。
+- 係数: `--shopping-attraction-beta 0.40625 --shopping-mnl-multipliers 0.90625,-0.0625,-4.65625,-0.453125 --shopping-local-mesh-capacity raw`。
+- 完了出力: `.local/pflow/output/retail_floor_area_20261009/shared_mesh_fixed/seed43/`。
+- 比較集計: `output/retail_floor_area_20261009/shared_mesh_fixed_seed42_43_comparison.json`。
+- 詳細: [seed43確認記録](20261011_A方式_seed43確認.md)。Pythonテスト94件成功。
 - 旧係数の945万ケースは途中停止した未採用候補。集計に使用しない。
-- 詳細は[原単位確認記録](20261009_売場面積と小売従業者原単位.md)。テスト94件成功。
 - 消費を抑えるため、必要箇所のみ読み、作業範囲を一段階ずつ区切る。
 
 ## 最優先: Aの校正を仕上げる（2026-10-09 引き継ぎ時点）
@@ -29,7 +29,7 @@
 
 初回校正候補は`plan_dept2014_f8000000.json`（371件、目標差+3.1%）。
 
-1. この設定と新係数を固定してseed43〜45で安定性を確認する。必要なcapacity調整はその結果から判断する。
+1. この設定と新係数を固定して残りseed44・45で安定性を確認する。必要なcapacity調整はその結果から判断する。
 3. 大型施設1つでは区全体の商業量がほとんど変わらず、他地区からの流入が出ない点を、市区町村の魅力の表し方を含めて検討する。
 4. 食事・業務・通勤へ広げ、複合施設に備える。
 5. 本人作業待ち: PTの基本ゾーン510書き出し、研究室へのMNL推定方法の確認。
