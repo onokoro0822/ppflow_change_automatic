@@ -1,6 +1,15 @@
 # 参照資料
 
-最終更新: 2026-10-09 JST
+最終更新: 2026-10-13 JST
+
+## 既存大型施設の検証準備（2026-10-13）
+
+- [JR名古屋タカシマヤ・会社概要](https://www.jr-takashimaya.co.jp/company/)、[採用サイト会社概要](https://www.jr-takashimaya.co.jp/recruit/company/)
+  - 本店・ゲートタワーモール等の区別と所在地を確認。会社全体従業員数を施設・テナント従業者数へ流用しない。
+- [Train, Discrete Choice Methods with Simulation, Chapter 4](https://eml.berkeley.edu/books/choice2nd/Ch04_p76-96.pdf)
+  - 下位選択肢の魅力を上位へ集約するnested logit/logsumの検討候補。モデルの採用・係数推定は未実施。
+- [既存大型施設の監査](20261013_既存大型施設の監査.md)
+  - TelePointとseed42 baselineの座標候補、および既存PTの粒度を監査。
 
 ## 売場面積と小売従業者原単位（2026-10-09確認）
 

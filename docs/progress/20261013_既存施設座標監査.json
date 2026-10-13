@@ -1,0 +1,47 @@
+{
+  "facility_id": "jr_nagoya_takashimaya",
+  "status": "coordinate_proxy_only_not_observed_validation",
+  "csv_file_count": 207,
+  "model_coordinate_points": [
+    {
+      "longitude": 136.88384797,
+      "latitude": 35.167278010000004,
+      "mesh_code": "52366700",
+      "all_retail_rows": 42,
+      "name_matched_rows": 14,
+      "other_name_rows": 28
+    },
+    {
+      "longitude": 136.88551518,
+      "latitude": 35.16766073,
+      "mesh_code": "52366700",
+      "all_retail_rows": 1,
+      "name_matched_rows": 1,
+      "other_name_rows": 0
+    }
+  ],
+  "generated_arrivals": {
+    "shopping_arrivals": 52,
+    "same_ward": 16,
+    "outside_ward": 36,
+    "unknown_previous": 0,
+    "outside_ward_share_known": 0.6923076923076923,
+    "destination_gcodes": {
+      "23105": 35,
+      "23104": 17
+    }
+  },
+  "baseline_dir": ".local/pflow/output/retail_floor_area_20261009/shared_mesh_fixed/seed42/baseline",
+  "sources": [
+    "https://www.jr-takashimaya.co.jp/company/",
+    "https://www.jr-takashimaya.co.jp/recruit/company/"
+  ],
+  "limitations": [
+    "Name matching and shared model coordinates are not a verified building boundary.",
+    "The current OD PT table has middle zones and purposes, but no destination facility identifier.",
+    "Facility-type age/time tables lack origin OD and cannot identify this store.",
+    "Sales floor area and observed store-specific shopping origins are not established.",
+    "Java assigns equal capacity 10000 to each retail row and outputs coordinates rather than identifying the selected tenant.",
+    "Company employee counts are not the store-and-tenant employment measure needed by the model."
+  ]
+}

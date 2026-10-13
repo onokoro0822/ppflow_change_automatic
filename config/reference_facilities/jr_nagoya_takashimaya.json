@@ -1,0 +1,11 @@
+{
+  "facility_id": "jr_nagoya_takashimaya",
+  "name": "ジェイアール名古屋タカシマヤ（本店）",
+  "gcode": "23105",
+  "name_aliases": ["ジェイアール名古屋タカシマヤ", "ジェイアール名古屋高島屋", "JR名古屋高島屋", "JR名古屋タカシマヤ"],
+  "exclude_name_terms": ["ゲートタワー", "ウオッチメゾン", "ウォッチメゾン", "フードメゾン"],
+  "sales_floor_area_m2": null,
+  "role": "candidate_for_existing_facility_validation",
+  "sources": ["https://www.jr-takashimaya.co.jp/company/", "https://www.jr-takashimaya.co.jp/recruit/company/"],
+  "limitations": ["Name matching and shared model coordinates are not a verified building boundary.", "The current OD PT table has middle zones and purposes, but no destination facility identifier.", "Facility-type age/time tables lack origin OD and cannot identify this store.", "Sales floor area and observed store-specific shopping origins are not established.", "Java assigns equal capacity 10000 to each retail row and outputs coordinates rather than identifying the selected tenant.", "Company employee counts are not the store-and-tenant employment measure needed by the model."]
+}
