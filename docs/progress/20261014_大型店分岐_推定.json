@@ -1,0 +1,1657 @@
+{
+  "pt_csv": "/Users/yuuki/Desktop/university/syuron/中京PTデータ/chukyo_pt_2022_od_facility_purpose_age.csv",
+  "split_seed": 13,
+  "split_origin_units": {
+    "train": [
+      "愛知郡東郷町・日進市・長久手市",
+      "岡崎市",
+      "みよし市",
+      "大府市",
+      "常滑市",
+      "名古屋市昭和区",
+      "春日井市",
+      "豊田市",
+      "田原市",
+      "知多郡東浦町・知多郡阿久比町",
+      "清須市",
+      "名古屋市南区",
+      "名古屋市守山区",
+      "名古屋市中区",
+      "名古屋市瑞穂区",
+      "豊川市",
+      "西尾市",
+      "名古屋市天白区",
+      "名古屋市西区",
+      "知立市",
+      "あま市・海部郡大治町",
+      "丹羽郡大口町・丹羽郡扶桑町",
+      "小牧市",
+      "東海市",
+      "犬山市",
+      "新城市",
+      "北設楽郡東栄町・北設楽郡設楽町・北設楽郡豊根村",
+      "瀬戸市",
+      "名古屋市中村区",
+      "碧南市・高浜市",
+      "江南市"
+    ],
+    "validation": [
+      "名古屋市名東区",
+      "安城市",
+      "名古屋市千種区・名古屋市東区",
+      "一宮市",
+      "豊橋市",
+      "弥富市・海部郡蟹江町・海部郡飛島村",
+      "北名古屋市・岩倉市・西春日井郡豊山町",
+      "額田郡幸田町",
+      "刈谷市",
+      "蒲郡市",
+      "知多郡武豊町"
+    ],
+    "test": [
+      "名古屋市港区",
+      "愛西市・津島市・稲沢市",
+      "知多市",
+      "半田市",
+      "名古屋市緑区",
+      "豊明市",
+      "名古屋市北区",
+      "名古屋市熱田区",
+      "尾張旭市",
+      "名古屋市中川区",
+      "知多郡南知多町・知多郡美浜町"
+    ]
+  },
+  "pt_aichi_trips": {
+    "large": 309141.0,
+    "other": 1049172.0
+  },
+  "pt_same_unit_share": {
+    "large": 0.5907789649383292,
+    "other": 0.7412321335300599
+  },
+  "large_store_share_by_age": {
+    "10歳未満": 0.2878157290470723,
+    "10～19歳": 0.30851825340014316,
+    "20～29歳": 0.27335421136126387,
+    "30～39歳": 0.24707185166108678,
+    "40～49歳": 0.2161057373576656,
+    "50～59歳": 0.22259461358509716,
+    "60～69歳": 0.23083106257878605,
+    "70～79歳": 0.21064125097119235,
+    "80歳以上": 0.19188582199540802
+  },
+  "large_store_share_all": 0.22389070848047118,
+  "zone5_large_store_trips_aichi": 19489.0,
+  "zone5_large_store_trips_outside": 1307,
+  "models": {
+    "current_single": {
+      "coefficients": [
+        0.40625,
+        0.90625,
+        -0.0625,
+        -4.65625,
+        -0.453125,
+        1.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.6257176858420874,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5774791606159726,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5786042532540256,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.133583429572309,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0013508108910476,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.2484995687165807,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2475184104957548,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.123766436124497,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.3265643375079215,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.378099689979715,
+      "zone5_large_origin_tvd": 0.378099689979715,
+      "nakamura_large_inside_share": 0.56613373009239,
+      "same_unit_share_large": 0.661894461187896
+    },
+    "single_refit_train": {
+      "coefficients": [
+        0.5078125,
+        0.88671875,
+        -0.140625,
+        -7.15625,
+        -0.625,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.6154641183875593,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5717208838983026,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5667846402054941,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1315890595458655,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0045961349497075,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.2484255523213221,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2436119372384893,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1250986770673668,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.323712665023538,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.3737080431322727,
+      "zone5_large_origin_tvd": 0.3737080431322727,
+      "nakamura_large_inside_share": 0.5677973923798814,
+      "same_unit_share_large": 0.6617224945399325
+    },
+    "other_train_r20": {
+      "coefficients": [
+        0.3671875,
+        0.9375,
+        -0.078125,
+        -6.625,
+        -0.796875,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.6539415751020172,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.6158610086147989,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.59765714249509,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1267168504125193,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.000501357127174,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.2298404263115168,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2487756955032336,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1312528407440827,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.3168235206189949,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.39433811454042983,
+      "zone5_large_origin_tvd": 0.39433811454042983,
+      "nakamura_large_inside_share": 0.6141719709117374,
+      "same_unit_share_large": 0.6878703045700293
+    },
+    "large_train_r20": {
+      "coefficients": [
+        0.859375,
+        0.765625,
+        -0.28125,
+        -9.0703125,
+        -0.3125,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5740743622000875,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5037459001121771,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5406974488891285,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1901303716014089,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0475270141811703,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.345529169930542,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2790180088410976,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.144464302879456,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.3916835181902611,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.3243273686098289,
+      "zone5_large_origin_tvd": 0.3243273686098289,
+      "nakamura_large_inside_share": 0.44914987101524845,
+      "same_unit_share_large": 0.5835476665968928,
+      "large_test_on_20km_trips": {
+        "mean_log_probability": -1.5406974488891285,
+        "trips": 62909.0,
+        "reachable_share": 0.9755450795521509
+      },
+      "zone5_reachable_share": 0.948842937041408
+    },
+    "large_train_r30": {
+      "coefficients": [
+        0.8203125,
+        0.7109375,
+        -0.25,
+        -8.7421875,
+        -0.265625,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.7197780515847059,
+          "trips": 173398.0,
+          "reachable_share": 0.9816629584968042
+        },
+        "validation": {
+          "mean_log_probability": -1.653121624162445,
+          "trips": 66535.0,
+          "reachable_share": 0.9781969478667412
+        },
+        "test": {
+          "mean_log_probability": -1.6072417214236938,
+          "trips": 63298.0,
+          "reachable_share": 0.9815773966442328
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.318569990178148,
+          "trips": 572639.0,
+          "reachable_share": 0.9742287597377962
+        },
+        "validation": {
+          "mean_log_probability": -1.1596201422206138,
+          "trips": 244308.0,
+          "reachable_share": 0.9684155448794178
+        },
+        "test": {
+          "mean_log_probability": -1.447823916860415,
+          "trips": 204551.0,
+          "reachable_share": 0.9782027555007197
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.4118209622234679,
+          "trips": 746037.0,
+          "reachable_share": 0.9759465950833569
+        },
+        "validation": {
+          "mean_log_probability": -1.2652526354760507,
+          "trips": 310843.0,
+          "reachable_share": 0.9704927347999026
+        },
+        "test": {
+          "mean_log_probability": -1.4854974873917457,
+          "trips": 267849.0,
+          "reachable_share": 0.9789981542060344
+        }
+      },
+      "nakamura_large_origin_tvd": 0.30477611098687085,
+      "zone5_large_origin_tvd": 0.30477611098687085,
+      "nakamura_large_inside_share": 0.41480450717858425,
+      "same_unit_share_large": 0.546516677379334,
+      "large_test_on_20km_trips": {
+        "mean_log_probability": -1.5600647491553803,
+        "trips": 62909.0,
+        "reachable_share": 0.9755450795521509
+      },
+      "zone5_reachable_share": 0.9763456308686952
+    },
+    "large_train_r40": {
+      "coefficients": [
+        0.734375,
+        0.671875,
+        -0.21875,
+        -8.390625,
+        -0.0078125,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.813335539314985,
+          "trips": 175137.0,
+          "reachable_share": 0.9915080079485046
+        },
+        "validation": {
+          "mean_log_probability": -1.7382330417601042,
+          "trips": 67262.0,
+          "reachable_share": 0.9888852950689523
+        },
+        "test": {
+          "mean_log_probability": -1.6887000089318198,
+          "trips": 63697.0,
+          "reachable_share": 0.9877647861551344
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.4429544312762521,
+          "trips": 579280.0,
+          "reachable_share": 0.9855270701801844
+        },
+        "validation": {
+          "mean_log_probability": -1.2193541640953223,
+          "trips": 245484.0,
+          "reachable_share": 0.9730771060267326
+        },
+        "test": {
+          "mean_log_probability": -1.6382195313079104,
+          "trips": 207834.0,
+          "reachable_share": 0.993902701461917
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.528937960436623,
+          "trips": 754417.0,
+          "reachable_share": 0.9869090975688884
+        },
+        "validation": {
+          "mean_log_probability": -1.3309489760816902,
+          "trips": 312746.0,
+          "reachable_share": 0.9764341511236552
+        },
+        "test": {
+          "mean_log_probability": -1.6500614756281173,
+          "trips": 271531.0,
+          "reachable_share": 0.9924560024854255
+        }
+      },
+      "nakamura_large_origin_tvd": 0.29189347233754415,
+      "zone5_large_origin_tvd": 0.29189347233754415,
+      "nakamura_large_inside_share": 0.3911383729778845,
+      "same_unit_share_large": 0.5179633893857734,
+      "large_test_on_20km_trips": {
+        "mean_log_probability": -1.5819768619168897,
+        "trips": 62909.0,
+        "reachable_share": 0.9755450795521509
+      },
+      "zone5_reachable_share": 0.9975883831905177
+    },
+    "large_train_r60": {
+      "coefficients": [
+        0.703125,
+        0.6328125,
+        -0.203125,
+        -8.1484375,
+        -0.03125,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.9215001789246593,
+          "trips": 176533.0,
+          "reachable_share": 0.9994112218844297
+        },
+        "validation": {
+          "mean_log_probability": -1.7634564084926945,
+          "trips": 67477.0,
+          "reachable_share": 0.9920462230586021
+        },
+        "test": {
+          "mean_log_probability": -1.8413149462470215,
+          "trips": 64437.0,
+          "reachable_share": 0.999240145147784
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.6550658121330182,
+          "trips": 587526.0,
+          "reachable_share": 0.999555961598334
+        },
+        "validation": {
+          "mean_log_probability": -1.3079407501098481,
+          "trips": 246923.0,
+          "reachable_share": 0.9787811761721289
+        },
+        "test": {
+          "mean_log_probability": -1.7241377120256927,
+          "trips": 208907.0,
+          "reachable_share": 0.9990339966237703
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.7166244850533408,
+          "trips": 764059.0,
+          "reachable_share": 0.9995225162998546
+        },
+        "validation": {
+          "mean_log_probability": -1.4057042045649986,
+          "trips": 314400.0,
+          "reachable_share": 0.9815981566935378
+        },
+        "test": {
+          "mean_log_probability": -1.7517605954309248,
+          "trips": 273344.0,
+          "reachable_share": 0.9990825855735668
+        }
+      },
+      "nakamura_large_origin_tvd": 0.2763544657932927,
+      "zone5_large_origin_tvd": 0.2763544657932927,
+      "nakamura_large_inside_share": 0.36782178913176267,
+      "same_unit_share_large": 0.4897911764295574,
+      "large_test_on_20km_trips": {
+        "mean_log_probability": -1.6086130018187885,
+        "trips": 62909.0,
+        "reachable_share": 0.9755450795521509
+      },
+      "zone5_reachable_share": 1.0
+    },
+    "large_accessibility_p0.5_q0": {
+      "coefficients": [
+        0.8984375,
+        0.77734375,
+        -0.2734375,
+        -2.890625,
+        0.5390625,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.595622308340905,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5250302668567624,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5420305695706746,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.176867380466432,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0306388005889593,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.27820102822641,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2738141670620453,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1356869907746205,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.3405927273149132,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.335257734150466,
+      "zone5_large_origin_tvd": 0.335257734150466,
+      "nakamura_large_inside_share": 0.4906818824988963,
+      "same_unit_share_large": 0.5916797912356642
+    },
+    "large_accessibility_p0.5_q1": {
+      "coefficients": [
+        1.2578125,
+        0.40234375,
+        -0.234375,
+        -3.3515625,
+        0.390625,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5664085334403615,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5067763979617332,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5321554822958103,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1500948337329715,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.019592832091153,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.2610848938775219,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2464764467380396,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.123109489183246,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.3251889911600494,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.31555513308716937,
+      "zone5_large_origin_tvd": 0.31555513308716937,
+      "nakamura_large_inside_share": 0.48799254325270736,
+      "same_unit_share_large": 0.6011956297379422
+    },
+    "large_accessibility_p0.5_q2": {
+      "coefficients": [
+        0.9609375,
+        0.203125,
+        -0.140625,
+        -2.5703125,
+        0.609375,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.565260598824451,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5008275377875215,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.55376642649932,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1345721143656624,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0054277390415163,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.256522689222635,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2342816623916393,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.110690179490719,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.3268163406371651,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.31148482150698614,
+      "zone5_large_origin_tvd": 0.31148482150698614,
+      "nakamura_large_inside_share": 0.48627979068114985,
+      "same_unit_share_large": 0.6049613751920561
+    },
+    "large_accessibility_p1_q0": {
+      "coefficients": [
+        0.859375,
+        0.765625,
+        -0.28125,
+        -9.0703125,
+        -0.3125,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5740743622000875,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5037459001121771,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5406974488891285,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1901303716014089,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0475270141811703,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.345529169930542,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2790180088410976,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.144464302879456,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.3916835181902611,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.3243273686098289,
+      "zone5_large_origin_tvd": 0.3243273686098289,
+      "nakamura_large_inside_share": 0.44914987101524845,
+      "same_unit_share_large": 0.5835476665968928
+    },
+    "large_accessibility_p1_q1": {
+      "coefficients": [
+        1.0,
+        0.46484375,
+        -0.2578125,
+        -9.3671875,
+        -0.46875,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5531629340097381,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5039763337379295,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5381390633372367,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1703151980435673,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.038874199507203,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.3402422654156358,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.258949039191944,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1376989988534778,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.3870418671721025,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.28654186927522884,
+      "zone5_large_origin_tvd": 0.28654186927522884,
+      "nakamura_large_inside_share": 0.41982191395535584,
+      "same_unit_share_large": 0.5916650918710696
+    },
+    "large_accessibility_p1_q2": {
+      "coefficients": [
+        0.8359375,
+        0.2421875,
+        -0.2109375,
+        -7.0859375,
+        -0.0703125,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5544691695010084,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5104157149321213,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5522147229692123,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1570616161481135,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0298083427738098,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.3226476560434088,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2490662295909838,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.131927691670033,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.3769367977645597,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.26128555076464355,
+      "zone5_large_origin_tvd": 0.26128555076464355,
+      "nakamura_large_inside_share": 0.4026176261539741,
+      "same_unit_share_large": 0.5944088808109393
+    },
+    "large_accessibility_p1.5_q0": {
+      "coefficients": [
+        0.6015625,
+        0.765625,
+        -0.2265625,
+        -10.8359375,
+        -0.5859375,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5668106934519328,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.492233403362631,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.56236155165981,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1977241633878304,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0497532055216685,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.400870215578491,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2831721203756128,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1437713007915573,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.4390604758308048,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.3165783308041305,
+      "zone5_large_origin_tvd": 0.3165783308041305,
+      "nakamura_large_inside_share": 0.423900067790608,
+      "same_unit_share_large": 0.5782994147382063
+    },
+    "large_accessibility_p1.5_q1": {
+      "coefficients": [
+        0.65625,
+        0.5703125,
+        -0.234375,
+        -10.9765625,
+        -0.65625,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.555216050317928,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5027302635418491,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5613545450969029,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.186250330442097,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.045260949904543,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.3985784252820423,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2716703184228035,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1424639292072731,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.437072517469508,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.2867217084610979,
+      "zone5_large_origin_tvd": 0.2867217084610979,
+      "nakamura_large_inside_share": 0.3980486575279043,
+      "same_unit_share_large": 0.5850135344147596
+    },
+    "large_accessibility_p1.5_q2": {
+      "coefficients": [
+        0.6015625,
+        0.38671875,
+        -0.21875,
+        -9.0390625,
+        -0.3984375,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5556114310338351,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5146118493995506,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5667083698602187,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.175967491309604,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0403248113206076,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.3786977428403169,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2638596152150587,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1411012170195733,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.4231594145951107,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.25830080894039675,
+      "zone5_large_origin_tvd": 0.25830080894039675,
+      "nakamura_large_inside_share": 0.37748777266686007,
+      "same_unit_share_large": 0.5872401506640837
+    },
+    "large_accessibility_p2_q0": {
+      "coefficients": [
+        0.4140625,
+        0.76953125,
+        -0.1875,
+        -10.5234375,
+        -0.546875,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5682284124730537,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.4904570301167137,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5792977216187498,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.2014018894416791,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0479370788693627,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.4224394210146323,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2863266277043266,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1419636209343116,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.4595340383988762,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.31554909374867324,
+      "zone5_large_origin_tvd": 0.31554909374867324,
+      "nakamura_large_inside_share": 0.41836965528522846,
+      "same_unit_share_large": 0.576744022572292
+    },
+    "large_accessibility_p2_q1": {
+      "coefficients": [
+        0.4375,
+        0.640625,
+        -0.203125,
+        -10.484375,
+        -0.5859375,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.560890363202445,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5013050250908444,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5784764964636226,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.193657090752637,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0441874698955667,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.4211804128941419,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.278675996382501,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1413157076417797,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.4583785593331757,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.29645111013456943,
+      "zone5_large_origin_tvd": 0.29645111013456943,
+      "nakamura_large_inside_share": 0.4011648957798659,
+      "same_unit_share_large": 0.5826303744012493
+    },
+    "large_accessibility_p2_q2": {
+      "coefficients": [
+        0.4296875,
+        0.5,
+        -0.2109375,
+        -9.4765625,
+        -0.4765625,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.559353873944464,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5131982634803902,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.57953978601371,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1870311762709758,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0422210406347108,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.4103821712497413,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.273228344861371,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1422941775197386,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.4503853905446977,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.27338744508197155,
+      "zone5_large_origin_tvd": 0.27338744508197155,
+      "nakamura_large_inside_share": 0.3826505001098731,
+      "same_unit_share_large": 0.5845395337527066
+    },
+    "large_accessibility_p3_q0": {
+      "coefficients": [
+        0.2421875,
+        0.77734375,
+        -0.15625,
+        -9.5234375,
+        -0.4453125,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5735673594014001,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.4929210591589646,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5945652326921185,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.2045546301212338,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0442137554155921,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.4300565182107041,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2899855013426778,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.139554984780171,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.4689603428509013,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.317986611265294,
+      "zone5_large_origin_tvd": 0.317986611265294,
+      "nakamura_large_inside_share": 0.4216738888580746,
+      "same_unit_share_large": 0.5778338873839631
+    },
+    "large_accessibility_p3_q1": {
+      "coefficients": [
+        0.2578125,
+        0.69921875,
+        -0.1796875,
+        -9.8125,
+        -0.515625,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5691657917902297,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5008282515146305,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.596298716575249,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.203598258467046,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0439905501332796,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.4394540241255416,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.288231525517198,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.1410593246025642,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.476545423386937,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.30618743275615207,
+      "zone5_large_origin_tvd": 0.30618743275615207,
+      "nakamura_large_inside_share": 0.4082972978119758,
+      "same_unit_share_large": 0.5795845064111221
+    },
+    "large_accessibility_p3_q2": {
+      "coefficients": [
+        0.2578125,
+        0.6171875,
+        -0.1953125,
+        -9.4140625,
+        -0.46875,
+        0.0
+      ],
+      "large": {
+        "train": {
+          "mean_log_probability": -1.5662785152902838,
+          "trips": 169968.0,
+          "reachable_share": 0.9622446033390513
+        },
+        "validation": {
+          "mean_log_probability": -1.5098161138545847,
+          "trips": 65022.0,
+          "reachable_share": 0.9559528360139963
+        },
+        "test": {
+          "mean_log_probability": -1.5941714326715493,
+          "trips": 62909.0,
+          "reachable_share": 0.9755450795521509
+        }
+      },
+      "other": {
+        "train": {
+          "mean_log_probability": -1.1979094793802827,
+          "trips": 564197.0,
+          "reachable_share": 0.9598664141942574
+        },
+        "validation": {
+          "mean_log_probability": -1.0414298442242003,
+          "trips": 240993.0,
+          "reachable_share": 0.9552751748085431
+        },
+        "test": {
+          "mean_log_probability": -1.4348802649940866,
+          "trips": 203108.0,
+          "reachable_share": 0.9713020482140893
+        }
+      },
+      "all": {
+        "train": {
+          "mean_log_probability": -1.2831913278687712,
+          "trips": 734165.0,
+          "reachable_share": 0.9604159471706801
+        },
+        "validation": {
+          "mean_log_probability": -1.140952455939008,
+          "trips": 306015.0,
+          "reachable_share": 0.9554190837168351
+        },
+        "test": {
+          "mean_log_probability": -1.4725502186715638,
+          "trips": 266017.0,
+          "reachable_share": 0.9723021254043386
+        }
+      },
+      "nakamura_large_origin_tvd": 0.2947228072538085,
+      "zone5_large_origin_tvd": 0.2947228072538085,
+      "nakamura_large_inside_share": 0.3993670157638997,
+      "same_unit_share_large": 0.5829511730452127
+    }
+  },
+  "pt_unreachable_share_20km": {
+    "large": 0.036365283155582726,
+    "other": 0.03895834048182757,
+    "all": 0.03836818170775072
+  },
+  "zone5_large_unreachable_share_20km": 0.05115706295859203,
+  "selected_radius_20_all_rows": [
+    0.859375,
+    0.765625,
+    -0.265625,
+    -11.40625,
+    0.109375,
+    0.0
+  ],
+  "large_all_rows_r30": [
+    0.8125,
+    0.71484375,
+    -0.234375,
+    -10.8359375,
+    0.2109375,
+    0.0
+  ],
+  "large_all_rows_r40": [
+    0.78125,
+    0.6796875,
+    -0.21875,
+    -10.4765625,
+    0.265625,
+    0.0
+  ],
+  "large_all_rows_r60": [
+    0.765625,
+    0.63671875,
+    -0.203125,
+    -9.9765625,
+    0.1796875,
+    0.0
+  ],
+  "other_all_rows_r20": [
+    0.2421875,
+    0.953125,
+    0.03125,
+    -2.84375,
+    -0.8046875,
+    0.0
+  ],
+  "large_accessibility_selected": {
+    "power": 2.0,
+    "decay": 0.0,
+    "selection": "best validation mean log-probability",
+    "train_coefficients": [
+      0.4140625,
+      0.76953125,
+      -0.1875,
+      -10.5234375,
+      -0.546875,
+      0.0
+    ],
+    "all_rows_coefficients": [
+      0.3984375,
+      0.77734375,
+      -0.15625,
+      -12.3515625,
+      -0.03125,
+      0.0
+    ]
+  },
+  "large_distance_sensitivity": [
+    {
+      "distance_multiplier": 0.77734375,
+      "train": -1.570388670762773,
+      "validation": -1.4868589879049163,
+      "test": -1.5677728085278413,
+      "all": -1.551604356897601,
+      "nakamura_large_origin_tvd": 0.32013314439684903,
+      "nakamura_large_inside_share": 0.42307106480071666
+    },
+    {
+      "distance_multiplier": 0.6,
+      "train": -1.617349121303024,
+      "validation": -1.4861821177530252,
+      "test": -1.67716270540883,
+      "all": -1.6013506515454354,
+      "nakamura_large_origin_tvd": 0.3021978203956565,
+      "nakamura_large_inside_share": 0.31830999009337013
+    },
+    {
+      "distance_multiplier": 0.45,
+      "train": -1.756935007537834,
+      "validation": -1.577330393863589,
+      "test": -1.8741707530277374,
+      "all": -1.7424902874236259,
+      "nakamura_large_origin_tvd": 0.33570607013793324,
+      "nakamura_large_inside_share": 0.23244067466666166
+    },
+    {
+      "distance_multiplier": 0.3,
+      "train": -2.0182407213938687,
+      "validation": -1.7831848322220705,
+      "test": -2.1900498738570136,
+      "all": -2.0032173005249683,
+      "nakamura_large_origin_tvd": 0.38422477054171805,
+      "nakamura_large_inside_share": 0.15695873623142972
+    },
+    {
+      "distance_multiplier": 0.15,
+      "train": -2.420564519659572,
+      "validation": -2.12379435725505,
+      "test": -2.6370107188095586,
+      "all": -2.401497065396415,
+      "nakamura_large_origin_tvd": 0.43889146600917806,
+      "nakamura_large_inside_share": 0.09677267600555195
+    }
+  ]
+}

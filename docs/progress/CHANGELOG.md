@@ -1,5 +1,9 @@
 # 進捗記録の更新履歴
 
+## 2026-10-14
+
+- 夜間作業（本人未確認）。`--facility-city-match`をcommit。中京PT到着施設別ODを`中京PTデータ/chukyo_pt_2022_od_facility_purpose_age.csv`へ保存（md5照合）。`pflow_large_store_estimation.py`で大型店・一般の行先MNLを分割推定（大型店test −1.5786→−1.5407）。Javaに大型店分岐・大型店魅力項・施設を大型店分岐限定にする任意オプションを追加（commit `e5ce559`、既定207 CSV完全一致）。2%校正で距離倍率0.45・施設capacity 1e9を採用、施設出発地TVDはseed42〜45平均0.431→0.354。全数seed42で施設17,965件、来訪者の97.2%は同メッシュ既存店からの転換。Python113テスト成功。[記録](20261014_大型店分岐と全数実行.md)。
+
 ## 2026-10-13
 
 - SSDのfull-processing入力同期完了。全国人物・networkを含み、再dry-run残り0、S3一覧の存在・サイズ不一致0。PFLOW全体70 GiB、空き629 GiB。全数生成は未実行。[取得記録](20261013_SSD入力ダウンロード.md)。

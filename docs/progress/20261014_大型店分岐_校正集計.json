@@ -1,0 +1,182 @@
+{
+ "seed": 42,
+ "sample": "Aichi 2% (sample-factor 50)",
+ "reference": "Chukyo PT 2022, zone-5 arrivals at 大型規模小売店, shopping purposes (chukyo_pt_2022_od_d5_shopping_facility_age.csv)",
+ "note": "Facility-origin TVD is the calibration target itself (in-sample), not an external validation. Store-type-specific coefficients come from pflow_large_store_estimation.py.",
+ "facility_runs": [
+  {
+   "run": "old_on",
+   "description": "adopted 2026-10-09 coefficients, facility-city-match on, f8e6",
+   "facility_arrivals": 228,
+   "tvd": 0.4230494730768063,
+   "tvd_aichi": 0.3917106185855629,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.3377192982456141,
+    "中村区内": 0.5526315789473685,
+    "名古屋市外の愛知県": 0.10964912280701754
+   }
+  },
+  {
+   "run": "old_off",
+   "description": "adopted 2026-10-09 coefficients, facility-city-match off, f8e6",
+   "facility_arrivals": 371,
+   "tvd": 0.39639633684479025,
+   "tvd_aichi": 0.3879118208778772,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.5067385444743936,
+    "中村区内": 0.3261455525606469,
+    "名古屋市外の愛知県": 0.16711590296495954
+   }
+  },
+  {
+   "run": "ls_f8M",
+   "description": "p1 d0.777 f8e6 (large coefficients, city-total attraction)",
+   "facility_arrivals": 241,
+   "tvd": 0.42636750284726,
+   "tvd_aichi": 0.3950870040744337,
+   "class_shares": {
+    "中村区内": 0.5311203319502075,
+    "名古屋市内（中村区以外）": 0.3195020746887967,
+    "名古屋市外の愛知県": 0.14937759336099585
+   }
+  },
+  {
+   "run": "ls_f1e9",
+   "description": "p1 d0.766 f1e9",
+   "facility_arrivals": 331,
+   "tvd": 0.4250282851280371,
+   "tvd_aichi": 0.39457303283175155,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.3202416918429003,
+    "中村区内": 0.5347432024169184,
+    "名古屋市外の愛知県": 0.14501510574018128
+   }
+  },
+  {
+   "run": "p2s0_f1e9",
+   "description": "p2 d0.777 f1e9",
+   "facility_arrivals": 363,
+   "tvd": 0.40675257002697596,
+   "tvd_aichi": 0.3760199827351927,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.34435261707988984,
+    "中村区内": 0.5151515151515151,
+    "名古屋市外の愛知県": 0.14049586776859505
+   }
+  },
+  {
+   "run": "p2s0_f400M",
+   "description": "p2 d0.777 f4e8",
+   "facility_arrivals": 361,
+   "tvd": 0.4060047239001321,
+   "tvd_aichi": 0.3752721366083488,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.34626038781163426,
+    "中村区内": 0.5152354570637119,
+    "名古屋市外の愛知県": 0.13850415512465375
+   }
+  },
+  {
+   "run": "p2sm1_f1e9",
+   "description": "p2 d0.777 same-city -1 f1e9",
+   "facility_arrivals": 361,
+   "tvd": 0.4111791155234946,
+   "tvd_aichi": 0.3806077695081635,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.34349030470914127,
+    "中村区内": 0.518005540166205,
+    "名古屋市外の愛知県": 0.13850415512465375
+   }
+  },
+  {
+   "run": "p15q2_f1e9",
+   "description": "p1.5 q2 (train coefficients) f1e9",
+   "facility_arrivals": 346,
+   "tvd": 0.38813183282245256,
+   "tvd_aichi": 0.3571767325691653,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.3554913294797688,
+    "中村区内": 0.5173410404624278,
+    "名古屋市外の愛知県": 0.12716763005780346
+   }
+  },
+  {
+   "run": "p2d06_f1e9",
+   "description": "p2 d0.6 f1e9",
+   "facility_arrivals": 362,
+   "tvd": 0.3760094110745904,
+   "tvd_aichi": 0.3447221537918117,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.3535911602209945,
+    "中村区内": 0.4889502762430939,
+    "名古屋市外の愛知県": 0.1574585635359116
+   }
+  },
+  {
+   "run": "p2d045_f1e9",
+   "description": "p2 d0.45 f1e9",
+   "facility_arrivals": 360,
+   "tvd": 0.34940212861447717,
+   "tvd_aichi": 0.3178794590680783,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.36111111111111116,
+    "中村区内": 0.46111111111111114,
+    "名古屋市外の愛知県": 0.17777777777777778
+   }
+  },
+  {
+   "run": "p2d03_f1e9",
+   "description": "p2 d0.3 f1e9",
+   "facility_arrivals": 364,
+   "tvd": 0.3185053550027584,
+   "tvd_aichi": 0.2863128200241444,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.3653846153846154,
+    "中村区内": 0.43131868131868134,
+    "名古屋市外の愛知県": 0.2032967032967033
+   }
+  },
+  {
+   "run": "p2d015_f1e9",
+   "description": "p2 d0.15 f1e9",
+   "facility_arrivals": 364,
+   "tvd": 0.2981802290804022,
+   "tvd_aichi": 0.26265182557193434,
+   "class_shares": {
+    "名古屋市内（中村区以外）": 0.3736263736263736,
+    "中村区内": 0.40934065934065933,
+    "名古屋市外の愛知県": 0.217032967032967
+   }
+  }
+ ],
+ "aichi_wide_shopping_baselines": {
+  "old_off": {
+   "same_unit_share": 0.6973,
+   "tvd_destinations": 0.0953,
+   "mean_trip_km": 4.067
+  },
+  "old_on": {
+   "same_unit_share": 0.6609,
+   "tvd_destinations": 0.0943,
+   "mean_trip_km": 4.0035
+  },
+  "p2_d0.777": {
+   "same_unit_share": 0.671,
+   "tvd_destinations": 0.0952,
+   "mean_trip_km": 3.9466
+  },
+  "p2_d0.45": {
+   "same_unit_share": 0.6213,
+   "tvd_destinations": 0.0937,
+   "mean_trip_km": 4.466
+  },
+  "p2_d0.3": {
+   "same_unit_share": 0.596,
+   "tvd_destinations": 0.0892,
+   "mean_trip_km": 4.8153
+  },
+  "pt": {
+   "same_unit_share": 0.707
+  }
+ }
+}
