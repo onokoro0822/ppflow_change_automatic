@@ -67,8 +67,7 @@ MNLへの商業量の追加は、修論では今後の課題または追加の�
    差分実行可否、2%／全数の実行時間・メモリ・出力容量、結果受渡し方法、使用commitを確定する。
 2. SSDをAPFS・`PFLOW_SSD`で用意し、内蔵の3.7 GiBを`migrate_pflow_to_ssd.sh`でコピー・照合する。
    SSD側でbaselineを再実行できるまで内蔵データを削除しない。
-3. `download_pflow_inputs.sh --scope full-processing --dest /Volumes/PFLOW_SSD/PFLOW`を最初に
-   `--dry-run`で確認し、その後、既存分を除く残りを同期する。`--delete`は使わない。
+3. 【完了 10/13】full-processing入力をSSDへ同期。再dry-run残り0、S3一覧の存在・サイズ不一致0。network・全国人物取得済み。内蔵入力は保持。
 4. 目標25,284件から逆算した`calibrated_target_25284`を全数候補として本人確認する。
    2%の1回実行は515件、全数換算25,750件、絶対誤差率1.84%である。
 5. 確定した校正ケースだけ`--sample-factor 1`でSSD上実行し、対象施設、対象メッシュ、同メッシュ他施設、
