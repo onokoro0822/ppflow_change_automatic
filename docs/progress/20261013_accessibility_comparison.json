@@ -1,0 +1,1099 @@
+{
+  "status": "prototype_not_java_simulation",
+  "split_seed": 13,
+  "split_origin_units": {
+    "train": [
+      "愛知郡東郷町・日進市・長久手市",
+      "岡崎市",
+      "みよし市",
+      "大府市",
+      "常滑市",
+      "名古屋市昭和区",
+      "春日井市",
+      "豊田市",
+      "田原市",
+      "知多郡東浦町・知多郡阿久比町",
+      "清須市",
+      "名古屋市南区",
+      "名古屋市守山区",
+      "名古屋市中区",
+      "名古屋市瑞穂区",
+      "豊川市",
+      "西尾市",
+      "名古屋市天白区",
+      "名古屋市西区",
+      "知立市",
+      "あま市・海部郡大治町",
+      "丹羽郡大口町・丹羽郡扶桑町",
+      "小牧市",
+      "東海市",
+      "犬山市",
+      "新城市",
+      "北設楽郡東栄町・北設楽郡設楽町・北設楽郡豊根村",
+      "瀬戸市",
+      "名古屋市中村区",
+      "碧南市・高浜市",
+      "江南市"
+    ],
+    "validation": [
+      "名古屋市名東区",
+      "安城市",
+      "名古屋市千種区・名古屋市東区",
+      "一宮市",
+      "豊橋市",
+      "弥富市・海部郡蟹江町・海部郡飛島村",
+      "北名古屋市・岩倉市・西春日井郡豊山町",
+      "額田郡幸田町",
+      "刈谷市",
+      "蒲郡市",
+      "知多郡武豊町"
+    ],
+    "test": [
+      "名古屋市港区",
+      "愛西市・津島市・稲沢市",
+      "知多市",
+      "半田市",
+      "名古屋市緑区",
+      "豊明市",
+      "名古屋市北区",
+      "名古屋市熱田区",
+      "尾張旭市",
+      "名古屋市中川区",
+      "知多郡南知多町・知多郡美浜町"
+    ]
+  },
+  "unreachable_pt_share": 0.03836818170775072,
+  "candidates": [
+    {
+      "power": 0.5,
+      "decay": 0.0,
+      "coefficients": [
+        0.640625,
+        0.90625,
+        -0.171875,
+        -3.890625,
+        -0.015625
+      ],
+      "train": {
+        "log_likelihood": -916362.2206659555,
+        "mean_log_probability": -1.2481693088964407,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -345791.0775076705,
+        "mean_log_probability": -1.129980809789293,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 401,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      }
+    },
+    {
+      "power": 0.5,
+      "decay": 1.0,
+      "coefficients": [
+        1.109375,
+        0.5625,
+        -0.1875,
+        -5.015625,
+        -0.296875
+      ],
+      "train": {
+        "log_likelihood": -898357.4770541172,
+        "mean_log_probability": -1.2236451983602015,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -344194.6096029753,
+        "mean_log_probability": -1.124763850147788,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 471,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      }
+    },
+    {
+      "power": 0.5,
+      "decay": 2.0,
+      "coefficients": [
+        0.90625,
+        0.34375,
+        -0.109375,
+        -4.703125,
+        0.03125
+      ],
+      "train": {
+        "log_likelihood": -891468.0899212621,
+        "mean_log_probability": -1.2142612218251512,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -341391.32488625287,
+        "mean_log_probability": -1.1156032380316419,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 681,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      },
+      "test": {
+        "log_likelihood": -343032.4141210152,
+        "mean_log_probability": -1.2895131293151008,
+        "trips": 266017.0
+      }
+    },
+    {
+      "power": 1.0,
+      "decay": 0.0,
+      "coefficients": [
+        0.5,
+        0.8984375,
+        -0.140625,
+        -6.953125,
+        -0.59375
+      ],
+      "train": {
+        "log_likelihood": -915008.7050011663,
+        "mean_log_probability": -1.2463256965411948,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -345119.57330004533,
+        "mean_log_probability": -1.1277864591606468,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 521,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      },
+      "test": {
+        "log_likelihood": -353753.44261313014,
+        "mean_log_probability": -1.3298151720120523,
+        "trips": 266017.0
+      }
+    },
+    {
+      "power": 1.0,
+      "decay": 1.0,
+      "coefficients": [
+        0.71875,
+        0.671875,
+        -0.171875,
+        -8.828125,
+        -0.9375
+      ],
+      "train": {
+        "log_likelihood": -904406.8971691711,
+        "mean_log_probability": -1.2318850628525893,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -345899.5810460161,
+        "mean_log_probability": -1.1303353791350623,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 951,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      }
+    },
+    {
+      "power": 1.0,
+      "decay": 2.0,
+      "coefficients": [
+        0.640625,
+        0.4765625,
+        -0.140625,
+        -7.59375,
+        -0.609375
+      ],
+      "train": {
+        "log_likelihood": -900282.5515918784,
+        "mean_log_probability": -1.2262673262711767,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -345745.8035851107,
+        "mean_log_probability": -1.1298328630462908,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 1091,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      }
+    },
+    {
+      "power": 1.5,
+      "decay": 0.0,
+      "coefficients": [
+        0.328125,
+        0.8984375,
+        -0.09375,
+        -7.5,
+        -0.71875
+      ],
+      "train": {
+        "log_likelihood": -915886.8006264742,
+        "mean_log_probability": -1.2475217432409256,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -344652.4429691405,
+        "mean_log_probability": -1.1262599642799878,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 781,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      }
+    },
+    {
+      "power": 1.5,
+      "decay": 1.0,
+      "coefficients": [
+        0.421875,
+        0.765625,
+        -0.125,
+        -8.78125,
+        -0.984375
+      ],
+      "train": {
+        "log_likelihood": -910607.2150678406,
+        "mean_log_probability": -1.240330463952709,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -346010.7909026031,
+        "mean_log_probability": -1.1306987922245744,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 1211,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      }
+    },
+    {
+      "power": 1.5,
+      "decay": 2.0,
+      "coefficients": [
+        0.40625,
+        0.6328125,
+        -0.125,
+        -8.0625,
+        -0.78125
+      ],
+      "train": {
+        "log_likelihood": -907592.2890487069,
+        "mean_log_probability": -1.2362238584632976,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -346770.3483582235,
+        "mean_log_probability": -1.1331808844606426,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 1571,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      }
+    },
+    {
+      "power": 2.0,
+      "decay": 0.0,
+      "coefficients": [
+        0.203125,
+        0.90625,
+        -0.0625,
+        -6.734375,
+        -0.59375
+      ],
+      "train": {
+        "log_likelihood": -917308.1419246336,
+        "mean_log_probability": -1.2494577403235425,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -344399.09196510265,
+        "mean_log_probability": -1.1254320604058712,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 811,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      }
+    },
+    {
+      "power": 2.0,
+      "decay": 1.0,
+      "coefficients": [
+        0.25,
+        0.8203125,
+        -0.09375,
+        -7.71875,
+        -0.78125
+      ],
+      "train": {
+        "log_likelihood": -914379.1180407996,
+        "mean_log_probability": -1.245468141413442,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -345276.5080963499,
+        "mean_log_probability": -1.128299292833194,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 621,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      }
+    },
+    {
+      "power": 2.0,
+      "decay": 2.0,
+      "coefficients": [
+        0.25,
+        0.734375,
+        -0.09375,
+        -7.25,
+        -0.71875
+      ],
+      "train": {
+        "log_likelihood": -912207.5307819066,
+        "mean_log_probability": -1.242510240588841,
+        "trips": 734165.0
+      },
+      "validation": {
+        "log_likelihood": -345763.3785816309,
+        "mean_log_probability": -1.1298902948601568,
+        "trips": 306015.0
+      },
+      "fit": {
+        "evaluations": 1191,
+        "final_step_max": 0.0078125,
+        "converged_step": true
+      }
+    }
+  ],
+  "selected": {
+    "power": 0.5,
+    "decay": 2.0,
+    "coefficients": [
+      0.90625,
+      0.34375,
+      -0.109375,
+      -4.703125,
+      0.03125
+    ],
+    "train": {
+      "log_likelihood": -891468.0899212621,
+      "mean_log_probability": -1.2142612218251512,
+      "trips": 734165.0
+    },
+    "validation": {
+      "log_likelihood": -341391.32488625287,
+      "mean_log_probability": -1.1156032380316419,
+      "trips": 306015.0
+    },
+    "fit": {
+      "evaluations": 681,
+      "final_step_max": 0.0078125,
+      "converged_step": true
+    },
+    "test": {
+      "log_likelihood": -343032.4141210152,
+      "mean_log_probability": -1.2895131293151008,
+      "trips": 266017.0
+    }
+  },
+  "baseline_train_fitted": {
+    "power": 1.0,
+    "decay": 0.0,
+    "coefficients": [
+      0.5,
+      0.8984375,
+      -0.140625,
+      -6.953125,
+      -0.59375
+    ],
+    "train": {
+      "log_likelihood": -915008.7050011663,
+      "mean_log_probability": -1.2463256965411948,
+      "trips": 734165.0
+    },
+    "validation": {
+      "log_likelihood": -345119.57330004533,
+      "mean_log_probability": -1.1277864591606468,
+      "trips": 306015.0
+    },
+    "fit": {
+      "evaluations": 521,
+      "final_step_max": 0.0078125,
+      "converged_step": true
+    },
+    "test": {
+      "log_likelihood": -353753.44261313014,
+      "mean_log_probability": -1.3298151720120523,
+      "trips": 266017.0
+    }
+  },
+  "all_pt_refit": {
+    "coefficients": [
+      0.921875,
+      0.3359375,
+      -0.09375,
+      -3.90625,
+      0.109375
+    ],
+    "diagnostic": {
+      "evaluations": 261,
+      "final_step_max": 0.0078125,
+      "converged_step": true
+    }
+  },
+  "intervention": {
+    "mesh": "52366700",
+    "employee_add": 745.942954248366,
+    "expected_outside_arrivals_before": 518.6103514519504,
+    "expected_outside_arrivals_after": 519.2681901886394,
+    "origin_flows": [
+      {
+        "origin": "23101",
+        "before": 8.158398092927055,
+        "after": 8.176591053779301
+      },
+      {
+        "origin": "23102",
+        "before": 9.75946889481837,
+        "after": 9.78251705319202
+      },
+      {
+        "origin": "23103",
+        "before": 15.159114653702888,
+        "after": 15.195785062370662
+      },
+      {
+        "origin": "23104",
+        "before": 41.999158683464756,
+        "after": 42.092465437488045
+      },
+      {
+        "origin": "23106",
+        "before": 78.16260705123992,
+        "after": 78.28535864925207
+      },
+      {
+        "origin": "23107",
+        "before": 10.568015831900833,
+        "after": 10.590232375724186
+      },
+      {
+        "origin": "23108",
+        "before": 6.571742530247068,
+        "after": 6.584905958025883
+      },
+      {
+        "origin": "23109",
+        "before": 14.457928131838187,
+        "after": 14.48385085673716
+      },
+      {
+        "origin": "23110",
+        "before": 203.6556496003222,
+        "after": 203.76207404057413
+      },
+      {
+        "origin": "23111",
+        "before": 20.899599210382977,
+        "after": 20.932507645401614
+      },
+      {
+        "origin": "23112",
+        "before": 5.811604783794643,
+        "after": 5.822719543198389
+      },
+      {
+        "origin": "23113",
+        "before": 2.23070923037428,
+        "after": 2.2354981499662325
+      },
+      {
+        "origin": "23114",
+        "before": 2.5039151125402728,
+        "after": 2.5085484814628494
+      },
+      {
+        "origin": "23115",
+        "before": 1.2573287200276162,
+        "after": 1.2599254539696119
+      },
+      {
+        "origin": "23116",
+        "before": 2.2657707808837872,
+        "after": 2.270295494645199
+      },
+      {
+        "origin": "23201",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23202",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23203",
+        "before": 2.18159441772803,
+        "after": 2.1852593829569598
+      },
+      {
+        "origin": "23204",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23205",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23206",
+        "before": 2.642077314950638,
+        "after": 2.6473852722450144
+      },
+      {
+        "origin": "23207",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23208",
+        "before": 2.333262248237678,
+        "after": 2.336847183005317
+      },
+      {
+        "origin": "23209",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23210",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23211",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23212",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23213",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23214",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23215",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23216",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23217",
+        "before": 0.8559006441455485,
+        "after": 0.8573213975047522
+      },
+      {
+        "origin": "23219",
+        "before": 1.2781254522623635,
+        "after": 1.2806019727460491
+      },
+      {
+        "origin": "23220",
+        "before": 4.472482670487558,
+        "after": 4.480418870789598
+      },
+      {
+        "origin": "23221",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23222",
+        "before": 0.8955240860693076,
+        "after": 0.896971132408797
+      },
+      {
+        "origin": "23223",
+        "before": 0.7503358294375834,
+        "after": 0.7515361518733311
+      },
+      {
+        "origin": "23224",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23225",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23226",
+        "before": 0.6741149880469635,
+        "after": 0.6753982507640494
+      },
+      {
+        "origin": "23227",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23228",
+        "before": 1.6879719146775534,
+        "after": 1.6913044737338727
+      },
+      {
+        "origin": "23229",
+        "before": 0.6261582221980657,
+        "after": 0.6272324709933267
+      },
+      {
+        "origin": "23230",
+        "before": 0.8670118271824218,
+        "after": 0.8686253978035623
+      },
+      {
+        "origin": "23231",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23232",
+        "before": 1.5625909373752318,
+        "after": 1.5649991412439819
+      },
+      {
+        "origin": "23233",
+        "before": 15.989615860514629,
+        "after": 16.019051446753938
+      },
+      {
+        "origin": "23234",
+        "before": 5.665578482871636,
+        "after": 5.677695440691807
+      },
+      {
+        "origin": "23235",
+        "before": 1.3931784908175808,
+        "after": 1.3952448524224983
+      },
+      {
+        "origin": "23236",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23237",
+        "before": 19.873566890358934,
+        "after": 19.89940482112815
+      },
+      {
+        "origin": "23238",
+        "before": 0.4831129733283036,
+        "after": 0.4840507758925335
+      },
+      {
+        "origin": "23302",
+        "before": 0.22198003345630749,
+        "after": 0.22236765481719475
+      },
+      {
+        "origin": "23342",
+        "before": 1.1521164270657749,
+        "after": 1.1546696215583805
+      },
+      {
+        "origin": "23361",
+        "before": 0.29130494847557886,
+        "after": 0.2917962761013978
+      },
+      {
+        "origin": "23362",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23424",
+        "before": 23.951340603199814,
+        "after": 23.969403004414904
+      },
+      {
+        "origin": "23425",
+        "before": 4.779536527638934,
+        "after": 4.785691479392571
+      },
+      {
+        "origin": "23427",
+        "before": 0.5208583529590685,
+        "after": 0.5216384616101062
+      },
+      {
+        "origin": "23441",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23442",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23445",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23446",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23447",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23501",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23561",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23562",
+        "before": 0.0,
+        "after": 0.0
+      },
+      {
+        "origin": "23563",
+        "before": 0.0,
+        "after": 0.0
+      }
+    ],
+    "destination_changes_for_outside_choosers": [
+      {
+        "destination": "23101",
+        "expected_outside_chooser_arrival_delta": -0.06240506488110202
+      },
+      {
+        "destination": "23102",
+        "expected_outside_chooser_arrival_delta": -0.08846242062897813
+      },
+      {
+        "destination": "23103",
+        "expected_outside_chooser_arrival_delta": -0.10316670208758673
+      },
+      {
+        "destination": "23104",
+        "expected_outside_chooser_arrival_delta": 0.5832271143820691
+      },
+      {
+        "destination": "23105",
+        "expected_outside_chooser_arrival_delta": 0.6578387366891154
+      },
+      {
+        "destination": "23106",
+        "expected_outside_chooser_arrival_delta": -0.19568640576768553
+      },
+      {
+        "destination": "23107",
+        "expected_outside_chooser_arrival_delta": -0.0653902604313197
+      },
+      {
+        "destination": "23108",
+        "expected_outside_chooser_arrival_delta": -0.02494095245522003
+      },
+      {
+        "destination": "23109",
+        "expected_outside_chooser_arrival_delta": -0.05310485993024494
+      },
+      {
+        "destination": "23110",
+        "expected_outside_chooser_arrival_delta": -0.1525430557048554
+      },
+      {
+        "destination": "23111",
+        "expected_outside_chooser_arrival_delta": -0.061810887267351906
+      },
+      {
+        "destination": "23112",
+        "expected_outside_chooser_arrival_delta": -0.02469853487201342
+      },
+      {
+        "destination": "23113",
+        "expected_outside_chooser_arrival_delta": -0.0228051978125057
+      },
+      {
+        "destination": "23114",
+        "expected_outside_chooser_arrival_delta": -0.011804657635113652
+      },
+      {
+        "destination": "23115",
+        "expected_outside_chooser_arrival_delta": -0.0106977726814276
+      },
+      {
+        "destination": "23116",
+        "expected_outside_chooser_arrival_delta": -0.013145249421503798
+      },
+      {
+        "destination": "23201",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23202",
+        "expected_outside_chooser_arrival_delta": -3.7853967673623107e-06
+      },
+      {
+        "destination": "23203",
+        "expected_outside_chooser_arrival_delta": -0.013678038061627266
+      },
+      {
+        "destination": "23204",
+        "expected_outside_chooser_arrival_delta": -0.0015880168256334096
+      },
+      {
+        "destination": "23205",
+        "expected_outside_chooser_arrival_delta": -1.4572282666343046e-05
+      },
+      {
+        "destination": "23206",
+        "expected_outside_chooser_arrival_delta": -0.023380565726058435
+      },
+      {
+        "destination": "23207",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23208",
+        "expected_outside_chooser_arrival_delta": -0.010191519850911098
+      },
+      {
+        "destination": "23209",
+        "expected_outside_chooser_arrival_delta": -7.443573340967357e-06
+      },
+      {
+        "destination": "23210",
+        "expected_outside_chooser_arrival_delta": -0.0004388008694396957
+      },
+      {
+        "destination": "23211",
+        "expected_outside_chooser_arrival_delta": -9.593815455153536e-05
+      },
+      {
+        "destination": "23212",
+        "expected_outside_chooser_arrival_delta": -4.5033150950302483e-05
+      },
+      {
+        "destination": "23213",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23214",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23215",
+        "expected_outside_chooser_arrival_delta": -0.0014403565437328795
+      },
+      {
+        "destination": "23216",
+        "expected_outside_chooser_arrival_delta": -5.423440610609906e-06
+      },
+      {
+        "destination": "23217",
+        "expected_outside_chooser_arrival_delta": -0.0041972296445007586
+      },
+      {
+        "destination": "23219",
+        "expected_outside_chooser_arrival_delta": -0.014025433087503807
+      },
+      {
+        "destination": "23220",
+        "expected_outside_chooser_arrival_delta": -0.02194125690490933
+      },
+      {
+        "destination": "23221",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23222",
+        "expected_outside_chooser_arrival_delta": -0.0027761990457564013
+      },
+      {
+        "destination": "23223",
+        "expected_outside_chooser_arrival_delta": -0.0019180920129154972
+      },
+      {
+        "destination": "23224",
+        "expected_outside_chooser_arrival_delta": -0.0002494565541032892
+      },
+      {
+        "destination": "23225",
+        "expected_outside_chooser_arrival_delta": -0.0001234387889396406
+      },
+      {
+        "destination": "23226",
+        "expected_outside_chooser_arrival_delta": -0.004230616432229427
+      },
+      {
+        "destination": "23227",
+        "expected_outside_chooser_arrival_delta": -2.1101652883248536e-05
+      },
+      {
+        "destination": "23228",
+        "expected_outside_chooser_arrival_delta": -0.007661800898995622
+      },
+      {
+        "destination": "23229",
+        "expected_outside_chooser_arrival_delta": -0.00280600744275291
+      },
+      {
+        "destination": "23230",
+        "expected_outside_chooser_arrival_delta": -0.00458656390243967
+      },
+      {
+        "destination": "23231",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23232",
+        "expected_outside_chooser_arrival_delta": -0.006857276684374646
+      },
+      {
+        "destination": "23233",
+        "expected_outside_chooser_arrival_delta": -0.07756980547469924
+      },
+      {
+        "destination": "23234",
+        "expected_outside_chooser_arrival_delta": -0.03509819704670429
+      },
+      {
+        "destination": "23235",
+        "expected_outside_chooser_arrival_delta": -0.004763063706350285
+      },
+      {
+        "destination": "23236",
+        "expected_outside_chooser_arrival_delta": -0.00043540991312317814
+      },
+      {
+        "destination": "23237",
+        "expected_outside_chooser_arrival_delta": -0.04399174466219734
+      },
+      {
+        "destination": "23238",
+        "expected_outside_chooser_arrival_delta": -0.004644155356883852
+      },
+      {
+        "destination": "23302",
+        "expected_outside_chooser_arrival_delta": -0.001484862433070263
+      },
+      {
+        "destination": "23342",
+        "expected_outside_chooser_arrival_delta": -0.01148372793280563
+      },
+      {
+        "destination": "23361",
+        "expected_outside_chooser_arrival_delta": -0.0022905538849520377
+      },
+      {
+        "destination": "23362",
+        "expected_outside_chooser_arrival_delta": -0.00123417627519124
+      },
+      {
+        "destination": "23424",
+        "expected_outside_chooser_arrival_delta": -0.03140675279282938
+      },
+      {
+        "destination": "23425",
+        "expected_outside_chooser_arrival_delta": -0.011187986196179531
+      },
+      {
+        "destination": "23427",
+        "expected_outside_chooser_arrival_delta": -0.0022817132982183644
+      },
+      {
+        "destination": "23441",
+        "expected_outside_chooser_arrival_delta": -4.381213175469809e-05
+      },
+      {
+        "destination": "23442",
+        "expected_outside_chooser_arrival_delta": -0.00020165571363880454
+      },
+      {
+        "destination": "23445",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23446",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23447",
+        "expected_outside_chooser_arrival_delta": -2.245746915482483e-06
+      },
+      {
+        "destination": "23501",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23561",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23562",
+        "expected_outside_chooser_arrival_delta": 0.0
+      },
+      {
+        "destination": "23563",
+        "expected_outside_chooser_arrival_delta": 0.0
+      }
+    ]
+  },
+  "notes": [
+    "Internal held-out aggregated PT origins, not external facility validation.",
+    "All-PT refit is for prospective simulation, not held-out evaluation.",
+    "Expected flow uses fixed original-baseline chooser counts; no new shopping activities.",
+    "The surrogate MNL predicts selected cities; PT describes physical areas. Full simulator evaluation must reconcile retail-address destinations."
+  ],
+  "fit_initialization": "neutral lab multiplier start; selected candidate and all-PT refit unchanged after correction"
+}

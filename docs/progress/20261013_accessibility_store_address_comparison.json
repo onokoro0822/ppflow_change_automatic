@@ -1,0 +1,530 @@
+[
+  {
+    "target_store_code": "23105",
+    "csv_file_count": 207,
+    "home_outside_net_lower": 21,
+    "home_outside_net_upper": 21,
+    "before_counts": {
+      "shopping_total": 39907,
+      "selected_city_differs_from_store": 10885,
+      "retail_address_target_arrivals": 1380,
+      "direct_home_target_arrivals": 664,
+      "known_home_outside_target_arrivals": 484,
+      "selected_city_target_arrivals": 985,
+      "selected_city_home_outside_arrivals": 263,
+      "unmapped_or_ambiguous": 258,
+      "unmapped_store_rows": 258,
+      "unknown_store_home_outside": 137
+    },
+    "after_counts": {
+      "shopping_total": 39907,
+      "selected_city_differs_from_store": 10892,
+      "retail_address_target_arrivals": 1446,
+      "direct_home_target_arrivals": 691,
+      "known_home_outside_target_arrivals": 505,
+      "selected_city_target_arrivals": 985,
+      "selected_city_home_outside_arrivals": 263,
+      "unmapped_or_ambiguous": 258,
+      "unmapped_store_rows": 258,
+      "unknown_store_home_outside": 137
+    },
+    "previous_store_cities_of_confirmed_entries": {
+      "23104": 32,
+      "23233": 1
+    },
+    "new_store_cities_of_confirmed_exits": {
+      "23104": 9,
+      "23424": 1,
+      "23233": 1,
+      "23110": 1
+    },
+    "home_cities_of_confirmed_entries": {
+      "23102": 1,
+      "23103": 3,
+      "23104": 9,
+      "23106": 2,
+      "23107": 1,
+      "23110": 5,
+      "23111": 2,
+      "23112": 1,
+      "23215": 1,
+      "23219": 1,
+      "23234": 1,
+      "23237": 4,
+      "23342": 1,
+      "23425": 1
+    },
+    "other_changes": {},
+    "notes": [
+      "Retail address codes are input locations, not observed visitor data.",
+      "Unambiguous outside origins here are HOME activities only.",
+      "Conservative bounds retain unmatched/ambiguous changed locations.",
+      "Identical unmapped locations with unchanged home-origin eligibility cancel; conflicting address codes remain bounded."
+    ],
+    "model": "city_total_model",
+    "case": "42"
+  },
+  {
+    "target_store_code": "23105",
+    "csv_file_count": 207,
+    "home_outside_net_lower": 27,
+    "home_outside_net_upper": 28,
+    "before_counts": {
+      "shopping_total": 40154,
+      "selected_city_differs_from_store": 11036,
+      "selected_city_target_arrivals": 977,
+      "retail_address_target_arrivals": 1390,
+      "selected_city_home_outside_arrivals": 281,
+      "unmapped_or_ambiguous": 259,
+      "unmapped_store_rows": 259,
+      "direct_home_target_arrivals": 681,
+      "known_home_outside_target_arrivals": 504,
+      "unknown_store_home_outside": 111
+    },
+    "after_counts": {
+      "shopping_total": 40154,
+      "selected_city_differs_from_store": 11014,
+      "selected_city_target_arrivals": 977,
+      "retail_address_target_arrivals": 1459,
+      "selected_city_home_outside_arrivals": 280,
+      "unmapped_or_ambiguous": 260,
+      "unmapped_store_rows": 260,
+      "direct_home_target_arrivals": 716,
+      "known_home_outside_target_arrivals": 531,
+      "unknown_store_home_outside": 112
+    },
+    "previous_store_cities_of_confirmed_entries": {
+      "23104": 33,
+      "23424": 1,
+      "23106": 1,
+      "23110": 1
+    },
+    "new_store_cities_of_confirmed_exits": {
+      "23233": 1,
+      "23104": 8
+    },
+    "home_cities_of_confirmed_entries": {
+      "23101": 1,
+      "23102": 1,
+      "23103": 1,
+      "23104": 10,
+      "23106": 3,
+      "23109": 2,
+      "23110": 8,
+      "23111": 1,
+      "23206": 1,
+      "23229": 1,
+      "23233": 4,
+      "23237": 1,
+      "23424": 1,
+      "23425": 1
+    },
+    "other_changes": {
+      "uncertain_changed_events": 1
+    },
+    "notes": [
+      "Retail address codes are input locations, not observed visitor data.",
+      "Unambiguous outside origins here are HOME activities only.",
+      "Conservative bounds retain unmatched/ambiguous changed locations.",
+      "Identical unmapped locations with unchanged home-origin eligibility cancel; conflicting address codes remain bounded."
+    ],
+    "model": "city_total_model",
+    "case": "43"
+  },
+  {
+    "target_store_code": "23105",
+    "csv_file_count": 207,
+    "home_outside_net_lower": 28,
+    "home_outside_net_upper": 30,
+    "before_counts": {
+      "shopping_total": 40272,
+      "selected_city_differs_from_store": 11058,
+      "selected_city_target_arrivals": 1005,
+      "retail_address_target_arrivals": 1417,
+      "selected_city_home_outside_arrivals": 292,
+      "direct_home_target_arrivals": 686,
+      "known_home_outside_target_arrivals": 526,
+      "unmapped_or_ambiguous": 258,
+      "unmapped_store_rows": 258,
+      "unknown_store_home_outside": 144
+    },
+    "after_counts": {
+      "shopping_total": 40273,
+      "selected_city_differs_from_store": 11053,
+      "selected_city_target_arrivals": 1004,
+      "retail_address_target_arrivals": 1489,
+      "selected_city_home_outside_arrivals": 292,
+      "direct_home_target_arrivals": 722,
+      "known_home_outside_target_arrivals": 554,
+      "unmapped_or_ambiguous": 260,
+      "unmapped_store_rows": 260,
+      "unknown_store_home_outside": 146
+    },
+    "previous_store_cities_of_confirmed_entries": {
+      "23104": 33,
+      "23233": 2,
+      "23106": 1
+    },
+    "new_store_cities_of_confirmed_exits": {
+      "23106": 1,
+      "23104": 6,
+      "23110": 1
+    },
+    "home_cities_of_confirmed_entries": {
+      "23101": 1,
+      "23102": 1,
+      "23103": 1,
+      "23104": 15,
+      "23106": 3,
+      "23108": 1,
+      "23109": 1,
+      "23110": 6,
+      "23233": 3,
+      "23234": 2,
+      "23237": 2
+    },
+    "other_changes": {
+      "uncertain_changed_events": 2
+    },
+    "notes": [
+      "Retail address codes are input locations, not observed visitor data.",
+      "Unambiguous outside origins here are HOME activities only.",
+      "Conservative bounds retain unmatched/ambiguous changed locations.",
+      "Identical unmapped locations with unchanged home-origin eligibility cancel; conflicting address codes remain bounded."
+    ],
+    "model": "city_total_model",
+    "case": "44"
+  },
+  {
+    "target_store_code": "23105",
+    "csv_file_count": 207,
+    "home_outside_net_lower": 31,
+    "home_outside_net_upper": 34,
+    "before_counts": {
+      "shopping_total": 40310,
+      "selected_city_differs_from_store": 11155,
+      "selected_city_target_arrivals": 1032,
+      "retail_address_target_arrivals": 1441,
+      "direct_home_target_arrivals": 699,
+      "known_home_outside_target_arrivals": 521,
+      "unmapped_or_ambiguous": 259,
+      "unmapped_store_rows": 259,
+      "unknown_store_home_outside": 135,
+      "selected_city_home_outside_arrivals": 303
+    },
+    "after_counts": {
+      "shopping_total": 40310,
+      "selected_city_differs_from_store": 11120,
+      "selected_city_target_arrivals": 1034,
+      "retail_address_target_arrivals": 1526,
+      "direct_home_target_arrivals": 740,
+      "known_home_outside_target_arrivals": 553,
+      "unmapped_or_ambiguous": 261,
+      "unmapped_store_rows": 261,
+      "unknown_store_home_outside": 136,
+      "selected_city_home_outside_arrivals": 303
+    },
+    "previous_store_cities_of_confirmed_entries": {
+      "23104": 39,
+      "23106": 2
+    },
+    "new_store_cities_of_confirmed_exits": {
+      "23104": 5,
+      "23233": 1,
+      "23109": 1,
+      "23424": 1
+    },
+    "home_cities_of_confirmed_entries": {
+      "23103": 6,
+      "23104": 9,
+      "23106": 2,
+      "23108": 1,
+      "23110": 16,
+      "23111": 1,
+      "23233": 3,
+      "23237": 1,
+      "23425": 2
+    },
+    "other_changes": {
+      "uncertain_changed_events": 3
+    },
+    "notes": [
+      "Retail address codes are input locations, not observed visitor data.",
+      "Unambiguous outside origins here are HOME activities only.",
+      "Conservative bounds retain unmatched/ambiguous changed locations.",
+      "Identical unmapped locations with unchanged home-origin eligibility cancel; conflicting address codes remain bounded."
+    ],
+    "model": "city_total_model",
+    "case": "45"
+  },
+  {
+    "target_store_code": "23105",
+    "csv_file_count": 207,
+    "home_outside_net_lower": 26,
+    "home_outside_net_upper": 27,
+    "before_counts": {
+      "shopping_total": 39877,
+      "selected_city_differs_from_store": 10829,
+      "retail_address_target_arrivals": 1325,
+      "direct_home_target_arrivals": 632,
+      "known_home_outside_target_arrivals": 462,
+      "selected_city_target_arrivals": 943,
+      "unmapped_or_ambiguous": 252,
+      "unmapped_store_rows": 252,
+      "unknown_store_home_outside": 130,
+      "selected_city_home_outside_arrivals": 261
+    },
+    "after_counts": {
+      "shopping_total": 39877,
+      "selected_city_differs_from_store": 10823,
+      "retail_address_target_arrivals": 1388,
+      "direct_home_target_arrivals": 665,
+      "known_home_outside_target_arrivals": 488,
+      "selected_city_target_arrivals": 944,
+      "unmapped_or_ambiguous": 253,
+      "unmapped_store_rows": 253,
+      "unknown_store_home_outside": 131,
+      "selected_city_home_outside_arrivals": 261
+    },
+    "previous_store_cities_of_confirmed_entries": {
+      "23104": 30,
+      "23106": 3,
+      "23237": 1,
+      "23233": 1
+    },
+    "new_store_cities_of_confirmed_exits": {
+      "23104": 6,
+      "23424": 1,
+      "23233": 1,
+      "23110": 1
+    },
+    "home_cities_of_confirmed_entries": {
+      "23102": 2,
+      "23103": 1,
+      "23104": 11,
+      "23106": 2,
+      "23107": 1,
+      "23108": 1,
+      "23110": 7,
+      "23115": 1,
+      "23234": 3,
+      "23237": 4,
+      "23342": 1,
+      "23361": 1
+    },
+    "other_changes": {
+      "uncertain_changed_events": 1
+    },
+    "notes": [
+      "Retail address codes are input locations, not observed visitor data.",
+      "Unambiguous outside origins here are HOME activities only.",
+      "Conservative bounds retain unmatched/ambiguous changed locations.",
+      "Identical unmapped locations with unchanged home-origin eligibility cancel; conflicting address codes remain bounded."
+    ],
+    "model": "accessibility_model",
+    "case": "42"
+  },
+  {
+    "target_store_code": "23105",
+    "csv_file_count": 207,
+    "home_outside_net_lower": 6,
+    "home_outside_net_upper": 6,
+    "before_counts": {
+      "shopping_total": 38487,
+      "selected_city_differs_from_store": 10607,
+      "selected_city_target_arrivals": 896,
+      "selected_city_home_outside_arrivals": 204,
+      "retail_address_target_arrivals": 1102,
+      "direct_home_target_arrivals": 516,
+      "known_home_outside_target_arrivals": 342,
+      "unmapped_or_ambiguous": 251,
+      "unmapped_store_rows": 251,
+      "unknown_store_home_outside": 132
+    },
+    "after_counts": {
+      "shopping_total": 38487,
+      "selected_city_differs_from_store": 10607,
+      "selected_city_target_arrivals": 896,
+      "selected_city_home_outside_arrivals": 204,
+      "retail_address_target_arrivals": 1114,
+      "direct_home_target_arrivals": 520,
+      "known_home_outside_target_arrivals": 348,
+      "unmapped_or_ambiguous": 251,
+      "unmapped_store_rows": 251,
+      "unknown_store_home_outside": 132
+    },
+    "previous_store_cities_of_confirmed_entries": {
+      "23104": 7
+    },
+    "new_store_cities_of_confirmed_exits": {
+      "23104": 1
+    },
+    "home_cities_of_confirmed_entries": {
+      "23103": 1,
+      "23110": 1,
+      "23228": 1,
+      "23234": 1,
+      "23237": 2,
+      "23425": 1
+    },
+    "other_changes": {},
+    "notes": [
+      "Retail address codes are input locations, not observed visitor data.",
+      "Unambiguous outside origins here are HOME activities only.",
+      "Conservative bounds retain unmatched/ambiguous changed locations.",
+      "Identical unmapped locations with unchanged home-origin eligibility cancel; conflicting address codes remain bounded."
+    ],
+    "model": "lab_default_model",
+    "case": "facility_100x"
+  },
+  {
+    "target_store_code": "23105",
+    "csv_file_count": 207,
+    "home_outside_net_lower": 67,
+    "home_outside_net_upper": 68,
+    "before_counts": {
+      "shopping_total": 38487,
+      "selected_city_differs_from_store": 10607,
+      "selected_city_target_arrivals": 896,
+      "selected_city_home_outside_arrivals": 204,
+      "retail_address_target_arrivals": 1102,
+      "direct_home_target_arrivals": 516,
+      "known_home_outside_target_arrivals": 342,
+      "unmapped_or_ambiguous": 251,
+      "unmapped_store_rows": 251,
+      "unknown_store_home_outside": 132
+    },
+    "after_counts": {
+      "shopping_total": 38487,
+      "selected_city_differs_from_store": 10635,
+      "selected_city_target_arrivals": 896,
+      "selected_city_home_outside_arrivals": 204,
+      "retail_address_target_arrivals": 1248,
+      "direct_home_target_arrivals": 583,
+      "known_home_outside_target_arrivals": 410,
+      "unmapped_or_ambiguous": 248,
+      "unmapped_store_rows": 248,
+      "unknown_store_home_outside": 131
+    },
+    "previous_store_cities_of_confirmed_entries": {
+      "23104": 41,
+      "23103": 7,
+      "23233": 5,
+      "23106": 22,
+      "23110": 5
+    },
+    "new_store_cities_of_confirmed_exits": {
+      "23106": 6,
+      "23104": 6,
+      "23233": 1
+    },
+    "home_cities_of_confirmed_entries": {
+      "23101": 1,
+      "23102": 5,
+      "23103": 15,
+      "23104": 8,
+      "23106": 3,
+      "23107": 1,
+      "23109": 2,
+      "23110": 12,
+      "23111": 3,
+      "23114": 1,
+      "23206": 1,
+      "23208": 1,
+      "23220": 1,
+      "23228": 5,
+      "23233": 4,
+      "23234": 9,
+      "23237": 4,
+      "23342": 1,
+      "23424": 2,
+      "23425": 1
+    },
+    "other_changes": {
+      "uncertain_changed_events": 1
+    },
+    "notes": [
+      "Retail address codes are input locations, not observed visitor data.",
+      "Unambiguous outside origins here are HOME activities only.",
+      "Conservative bounds retain unmatched/ambiguous changed locations.",
+      "Identical unmapped locations with unchanged home-origin eligibility cancel; conflicting address codes remain bounded."
+    ],
+    "model": "lab_default_model",
+    "case": "mesh_10x"
+  },
+  {
+    "target_store_code": "23105",
+    "csv_file_count": 207,
+    "home_outside_net_lower": 66,
+    "home_outside_net_upper": 67,
+    "before_counts": {
+      "shopping_total": 38487,
+      "selected_city_differs_from_store": 10607,
+      "selected_city_target_arrivals": 896,
+      "selected_city_home_outside_arrivals": 204,
+      "retail_address_target_arrivals": 1102,
+      "direct_home_target_arrivals": 516,
+      "known_home_outside_target_arrivals": 342,
+      "unmapped_or_ambiguous": 251,
+      "unmapped_store_rows": 251,
+      "unknown_store_home_outside": 132
+    },
+    "after_counts": {
+      "shopping_total": 38487,
+      "selected_city_differs_from_store": 10639,
+      "selected_city_target_arrivals": 896,
+      "selected_city_home_outside_arrivals": 204,
+      "retail_address_target_arrivals": 1255,
+      "direct_home_target_arrivals": 582,
+      "known_home_outside_target_arrivals": 409,
+      "unmapped_or_ambiguous": 248,
+      "unmapped_store_rows": 248,
+      "unknown_store_home_outside": 131
+    },
+    "previous_store_cities_of_confirmed_entries": {
+      "23104": 41,
+      "23103": 7,
+      "23233": 5,
+      "23106": 22,
+      "23110": 5
+    },
+    "new_store_cities_of_confirmed_exits": {
+      "23106": 6,
+      "23104": 7,
+      "23233": 1
+    },
+    "home_cities_of_confirmed_entries": {
+      "23101": 1,
+      "23102": 5,
+      "23103": 15,
+      "23104": 8,
+      "23106": 3,
+      "23107": 1,
+      "23109": 2,
+      "23110": 12,
+      "23111": 3,
+      "23114": 1,
+      "23206": 1,
+      "23208": 1,
+      "23220": 1,
+      "23228": 5,
+      "23233": 4,
+      "23234": 9,
+      "23237": 4,
+      "23342": 1,
+      "23424": 2,
+      "23425": 1
+    },
+    "other_changes": {
+      "uncertain_changed_events": 1
+    },
+    "notes": [
+      "Retail address codes are input locations, not observed visitor data.",
+      "Unambiguous outside origins here are HOME activities only.",
+      "Conservative bounds retain unmatched/ambiguous changed locations.",
+      "Identical unmapped locations with unchanged home-origin eligibility cancel; conflicting address codes remain bounded."
+    ],
+    "model": "lab_default_model",
+    "case": "combined_mesh_10x_facility_10x"
+  }
+]
