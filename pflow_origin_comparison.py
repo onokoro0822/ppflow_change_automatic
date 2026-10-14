@@ -152,29 +152,28 @@ def pt_origin_counts(pt_csv: Path, units: ComparisonUnits, zone_labels) -> dict[
     return counts
 
 
-def pflow_origin_counts(scenario_dir: Path, units: ComparisonUnits) -> dict[str, dict[str, float]]:
+def pflow_origin_counts(scenario_dir: Path, units: ComparisonUnits, target=None) -> dict[str, dict[str, float]]:
     """Count shopping arrivals by the unit of the immediately preceding activity."""
+    from pflow_target import AnalysisTarget
+    target = target or AnalysisTarget()
     selections = {"admin": Counter(), "mesh": Counter(), "facility": Counter()}
     csv_files = sorted(path for path in scenario_dir.rglob("*.csv") if path.is_file())
     if not csv_files:
         raise FileNotFoundError(f"No activity CSVs under {scenario_dir}")
     for csv_path in csv_files:
         previous_by_person: dict[int, dict[str, object]] = {}
-        for row in _iter_rows(csv_path):
+        for row, trace in target.rows(csv_path):
             person_id = int(row["person_id"])
             previous = previous_by_person.get(person_id)
             previous_by_person[person_id] = row
             if int(row["purpose"]) != SHOPPING_PURPOSE or previous is None:
                 continue
             unit = units.unit_for_gcode(str(previous["gcode"]))
-            if str(row["gcode"]) == TARGET_GCODE:
+            if str(row["gcode"]) == target.gcode:
                 selections["admin"][unit] += 1
-            if third_mesh_code(float(row["lon"]), float(row["lat"])) == TARGET_MESH:
+            if third_mesh_code(float(row["lon"]), float(row["lat"])) == target.meshCode:
                 selections["mesh"][unit] += 1
-            if (
-                abs(float(row["lon"]) - TARGET_LON) <= FACILITY_TOLERANCE
-                and abs(float(row["lat"]) - TARGET_LAT) <= FACILITY_TOLERANCE
-            ):
+            if target.matches(row, trace):
                 selections["facility"][unit] += 1
     return {key: dict(value) for key, value in selections.items()}
 
@@ -285,7 +284,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--pt-csv", type=Path, default=pt.DEFAULT_INPUT)
     parser.add_argument("--zone-xlsx", type=Path, default=pt.DEFAULT_ZONE_CODE_XLSX)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--target-config", type=Path)
     args = parser.parse_args(argv)
+    from pflow_target import AnalysisTarget
+    target = AnalysisTarget.load(args.target_config) if args.target_config else None
 
     baseline_dir = args.baseline_dir or args.pflow_home / "output" / "capacity_experiment" / "baseline"
     calibrated_dir = args.calibrated_dir or (
@@ -297,7 +299,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     distributions: dict[str, dict[str, float]] = {}
     distributions.update(pt_origin_counts(args.pt_csv, units, zone_labels))
     for prefix, directory in (("baseline", baseline_dir), ("calibrated", calibrated_dir)):
-        for selection, counts in pflow_origin_counts(directory, units).items():
+        for selection, counts in pflow_origin_counts(directory, units, target).items():
             if prefix == "baseline" and selection == "facility":
                 continue  # the injected facility does not exist in the baseline
             distributions[f"{prefix}_{selection}"] = counts

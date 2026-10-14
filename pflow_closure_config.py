@@ -40,7 +40,7 @@ def build(facilities, output):
         (output/(name+'_b.json')).write_text(json.dumps(dict(gamma=coefficients['gamma'],transform='log1p',unit='TelePoint_BUSC3402_row_count',indicators=values),indent=2)+'\n')
     audit=dict(retail_file=str(retail.resolve()),retail_sha256=hashlib.sha256(retail.read_bytes()).hexdigest(),
                rows=rows,addresses=addresses,meshes=meshes,nakamura_before=indicators['23105'],nakamura_after=indicators['23105']-rows,
-               capacity_removal_mesh_status='awaiting_user_confirmation_52365790_vs_52366700',
+               capacity_removal_mesh_status='confirmed_52365790', capacity_removal_mesh='52365790',
                mesh_capacity_remove=54374*65068/4743000,national_indicator_cities=len(codes),
                estimator_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),coefficients=coefficients,
                limitations=['Exact address match; floor suffixes are not removed.',

@@ -16,5 +16,14 @@
   "postclosure_removed_rows": 306,
   "postclosure_nakamura_indicator": 19.0,
   "mesh_capacity_removed": 745.942954248366,
-  "capacity_removal_mesh_status": "awaiting_user_confirmation_52365790_vs_52366700"
+  "capacity_removal_mesh_status": "confirmed_52365790",
+  "target": {
+    "meshCode": "52365790",
+    "gcode": "23105",
+    "longitude": 136.88665075,
+    "latitude": 35.16649051,
+    "facilityId": 900000001,
+    "tolerance": 1e-06,
+    "source": "city_retail.csv: exact address 名駅1丁目2-1; existing Java constant datum shift; model coordinates, not a newly validated geodetic conversion"
+  }
 }

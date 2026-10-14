@@ -58,8 +58,11 @@ def _time_band(seconds: int) -> str:
     return "20-23"
 
 
-def summarize_scenario(scenario_dir: Path) -> dict[str, object]:
+def summarize_scenario(scenario_dir: Path, target=None) -> dict[str, object]:
+    from pflow_target import AnalysisTarget
+    target = target or AnalysisTarget()
     metrics: dict[str, object] = {
+        "analysis_target": target.as_dict(),
         "scenario_id": scenario_dir.name,
         "shopping_total": 0,
         "target_facility": 0,
@@ -78,18 +81,15 @@ def summarize_scenario(scenario_dir: Path) -> dict[str, object]:
 
     for csv_path in csv_files:
         previous_by_person: dict[int, dict[str, object]] = {}
-        for row in _iter_rows(csv_path):
+        for row, trace in target.rows(csv_path):
             person_id = int(row["person_id"])
             previous = previous_by_person.get(person_id)
             if int(row["purpose"]) == SHOPPING_PURPOSE:
                 metrics["shopping_total"] = int(metrics["shopping_total"]) + 1
-                if str(row["gcode"]) == TARGET_GCODE:
+                if str(row["gcode"]) == target.gcode:
                     metrics["target_admin_shopping"] = int(metrics["target_admin_shopping"]) + 1
-                is_target_mesh = third_mesh_code(float(row["lon"]), float(row["lat"])) == TARGET_MESH
-                is_target_facility = (
-                    abs(float(row["lon"]) - TARGET_LON) <= FACILITY_TOLERANCE
-                    and abs(float(row["lat"]) - TARGET_LAT) <= FACILITY_TOLERANCE
-                )
+                is_target_mesh = third_mesh_code(float(row["lon"]), float(row["lat"])) == target.meshCode
+                is_target_facility = target.matches(row, trace)
                 if is_target_mesh:
                     metrics["target_mesh"] = int(metrics["target_mesh"]) + 1
                     age[str(row["age"])] += 1
@@ -160,12 +160,12 @@ def write_sensitivity_chart(results: list[dict[str, object]], output_dir: Path) 
     figure.savefig(output_dir / "capacity_sensitivity.svg", bbox_inches="tight")
     plt.close(figure)
 
-def analyze(input_root: Path, output_dir: Path) -> list[dict[str, object]]:
+def analyze(input_root: Path, output_dir: Path, target=None) -> list[dict[str, object]]:
     scenario_dirs = sorted(
         path for path in input_root.iterdir()
         if path.is_dir() and (path / ".complete").is_file()
     )
-    results = [summarize_scenario(path) for path in scenario_dirs if list(path.rglob("*.csv"))]
+    results = [summarize_scenario(path, target) for path in scenario_dirs if list(path.rglob("*.csv"))]
     if not results:
         raise FileNotFoundError(f"No scenario activity CSVs under {input_root}")
     baseline = next((row for row in results if row["scenario_id"] == "baseline"), None)
@@ -194,8 +194,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input-root", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--target-config", type=Path)
     args = parser.parse_args()
-    results = analyze(args.input_root, args.output_dir)
+    from pflow_target import AnalysisTarget
+    target = AnalysisTarget.load(args.target_config) if args.target_config else None
+    results = analyze(args.input_root, args.output_dir, target)
     print(f"Wrote {len(results)} scenario summaries to {args.output_dir}")
 
 
