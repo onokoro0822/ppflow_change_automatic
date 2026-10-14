@@ -331,7 +331,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument("--pt-csv", type=Path, default=pt.DEFAULT_INPUT)
     parser.add_argument("--zone-xlsx", type=Path, default=pt.DEFAULT_ZONE_CODE_XLSX)
+    parser.add_argument("--gamma-indicators", type=Path, help="Sourced city retail area CSV (m2): gcode,indicator,source")
+    parser.add_argument("--gamma-transform", choices=("both", "log1p_area", "presence"), default="both")
+    parser.add_argument("--gamma-holdout-gcodes", help="Comma-separated documented large-facility cities, withheld before estimation")
     args = parser.parse_args(argv)
+    if args.gamma_indicators is not None:
+        from pflow_gamma_estimation import run
+        return run(args)
 
     facilities = args.pflow_home / "data" / "facilities"
     baseline_dir = args.baseline_dir or args.pflow_home / "output" / "capacity_experiment" / "baseline" / "23"

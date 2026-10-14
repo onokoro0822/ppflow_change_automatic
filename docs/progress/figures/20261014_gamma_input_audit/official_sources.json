@@ -1,0 +1,28 @@
+{
+  "retrieved_date_jst": "2026-10-14",
+  "nagoya": {
+    "url": "https://www.city.nagoya.jp/_res/projects/default_project/_page_/001/026/740/r8.2daiten.pdf",
+    "local_file": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/data/large_store_area_20261014/nagoya_r8.2daiten.pdf",
+    "sha256": "7fdc06c97ea59858d0056d8f08b2d67e02f4513726b45d796955f91987c71ef0",
+    "source_as_of": "2026-02-end",
+    "listed_records": 271,
+    "includes_planned_stores": true,
+    "accepted_model_records": 0,
+    "meitetsu_related_row": 72,
+    "meitetsu_combined_notification_area_m2": 72891
+  },
+  "aichi": {
+    "url": "https://www.pref.aichi.jp/soshiki/shogyo/0000001865.html",
+    "found": "annual_notification_changes_since_2007",
+    "complete_stock_list_confirmed": false,
+    "http_download_status": 403,
+    "accepted_model_records": 0
+  },
+  "baseline": {
+    "contains_meitetsu_named_retail_rows": 219,
+    "time_alignment": "unresolved_mixed_vintage_sources",
+    "closure_filter_applied": false
+  },
+  "status": "stopped_per_user_missing_usable_complete_inventory",
+  "prohibited_fallback": "no_name_inferred_labels_no_missing_city_zero_fill"
+}
