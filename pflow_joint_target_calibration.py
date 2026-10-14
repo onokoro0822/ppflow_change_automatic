@@ -115,7 +115,7 @@ def main():
     p.add_argument('--sample-factor', type=int, default=50)
     p.add_argument('--mesh-additions', type=float, nargs='+', default=[745.942954248366,6000])
     p.add_argument('--competing-capacity', type=float, default=3220000)
-    p.add_argument('--reference-ceiling', type=float, default=360, help='Arrivals in the saved 2% reference run')
+    p.add_argument('--reference-ceiling', type=float, default=122, help='Arrivals in the corrected-filter 2% reference run (seed 42, capacity 1e9, employee add 745.943)')
     p.add_argument('--reference-sample-factor', type=int, default=50)
     p.add_argument('--rounds', type=int, default=3)
     p.add_argument('--workers', type=int, default=1)
@@ -144,6 +144,8 @@ def main():
               'pt_sha256':hashlib.sha256(args.pt_csv.read_bytes()).hexdigest(),
               'pt_raw_counts':reference,'pt_aichi_normalized':ref_aichi,'pt_aichi_class_shares':dict(ref_classes),
               'mesh_additions':args.mesh_additions,'count_tolerance':args.count_tolerance,
+              'reference_ceiling':args.reference_ceiling,'reference_sample_factor':args.reference_sample_factor,
+              'competing_capacity':args.competing_capacity,
               'tvd_tolerance':args.tvd_tolerance,'round_budget':args.rounds,
               'notes':['PT origin is preceding activity, not residence.',
                        'The reference is ward-wide large-store shopping, not observations of the hypothetical facility.',
@@ -152,7 +154,7 @@ def main():
                        'MNL coefficients and distance multiplier 0.45 are fixed.',
                        '2% full equivalents are estimates, not full-population executions.',
                        'Transfer classification uses baseline selected-city codes; physical-city inflow needs separate audit.',
-                       'Existing facility-only filter can be overwritten by city matching in Java; existing behavior is retained.'],
+                       'Java city matching uses the already filtered pool; ordinary shopping cannot restore injected facilities.'],
               'trials':[],'best':{}}
     atomic_json(out/'report.json',report)
     def trial(target,addition,capacity,index):

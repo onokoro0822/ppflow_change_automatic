@@ -1,0 +1,14 @@
+{
+  "csv_count": 207,
+  "identical": true,
+  "old": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/capacity_experiment/baseline/23",
+  "new": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/facility_filter_fix_20261014/default_check/baseline/23",
+  "aggregate_sha256_names_and_file_hashes": "bac168953f4d48a869169b9f8fecefd9316d7a15fdce997c1022ee365e5989b3",
+  "java_commit": "a118854",
+  "java_tests": {
+    "before_failures": 2,
+    "after_tests": 4,
+    "after_failures": 0
+  },
+  "python_tests": 120
+}
