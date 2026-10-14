@@ -1,6 +1,14 @@
 # 参照資料
 
-最終更新: 2026-10-13 JST
+最終更新: 2026-10-14 JST
+
+## 仮想施設校正の一次データ・コード（2026-10-14）
+
+- `中京PTデータ/chukyo_pt_2022_od_d5_shopping_facility_age.csv`：用意済みの中村区着・買物OD。出発地は直前活動地点。入力SHA256は実行report.jsonに保存。
+- `pflow_joint_target_calibration.py`、`pflow_joint_target_verify.py`、`pflow_capacity_analysis.py`、`pflow_origin_comparison.py`：校正・実集計の一次コード。
+- 隣接Pseudo-PFLOW-v3の`CapacityScenario.java`・`ActGenerator.java`：商業量加算、施設選択容量比、フィルター順序の一次仕様。
+- [仮想施設3,000・6,000校正](20261014_仮想施設3000_6000校正.md)と同名JSON：本セッションの全数実行・店舗所在地・活動監査。
+
 
 ## 既存大型施設の検証準備（2026-10-13）
 
