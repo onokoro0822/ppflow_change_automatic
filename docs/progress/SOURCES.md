@@ -263,3 +263,7 @@
   - 栄三丁目5番1号で現在営業する商業施設として、栄側上位座標との対応確認に使用した。
 - [アスナル金山 アクセス](https://www.asunal.jp/access/)
   - 金山駅北口の営業中商業施設として、金山側座標クラスタとの対応候補に使用した。
+
+## 採用(b)と閉店入力監査（2026-10-14夕方）
+
+本チャットの本人指示、DECISIONS同日夕方、`output/gamma_telepoint_3402/gamma_estimation.json`、`city_retail.csv` と `mesh_ecensus.csv` を照合。[ハッシュ・実数・コード上の座標](20261014_gamma導入と閉店入力監査.md)。

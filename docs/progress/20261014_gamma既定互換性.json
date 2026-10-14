@@ -1,0 +1,9 @@
+{
+  "reference": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/capacity_experiment/baseline/23",
+  "actual": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_closure_default_20261014/baseline/23",
+  "csv_count": 207,
+  "byte_identical": true,
+  "manifest_sha256": "d0d57a135bdfbde213734e8fd6fb194cd509d251a7e949e497ed85272c2a9b05",
+  "error_logs": [],
+  "command": "PATH=/Users/yuuki/tools/apache-maven-3.6.3/bin:$PATH MAVEN_OPTS=-Xmx6g bash scripts/run_pflow_capacity_sweep.sh --scenario baseline --seed 42 --skip-compile --output-root .local/pflow/output/gamma_closure_default_20261014"
+}

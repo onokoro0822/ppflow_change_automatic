@@ -1,0 +1,20 @@
+{
+  "source": "output/gamma_telepoint_3402/gamma_estimation.json",
+  "source_sha256": "c7b4821555025cef7d0e9b546403ab78e8a8cf21ad1070229e89fc7322e51592",
+  "adopted_model": "b",
+  "source_transform_key": "log1p_area",
+  "actual_indicator_unit": "TelePoint_BUSC3402_row_count",
+  "coefficients": {
+    "gamma": 0.011720855296350972,
+    "beta": 0.43590586364374384,
+    "distance_multiplier": 0.9171120757320695,
+    "area_multiplier": -0.08266305088851081,
+    "population_multiplier": -4.266766913696244,
+    "office_multiplier": -0.9742489937064989
+  },
+  "warning": "Source m2 labels and 54374m2 feature increment are inapplicable to this row-count fit. Do not use them.",
+  "postclosure_removed_rows": 306,
+  "postclosure_nakamura_indicator": 19.0,
+  "mesh_capacity_removed": 745.942954248366,
+  "capacity_removal_mesh_status": "awaiting_user_confirmation_52365790_vs_52366700"
+}

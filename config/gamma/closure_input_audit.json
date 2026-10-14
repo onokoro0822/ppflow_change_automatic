@@ -1,0 +1,33 @@
+{
+  "retail_file": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/data/facilities/city_retail.csv",
+  "retail_sha256": "10f4b5ccfb6a0da09c08837a83b586f8eba8f0cea3d0b3a45edb32b905d0e316",
+  "rows": 306,
+  "addresses": {
+    "愛知県　名古屋市中村区　名駅　１丁目　２−２": 103,
+    "愛知県　名古屋市中村区　名駅　１丁目　２−１": 140,
+    "愛知県　名古屋市中村区　名駅　１丁目　２−４": 63
+  },
+  "meshes": {
+    "52365790": 306
+  },
+  "nakamura_before": 325,
+  "nakamura_after": 19,
+  "capacity_removal_mesh_status": "awaiting_user_confirmation_52365790_vs_52366700",
+  "mesh_capacity_remove": 745.942954248366,
+  "national_indicator_cities": 1902,
+  "estimator_sha256": "c7b4821555025cef7d0e9b546403ab78e8a8cf21ad1070229e89fc7322e51592",
+  "coefficients": {
+    "gamma": 0.011720855296350972,
+    "beta": 0.43590586364374384,
+    "distance_multiplier": 0.9171120757320695,
+    "area_multiplier": -0.08266305088851081,
+    "population_multiplier": -4.266766913696244,
+    "office_multiplier": -0.9742489937064989
+  },
+  "limitations": [
+    "Exact address match; floor suffixes are not removed.",
+    "BUSC3402 row count is a provisional proxy, not store count or floor area.",
+    "National rows use the same rule for border alternatives; coefficients were fitted on Aichi only.",
+    "Original estimation m2 metadata is inapplicable; its numeric log1p fit is retained."
+  ]
+}

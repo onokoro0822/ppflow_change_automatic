@@ -1,0 +1,21 @@
+{
+  "scenarioId": "meitetsu_closed",
+  "target": {
+    "meshCode": "52366700",
+    "gcode": "23105"
+  },
+  "meshCapacityRemove": 745.942954248366,
+  "retailExclusion": {
+    "gcode": "23105",
+    "businessPrefix": "3402",
+    "addresses": [
+      "愛知県　名古屋市中村区　名駅　１丁目　２−１",
+      "愛知県　名古屋市中村区　名駅　１丁目　２−２",
+      "愛知県　名古屋市中村区　名駅　１丁目　２−４"
+    ],
+    "expectedRows": 306
+  },
+  "meshCapacityMultiplier": 1.0,
+  "meshCapacityAdd": 0.0,
+  "injectFacility": false
+}
