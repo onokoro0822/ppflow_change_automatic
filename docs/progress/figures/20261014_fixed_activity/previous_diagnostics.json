@@ -1,0 +1,64 @@
+{
+  "3000": {
+    "totals": {
+      "before": {
+        "outside_target_city": 1912925,
+        "target_mesh_existing": 31613,
+        "other_mesh_target_city": 43754,
+        "unknown_store_city": 13273
+      },
+      "after": {
+        "outside_target_city": 1907815,
+        "target_mesh_existing": 35233,
+        "other_mesh_target_city": 42233,
+        "unknown_store_city": 13231,
+        "new_facility": 3038
+      },
+      "net": {
+        "other_mesh_target_city": -1521,
+        "new_facility": 3038,
+        "target_mesh_existing": 3620,
+        "outside_target_city": -5110,
+        "unknown_store_city": -42
+      }
+    },
+    "changed_shopping_events_by_temporal_stage": {
+      "no_facility_visit": 64178,
+      "facility_arrival": 3037,
+      "pre_visit": 34,
+      "post_visit": 48
+    },
+    "unaligned_persons": 594
+  },
+  "6000": {
+    "totals": {
+      "before": {
+        "outside_target_city": 1912925,
+        "target_mesh_existing": 31613,
+        "other_mesh_target_city": 43754,
+        "unknown_store_city": 13273
+      },
+      "after": {
+        "outside_target_city": 1912286,
+        "target_mesh_existing": 26325,
+        "other_mesh_target_city": 43555,
+        "unknown_store_city": 13269,
+        "new_facility": 6110
+      },
+      "net": {
+        "other_mesh_target_city": -199,
+        "new_facility": 6110,
+        "target_mesh_existing": -5288,
+        "outside_target_city": -639,
+        "unknown_store_city": -4
+      }
+    },
+    "changed_shopping_events_by_temporal_stage": {
+      "no_facility_visit": 9419,
+      "facility_arrival": 6110,
+      "post_visit": 28,
+      "pre_visit": 11
+    },
+    "unaligned_persons": 104
+  }
+}

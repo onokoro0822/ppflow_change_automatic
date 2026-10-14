@@ -1,0 +1,373 @@
+{
+  "results": [
+    {
+      "seed": 42,
+      "sample_factor": 50,
+      "target": 3000,
+      "actual_sample": 60,
+      "tvd": 0.07119742760873653,
+      "quota_exact": true,
+      "audit": {
+        "activities": 561780,
+        "persons": 140569,
+        "induced_persons": 59,
+        "facility_arrivals": 60,
+        "changed_destinations": 72,
+        "direct_destination_changes": 60,
+        "downstream_destination_changes": 12,
+        "schedule_mismatches": 0,
+        "fixed_destination_mismatches": 0,
+        "noninduced_person_mismatches": 0,
+        "ordinary_facility_arrivals": 0,
+        "status": "passed"
+      },
+      "counts": {
+        "activities": 561780,
+        "changed_destinations": 72,
+        "changed_persons": 59,
+        "direct_facility": 59,
+        "downstream_reselected": 12,
+        "facility_arrivals": 60,
+        "induced_persons": 59,
+        "persons": 140569,
+        "repeat_facility": 1
+      }
+    },
+    {
+      "seed": 42,
+      "sample_factor": 50,
+      "target": 6000,
+      "actual_sample": 120,
+      "tvd": 0.04001488018882444,
+      "quota_exact": true,
+      "audit": {
+        "activities": 561780,
+        "persons": 140569,
+        "induced_persons": 119,
+        "facility_arrivals": 120,
+        "changed_destinations": 141,
+        "direct_destination_changes": 120,
+        "downstream_destination_changes": 21,
+        "schedule_mismatches": 0,
+        "fixed_destination_mismatches": 0,
+        "noninduced_person_mismatches": 0,
+        "ordinary_facility_arrivals": 0,
+        "status": "passed"
+      },
+      "counts": {
+        "activities": 561780,
+        "changed_destinations": 141,
+        "changed_persons": 119,
+        "direct_facility": 119,
+        "downstream_reselected": 21,
+        "facility_arrivals": 120,
+        "induced_persons": 119,
+        "persons": 140569,
+        "repeat_facility": 1
+      }
+    },
+    {
+      "seed": 43,
+      "sample_factor": 50,
+      "target": 3000,
+      "actual_sample": 60,
+      "tvd": 0.07119742760873653,
+      "quota_exact": true,
+      "audit": {
+        "activities": 561825,
+        "persons": 140569,
+        "induced_persons": 59,
+        "facility_arrivals": 60,
+        "changed_destinations": 72,
+        "direct_destination_changes": 60,
+        "downstream_destination_changes": 12,
+        "schedule_mismatches": 0,
+        "fixed_destination_mismatches": 0,
+        "noninduced_person_mismatches": 0,
+        "ordinary_facility_arrivals": 0,
+        "status": "passed"
+      },
+      "counts": {
+        "activities": 561825,
+        "changed_destinations": 72,
+        "changed_persons": 59,
+        "direct_facility": 59,
+        "downstream_reselected": 12,
+        "facility_arrivals": 60,
+        "induced_persons": 59,
+        "persons": 140569,
+        "repeat_facility": 1
+      }
+    },
+    {
+      "seed": 43,
+      "sample_factor": 50,
+      "target": 6000,
+      "actual_sample": 120,
+      "tvd": 0.04001488018882444,
+      "quota_exact": true,
+      "audit": {
+        "activities": 561825,
+        "persons": 140569,
+        "induced_persons": 118,
+        "facility_arrivals": 120,
+        "changed_destinations": 146,
+        "direct_destination_changes": 120,
+        "downstream_destination_changes": 26,
+        "schedule_mismatches": 0,
+        "fixed_destination_mismatches": 0,
+        "noninduced_person_mismatches": 0,
+        "ordinary_facility_arrivals": 0,
+        "status": "passed"
+      },
+      "counts": {
+        "activities": 561825,
+        "changed_destinations": 146,
+        "changed_persons": 118,
+        "direct_facility": 118,
+        "downstream_reselected": 26,
+        "facility_arrivals": 120,
+        "induced_persons": 118,
+        "persons": 140569,
+        "repeat_facility": 2
+      }
+    },
+    {
+      "seed": 44,
+      "sample_factor": 50,
+      "target": 3000,
+      "actual_sample": 60,
+      "tvd": 0.07119742760873653,
+      "quota_exact": true,
+      "audit": {
+        "activities": 562258,
+        "persons": 140569,
+        "induced_persons": 60,
+        "facility_arrivals": 60,
+        "changed_destinations": 78,
+        "direct_destination_changes": 60,
+        "downstream_destination_changes": 18,
+        "schedule_mismatches": 0,
+        "fixed_destination_mismatches": 0,
+        "noninduced_person_mismatches": 0,
+        "ordinary_facility_arrivals": 0,
+        "status": "passed"
+      },
+      "counts": {
+        "activities": 562258,
+        "changed_destinations": 78,
+        "changed_persons": 60,
+        "direct_facility": 60,
+        "downstream_reselected": 18,
+        "facility_arrivals": 60,
+        "induced_persons": 60,
+        "persons": 140569
+      }
+    },
+    {
+      "seed": 44,
+      "sample_factor": 50,
+      "target": 6000,
+      "actual_sample": 120,
+      "tvd": 0.04001488018882444,
+      "quota_exact": true,
+      "audit": {
+        "activities": 562258,
+        "persons": 140569,
+        "induced_persons": 120,
+        "facility_arrivals": 120,
+        "changed_destinations": 144,
+        "direct_destination_changes": 120,
+        "downstream_destination_changes": 24,
+        "schedule_mismatches": 0,
+        "fixed_destination_mismatches": 0,
+        "noninduced_person_mismatches": 0,
+        "ordinary_facility_arrivals": 0,
+        "status": "passed"
+      },
+      "counts": {
+        "activities": 562258,
+        "changed_destinations": 144,
+        "changed_persons": 120,
+        "direct_facility": 120,
+        "downstream_reselected": 24,
+        "facility_arrivals": 120,
+        "induced_persons": 120,
+        "persons": 140569
+      }
+    },
+    {
+      "seed": 45,
+      "sample_factor": 50,
+      "target": 3000,
+      "actual_sample": 60,
+      "tvd": 0.07119742760873653,
+      "quota_exact": true,
+      "audit": {
+        "activities": 562584,
+        "persons": 140569,
+        "induced_persons": 60,
+        "facility_arrivals": 60,
+        "changed_destinations": 73,
+        "direct_destination_changes": 60,
+        "downstream_destination_changes": 13,
+        "schedule_mismatches": 0,
+        "fixed_destination_mismatches": 0,
+        "noninduced_person_mismatches": 0,
+        "ordinary_facility_arrivals": 0,
+        "status": "passed"
+      },
+      "counts": {
+        "activities": 562584,
+        "changed_destinations": 73,
+        "changed_persons": 60,
+        "direct_facility": 60,
+        "downstream_reselected": 13,
+        "facility_arrivals": 60,
+        "induced_persons": 60,
+        "persons": 140569
+      }
+    },
+    {
+      "seed": 45,
+      "sample_factor": 50,
+      "target": 6000,
+      "actual_sample": 120,
+      "tvd": 0.04001488018882444,
+      "quota_exact": true,
+      "audit": {
+        "activities": 562584,
+        "persons": 140569,
+        "induced_persons": 120,
+        "facility_arrivals": 120,
+        "changed_destinations": 139,
+        "direct_destination_changes": 120,
+        "downstream_destination_changes": 19,
+        "schedule_mismatches": 0,
+        "fixed_destination_mismatches": 0,
+        "noninduced_person_mismatches": 0,
+        "ordinary_facility_arrivals": 0,
+        "status": "passed"
+      },
+      "counts": {
+        "activities": 562584,
+        "changed_destinations": 139,
+        "changed_persons": 120,
+        "direct_facility": 120,
+        "downstream_reselected": 19,
+        "facility_arrivals": 120,
+        "induced_persons": 120,
+        "persons": 140569
+      }
+    },
+    {
+      "seed": 42,
+      "sample_factor": 1,
+      "target": 3000,
+      "actual_sample": 3000,
+      "tvd": 0.001510185232695377,
+      "quota_exact": true,
+      "audit": {
+        "activities": 28057110,
+        "persons": 7023479,
+        "induced_persons": 2998,
+        "facility_arrivals": 3000,
+        "changed_destinations": 3618,
+        "direct_destination_changes": 3000,
+        "downstream_destination_changes": 618,
+        "selection_failures": 1,
+        "schedule_mismatches": 0,
+        "fixed_destination_mismatches": 0,
+        "noninduced_person_mismatches": 0,
+        "ordinary_facility_arrivals": 0,
+        "status": "passed"
+      },
+      "counts": {
+        "activities": 28057110,
+        "changed_destinations": 3618,
+        "changed_persons": 2998,
+        "direct_facility": 2998,
+        "downstream_reselected": 618,
+        "facility_arrivals": 3000,
+        "induced_persons": 2998,
+        "persons": 7023479,
+        "repeat_facility": 2,
+        "selection_failures": 1
+      }
+    },
+    {
+      "seed": 42,
+      "sample_factor": 1,
+      "target": 6000,
+      "actual_sample": 6000,
+      "tvd": 0.0007972788068483162,
+      "quota_exact": true,
+      "audit": {
+        "activities": 28057110,
+        "persons": 7023479,
+        "induced_persons": 5990,
+        "facility_arrivals": 6000,
+        "changed_destinations": 7249,
+        "direct_destination_changes": 6000,
+        "downstream_destination_changes": 1249,
+        "selection_failures": 4,
+        "schedule_mismatches": 0,
+        "fixed_destination_mismatches": 0,
+        "noninduced_person_mismatches": 0,
+        "ordinary_facility_arrivals": 0,
+        "status": "passed"
+      },
+      "counts": {
+        "activities": 28057110,
+        "changed_destinations": 7249,
+        "changed_persons": 5990,
+        "direct_facility": 5990,
+        "downstream_reselected": 1249,
+        "facility_arrivals": 6000,
+        "induced_persons": 5990,
+        "persons": 7023479,
+        "repeat_facility": 10,
+        "selection_failures": 4
+      }
+    }
+  ],
+  "checks": {
+    "default_csv_identical": 207,
+    "target_zero_csv_identical": 207,
+    "same_seed_csv_identical": 207,
+    "direct_only_conservation": "passed: only facility-bound destinations changed",
+    "3000": {
+      "facility_mesh_city_gross_arrivals": [
+        3000,
+        3000,
+        3000
+      ],
+      "withdrawals_by_output_city": {
+        "outside_target_city": 2379,
+        "target_mesh": 262,
+        "other_mesh_target_city": 359
+      },
+      "failures": {
+        "200:IllegalStateException": 1
+      }
+    },
+    "6000": {
+      "facility_mesh_city_gross_arrivals": [
+        6000,
+        6000,
+        6000
+      ],
+      "withdrawals_by_output_city": {
+        "outside_target_city": 4749,
+        "other_mesh_target_city": 745,
+        "target_mesh": 506
+      },
+      "failures": {
+        "200:IllegalStateException": 4
+      }
+    }
+  },
+  "full_report": "/Volumes/PFLOW_SSD/PFLOW/output/fixed_activity_20261014/seed42_full_replay/report.json",
+  "baseline": "/Volumes/PFLOW_SSD/PFLOW/output/fixed_activity_20261014/seed42_full/baseline",
+  "pt_role": "assumed_input_not_validation"
+}

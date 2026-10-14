@@ -1,0 +1,134 @@
+[
+  {
+    "root": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/fixed_activity_20261014/default/baseline",
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario",
+      "baseline",
+      "--pflow-home",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow",
+      "--output-root",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/fixed_activity_20261014/default",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "50",
+      "--skip-compile",
+      "--pflow-args",
+      ""
+    ],
+    "seed": 42,
+    "sample_factor": 50
+  },
+  {
+    "root": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/fixed_activity_20261014/seed42_2pct/baseline",
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario",
+      "baseline",
+      "--pflow-home",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow",
+      "--output-root",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/fixed_activity_20261014/seed42_2pct",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "50",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.2421875 --shopping-mnl-multipliers 0.953125,0.03125,-2.84375,-0.8046875,0 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --shopping-large-store-accessibility 2,0 --shopping-large-store 0.22389070848047118,0.3984375,0.45,-0.15625,-12.3515625,-0.03125,0 --activity-trace on"
+    ],
+    "seed": 42,
+    "sample_factor": 50
+  },
+  {
+    "root": "/Volumes/PFLOW_SSD/PFLOW/output/fixed_activity_20261014/seed42_full/baseline",
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario",
+      "baseline",
+      "--pflow-home",
+      "/Volumes/PFLOW_SSD/PFLOW",
+      "--output-root",
+      "/Volumes/PFLOW_SSD/PFLOW/output/fixed_activity_20261014/seed42_full",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "1",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.2421875 --shopping-mnl-multipliers 0.953125,0.03125,-2.84375,-0.8046875,0 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --shopping-large-store-accessibility 2,0 --shopping-large-store 0.22389070848047118,0.3984375,0.45,-0.15625,-12.3515625,-0.03125,0 --activity-trace on"
+    ],
+    "seed": 42,
+    "sample_factor": 1
+  },
+  {
+    "root": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/fixed_activity_20261014/seed43_2pct/baseline",
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario",
+      "baseline",
+      "--pflow-home",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow",
+      "--output-root",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/fixed_activity_20261014/seed43_2pct",
+      "--seed",
+      "43",
+      "--sample-factor",
+      "50",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.2421875 --shopping-mnl-multipliers 0.953125,0.03125,-2.84375,-0.8046875,0 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --shopping-large-store-accessibility 2,0 --shopping-large-store 0.22389070848047118,0.3984375,0.45,-0.15625,-12.3515625,-0.03125,0 --activity-trace on"
+    ],
+    "seed": 43,
+    "sample_factor": 50
+  },
+  {
+    "root": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/fixed_activity_20261014/seed44_2pct/baseline",
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario",
+      "baseline",
+      "--pflow-home",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow",
+      "--output-root",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/fixed_activity_20261014/seed44_2pct",
+      "--seed",
+      "44",
+      "--sample-factor",
+      "50",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.2421875 --shopping-mnl-multipliers 0.953125,0.03125,-2.84375,-0.8046875,0 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --shopping-large-store-accessibility 2,0 --shopping-large-store 0.22389070848047118,0.3984375,0.45,-0.15625,-12.3515625,-0.03125,0 --activity-trace on"
+    ],
+    "seed": 44,
+    "sample_factor": 50
+  },
+  {
+    "root": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/fixed_activity_20261014/seed45_2pct/baseline",
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario",
+      "baseline",
+      "--pflow-home",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow",
+      "--output-root",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/fixed_activity_20261014/seed45_2pct",
+      "--seed",
+      "45",
+      "--sample-factor",
+      "50",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.2421875 --shopping-mnl-multipliers 0.953125,0.03125,-2.84375,-0.8046875,0 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --shopping-large-store-accessibility 2,0 --shopping-large-store 0.22389070848047118,0.3984375,0.45,-0.15625,-12.3515625,-0.03125,0 --activity-trace on"
+    ],
+    "seed": 45,
+    "sample_factor": 50
+  }
+]
