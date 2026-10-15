@@ -1,0 +1,86 @@
+{
+  "3000": {
+    "closed": {
+      "Commuter": {
+        "nonzero_return_persons": 40970,
+        "processed_persons": 3296764,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_controls_52365790_20261014/t3000_postclosure_f1/scenario/logs/Commuter.log",
+        "fatal_marker_present": false
+      },
+      "NonCommuter": {
+        "nonzero_return_persons": 53749,
+        "processed_persons": 2442107,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_controls_52365790_20261014/t3000_postclosure_f1/scenario/logs/NonCommuter.log",
+        "fatal_marker_present": false
+      },
+      "Student": {
+        "nonzero_return_persons": 3210,
+        "processed_persons": 1284608,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_controls_52365790_20261014/t3000_postclosure_f1/scenario/logs/Student.log",
+        "fatal_marker_present": false
+      }
+    },
+    "new": {
+      "Commuter": {
+        "nonzero_return_persons": 40945,
+        "processed_persons": 3296764,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_52365790_20261014/t3000_full1/scenario/logs/Commuter.log",
+        "fatal_marker_present": false
+      },
+      "NonCommuter": {
+        "nonzero_return_persons": 53692,
+        "processed_persons": 2442107,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_52365790_20261014/t3000_full1/scenario/logs/NonCommuter.log",
+        "fatal_marker_present": false
+      },
+      "Student": {
+        "nonzero_return_persons": 3209,
+        "processed_persons": 1284608,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_52365790_20261014/t3000_full1/scenario/logs/Student.log",
+        "fatal_marker_present": false
+      }
+    }
+  },
+  "6000": {
+    "closed": {
+      "Commuter": {
+        "nonzero_return_persons": 40959,
+        "processed_persons": 3296764,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_controls_52365790_20261014/t6000_postclosure_f1/scenario/logs/Commuter.log",
+        "fatal_marker_present": false
+      },
+      "NonCommuter": {
+        "nonzero_return_persons": 53739,
+        "processed_persons": 2442107,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_controls_52365790_20261014/t6000_postclosure_f1/scenario/logs/NonCommuter.log",
+        "fatal_marker_present": false
+      },
+      "Student": {
+        "nonzero_return_persons": 3207,
+        "processed_persons": 1284608,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_controls_52365790_20261014/t6000_postclosure_f1/scenario/logs/Student.log",
+        "fatal_marker_present": false
+      }
+    },
+    "new": {
+      "Commuter": {
+        "nonzero_return_persons": 40901,
+        "processed_persons": 3296764,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_52365790_20261014/t6000_full1/scenario/logs/Commuter.log",
+        "fatal_marker_present": false
+      },
+      "NonCommuter": {
+        "nonzero_return_persons": 53688,
+        "processed_persons": 2442107,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_52365790_20261014/t6000_full1/scenario/logs/NonCommuter.log",
+        "fatal_marker_present": false
+      },
+      "Student": {
+        "nonzero_return_persons": 3208,
+        "processed_persons": 1284608,
+        "source": "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_52365790_20261014/t6000_full1/scenario/logs/Student.log",
+        "fatal_marker_present": false
+      }
+    }
+  }
+}

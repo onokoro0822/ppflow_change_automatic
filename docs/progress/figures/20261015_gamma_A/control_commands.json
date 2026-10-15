@@ -1,0 +1,176 @@
+{
+  "t3000_postclosure_f50": {
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario-file",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_A_controls_20261015/t3000_postclosure_f50/scenario.json",
+      "--output-root",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_A_controls_20261015/t3000_postclosure_f50/generated",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "50",
+      "--pflow-home",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.43590586364374384 --shopping-mnl-multipliers 0.6904602744556604,-0.08266305088851081,-4.266766913696244,-0.9742489937064989 --shopping-large-store 0.22389070848047118,0.43590586364374384,0.6904602744556604,-0.08266305088851081,-4.266766913696244,-0.9742489937064989,1 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --activity-trace on --shopping-gamma-config /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/config/gamma/postclosure_b.json"
+    ],
+    "distance": 0.6904602744556604,
+    "analysis_target": {
+      "meshCode": "52365790",
+      "gcode": "23105",
+      "longitude": 136.88665075,
+      "latitude": 35.16649051,
+      "facilityId": 900000001,
+      "tolerance": 1e-06,
+      "source": "city_retail.csv: exact address 名駅1丁目2-1; existing Java constant datum shift; model coordinates, not a newly validated geodetic conversion"
+    }
+  },
+  "t6000_postclosure_f50": {
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario-file",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_A_controls_20261015/t6000_postclosure_f50/scenario.json",
+      "--output-root",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_A_controls_20261015/t6000_postclosure_f50/generated",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "50",
+      "--pflow-home",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.43590586364374384 --shopping-mnl-multipliers 0.6901030403858693,-0.08266305088851081,-4.266766913696244,-0.9742489937064989 --shopping-large-store 0.22389070848047118,0.43590586364374384,0.6901030403858693,-0.08266305088851081,-4.266766913696244,-0.9742489937064989,1 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --activity-trace on --shopping-gamma-config /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/config/gamma/postclosure_b.json"
+    ],
+    "distance": 0.6901030403858693,
+    "analysis_target": {
+      "meshCode": "52365790",
+      "gcode": "23105",
+      "longitude": 136.88665075,
+      "latitude": 35.16649051,
+      "facilityId": 900000001,
+      "tolerance": 1e-06,
+      "source": "city_retail.csv: exact address 名駅1丁目2-1; existing Java constant datum shift; model coordinates, not a newly validated geodetic conversion"
+    }
+  },
+  "t6000_postclosure_f1": {
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario-file",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_A_controls_20261015/t6000_postclosure_f1/scenario.json",
+      "--output-root",
+      "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_controls_52365790_20261014/t6000_postclosure_f1",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "1",
+      "--pflow-home",
+      "/Volumes/PFLOW_SSD/PFLOW",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.43590586364374384 --shopping-mnl-multipliers 0.6901030403858693,-0.08266305088851081,-4.266766913696244,-0.9742489937064989 --shopping-large-store 0.22389070848047118,0.43590586364374384,0.6901030403858693,-0.08266305088851081,-4.266766913696244,-0.9742489937064989,1 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --activity-trace on --shopping-gamma-config /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/config/gamma/postclosure_b.json"
+    ],
+    "distance": 0.6901030403858693,
+    "analysis_target": {
+      "meshCode": "52365790",
+      "gcode": "23105",
+      "longitude": 136.88665075,
+      "latitude": 35.16649051,
+      "facilityId": 900000001,
+      "tolerance": 1e-06,
+      "source": "city_retail.csv: exact address 名駅1丁目2-1; existing Java constant datum shift; model coordinates, not a newly validated geodetic conversion"
+    }
+  },
+  "t3000_postclosure_f1": {
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario-file",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_A_controls_20261015/t3000_postclosure_f1/scenario.json",
+      "--output-root",
+      "/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_controls_52365790_20261014/t3000_postclosure_f1",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "1",
+      "--pflow-home",
+      "/Volumes/PFLOW_SSD/PFLOW",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.43590586364374384 --shopping-mnl-multipliers 0.6904602744556604,-0.08266305088851081,-4.266766913696244,-0.9742489937064989 --shopping-large-store 0.22389070848047118,0.43590586364374384,0.6904602744556604,-0.08266305088851081,-4.266766913696244,-0.9742489937064989,1 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --activity-trace on --shopping-gamma-config /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/config/gamma/postclosure_b.json"
+    ],
+    "distance": 0.6904602744556604,
+    "analysis_target": {
+      "meshCode": "52365790",
+      "gcode": "23105",
+      "longitude": 136.88665075,
+      "latitude": 35.16649051,
+      "facilityId": 900000001,
+      "tolerance": 1e-06,
+      "source": "city_retail.csv: exact address 名駅1丁目2-1; existing Java constant datum shift; model coordinates, not a newly validated geodetic conversion"
+    }
+  },
+  "t6000_preclosure_f50": {
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario-file",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_A_controls_20261015/t6000_preclosure_f50/scenario.json",
+      "--output-root",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_A_controls_20261015/t6000_preclosure_f50/generated",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "50",
+      "--pflow-home",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.43590586364374384 --shopping-mnl-multipliers 0.6901030403858693,-0.08266305088851081,-4.266766913696244,-0.9742489937064989 --shopping-large-store 0.22389070848047118,0.43590586364374384,0.6901030403858693,-0.08266305088851081,-4.266766913696244,-0.9742489937064989,1 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --activity-trace on --shopping-gamma-config /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/config/gamma/preclosure_b.json"
+    ],
+    "distance": 0.6901030403858693,
+    "analysis_target": {
+      "meshCode": "52365790",
+      "gcode": "23105",
+      "longitude": 136.88665075,
+      "latitude": 35.16649051,
+      "facilityId": 900000001,
+      "tolerance": 1e-06,
+      "source": "city_retail.csv: exact address 名駅1丁目2-1; existing Java constant datum shift; model coordinates, not a newly validated geodetic conversion"
+    }
+  },
+  "t3000_preclosure_f50": {
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario-file",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_A_controls_20261015/t3000_preclosure_f50/scenario.json",
+      "--output-root",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/gamma_A_controls_20261015/t3000_preclosure_f50/generated",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "50",
+      "--pflow-home",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.43590586364374384 --shopping-mnl-multipliers 0.6904602744556604,-0.08266305088851081,-4.266766913696244,-0.9742489937064989 --shopping-large-store 0.22389070848047118,0.43590586364374384,0.6904602744556604,-0.08266305088851081,-4.266766913696244,-0.9742489937064989,1 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on --activity-trace on --shopping-gamma-config /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/config/gamma/preclosure_b.json"
+    ],
+    "distance": 0.6904602744556604,
+    "analysis_target": {
+      "meshCode": "52365790",
+      "gcode": "23105",
+      "longitude": 136.88665075,
+      "latitude": 35.16649051,
+      "facilityId": 900000001,
+      "tolerance": 1e-06,
+      "source": "city_retail.csv: exact address 名駅1丁目2-1; existing Java constant datum shift; model coordinates, not a newly validated geodetic conversion"
+    }
+  }
+}

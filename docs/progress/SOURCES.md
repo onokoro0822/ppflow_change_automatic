@@ -2,12 +2,18 @@
 
 最終更新: 2026-10-15 JST
 
+## 全数の係数一致比較・失敗監査（2026-10-15午後）
+
+- `.local/pflow/output/gamma_A_controls_20261015/controls.json`：最終距離係数の全数閉店後baselineと人物比較。`full_reaudit.json`：SSD上の新施設あり全数を再集計し、元の件数と一致。
+- `figures/20261015_gamma_A/control_commands.json`：6比較ケースの実コマンド。`mesh_changes.csv`：全メッシュ純増減。
+- `scripts/audit_gamma_generation_status.py`、`generation_status.json`：Java各タスクの非0戻り人数。Java3生成クラスの選択失敗時return 3・自宅系列への復帰を確認。例外検査と別指標。
+
 ## A全数自動校正の保存結果（2026-10-15）
 
 - `.local/pflow/output/gamma_A_52365790_20261014/report.json`：期待値探索、2%4seed×2回、全数seed42×2回の入力と実集計。10/15のコマンドで読み出し確認。
 - `config/gamma/adopted_b.json`、`output/gamma_telepoint_3402/gamma_estimation.json`：採用(b)の係数・数値標準誤差・AIC。指標は3402行数であり面積ではない。
 - `pflow_scenario_metrics.py`：実際の直前Oと施設IDによる集計、県内OD条件付き行先TVD。
-- `pflow_gamma_controls.py`：最終距離倍率を一致させた閉店前後の比較生成。SSD未接続により全数追加比較は保留。
+- `pflow_gamma_controls.py`：最終距離倍率を一致させた閉店前後の比較生成。午前はSSD未接続で保留、午後に再接続して全数比較完了。
 - [結果・再現コマンド](20261015_A方式全数校正.md)、[表・図と一次集計](figures/20261015_gamma_A/summary.json)。追加Web資料なし。
 
 

@@ -82,10 +82,19 @@ def main():
             c=v['full_paired_comparison']['counts']
             lines.append('|'+g+'|'+'|'.join(f"{c.get(k,0):,}" for k in ['nonvisitor_changed_shopping_events','nonvisitor_changed_shopping_persons','unaligned_persons','unaligned_nonvisitor_persons'])+'|')
         lines+=['','非来訪者は新施設あり出力で新施設IDへの買物到着がない人。日時・目的等が対応する人だけで行き先変更を数え、不一致の系列は別計上する。同座標・同所在地で施設IDだけ変わる場合は、空間的な行き先変更に含めない。','','![閉店後から新施設ありのメッシュ別買物到着増減](figures/20261015_gamma_A/mesh_changes.png)']
+    if full_controls:
+        lines+=['','### 既存店も増える構造','','市区町村・メッシュの魅力度は通常買物にも作用する。一方、新施設への選択資格は大型店買物分岐（確率0.2238907085）に限定される。今回の最終設定で新施設到着／対象メッシュ全到着は3,000側22.75%、6,000側22.67%。施設capacityを上限付近まで増やすと、大型店分岐の施設選択はほぼ飽和しても、通常買物は同メッシュの既存店へ向かう。これは新施設だけへ任意人数を増やす操作ではない。','', '近似モデルの対象メッシュ既存競合capacityは2,570,000、新施設capacityは約10億で、対象の候補pool内のcapacity比は約99.74%。全経路の選択確率や利用率と同一視しない。市区町村選択・共有メッシュ・移動連鎖も介在するため、上の22.4%から全数を厳密に逆算できるとは主張しない。','','```mermaid','flowchart LR','    A[買物活動] --> B[市区町村MNL: β・γ・距離]','    B --> C[メッシュ選択: 追加capacityが両分岐に作用]','    C --> D[大型店買物: 約22.4%]','    C --> E[通常買物: 約77.6%]','    D --> F[新施設または既存店: capacity比]','    E --> G[既存店のみ]','```','', '今後は「到着数を満たす入力があるか」と「周辺の変化が妥当か」を別々に評価する。大型店限定のフィルターを緩めたり、地区枠を割り当てたりして、この差を隠さない。']
+    status_path=dest/'generation_status.json'
+    if status_path.exists():
+        statuses=json.loads(status_path.read_text());output['generation_status']=statuses
+        lines+=['','### 既存の活動生成失敗と例外の区別','','|設定|状態|就業者の非0戻り|非就業者の非0戻り|学生の非0戻り|','|---|---|---|---|---|']
+        for g,v in statuses.items():
+            for state,cohorts in v.items():lines.append('|'+g+'|'+state+'|'+'|'.join(f"{cohorts[c]['nonzero_return_persons']:,}" for c in ['Commuter','NonCommuter','Student'])+'|')
+        lines+=['','`Commuter/NonCommuter/Student` のタスク集計ログを読み、createActivities/createActivityの非0戻りを数えた。行き先選択がnullになると活動を消して自宅のみへ戻す既存処理（return 3）があり、Aでは保持されている。今回新設した処理ではなく閉店後baselineにも存在するが、活動系列の保全を満たしたとは報告しない。例外・コンパイル失敗がないこと、非0戻り件数、前後の系列不一致人数は異なる指標。失敗の人物ID・目的別内訳はこのログでは識別できず、原因別監査は残課題。出典 `generation_status.json` と `scripts/audit_gamma_generation_status.py`。']
     status='全数CSVはSSDに保存。係数一致baselineと非来訪者変更監査が両目標で完了。' if len(full_controls)==len(report['targets']) else '全数の係数一致baseline生成と非来訪者監査は継続中。未完了のケースを確認済みとして扱わない。'
     lines+=['',status,'','## 活動固定Bとの比較','','|方式|3,000目標の実数/TVD|6,000目標の実数/TVD|解釈|','|---|---|---|---|','|A（今回）|3,040 / 0.458750|5,991 / 0.458073|入力を変えて活動生成し直す|','|B（保存済み旧実験）|3,000 / 0.001510|6,000 / 0.000797|地区別整数枠への割当て|','','Bは閉店前・旧メッシュ52366700の別条件。方式の性質を示す参考比較であり、同条件の優劣比較ではない。Bの小さなTVDは入力枠への適合で、予測精度を意味しない。出典 `figures/20261014_fixed_activity/results.csv`。','','## 再実行・出力先','','最終scenario/gamma設定は `figures/20261015_gamma_A/t3000_{scenario,gamma}.json` および `t6000_{scenario,gamma}.json` に複製保存した。個別の実行コマンドは`figures/20261015_gamma_A/summary.json`の`targets.*.command.command`、元ファイルは `.local/pflow/output/gamma_A_52365790_20261014/t3000_full1/command.json` と `t6000_full1/command.json`。全数CSVは `/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_52365790_20261014/t{3000,6000}_full1/scenario/23`。','','```sh','.venv/bin/python pflow_gamma_controls.py --report .local/pflow/output/gamma_A_52365790_20261014/report.json --output .local/pflow/output/gamma_A_controls_20261015 --resume','.venv/bin/python scripts/report_gamma_a.py','```','','最終パラメータでのv1→v2感度も確認した（補正前期待値：3,031.875→3,030.650、5,953.208→5,950.822）。出典 `figures/20261015_gamma_A/final_parameter_surrogate_sensitivity.json`。この差だけで出発地TVDの大きな残差を説明することはできない。近似モデルv1では病院・飲食店由来の一部共有メッシュ所属が欠けた。v2修正で初回3,000候補の期待数は2,999.978→2,998.765（約−0.04%）。今回の探索はv1、最終人数はJava実生成の値。近似はbaselineのO・活動を固定するため、連鎖的変化は実生成でしか評価できない。','','![人数・適合度](figures/20261015_gamma_A/calibration.png)\n\n![PTと実生成の直前活動地区構成](figures/20261015_gamma_A/origin_composition.png)','','全数seed感度、同条件B比較、既存施設による独立検証、床面積からの需要予測は未完了。']
     for name,header,rows in [('parameters.csv',['target']+report['parameter_order'],params),('origins.csv',['target','origin','arrivals','observed_share_aichi','pt_share_aichi'],origin_rows),('pilots.csv',['target','round','seed','arrivals_sample','full_equivalent','origin_tvd','destination_tvd'],pilot_rows)]:
-        with (dest/name).open('w') as f:w=csv.writer(f);w.writerow(header);w.writerows(rows)
+        with (dest/name).open('w') as f:w=csv.writer(f,lineterminator="\n");w.writerow(header);w.writerows(rows)
     (dest/'summary.json').write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n')
     (ROOT/'docs/progress/20261015_A方式全数校正.md').write_text('\n'.join(lines)+'\n')
     fig,axs=plt.subplots(1,2,figsize=(10,3.8),layout='constrained');goals=list(report['targets']);actual=[report['targets'][g]['best']['counts']['facility'] for g in goals]
@@ -129,6 +138,6 @@ def main():
             fig.colorbar(plot,ax=ax,label='Shopping arrivals / day (symlog)')
         fig.savefig(dest/'mesh_changes.png',dpi=170);plt.close(fig)
         with (dest/'mesh_changes.csv').open('w') as f:
-            w=csv.writer(f);w.writerow(['target','mesh','closed_arrivals','new_arrivals','net_change']);w.writerows(mesh_rows)
+            w=csv.writer(f,lineterminator="\n");w.writerow(['target','mesh','closed_arrivals','new_arrivals','net_change']);w.writerows(mesh_rows)
     print(dest)
 if __name__=='__main__':main()

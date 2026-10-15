@@ -13,5 +13,9 @@
   "control_sample_cases_completed": 4,
   "control_logs_checked": 12,
   "control_error_logs": [],
-  "full_reaudit_logs_checked": 6
+  "full_reaudit_logs_checked": 6,
+  "control_full_cases_completed": 2,
+  "full_paired_comparisons_completed": 2,
+  "control_full_logs_checked": 6,
+  "nonzero_return_counts": "generation_status.json; distinct from fatal errors"
 }
