@@ -60,6 +60,10 @@ def main():
         save(dest/f'previous_t{goal}_control.json',prior)
     lines+=['','## 最終重みと2%感度','','|目標|専用重み|全数±2%達成|seed42実件|seed43実件|seed44実件|seed45実件|','|---|---:|---|---:|---:|---:|---:|']
     for goal,r in report['targets'].items():lines.append('|'+goal+'|'+str(r['best']['input']['weight'])+'|'+str(r['count_met'])+'|'+'|'.join(str(x['counts'].get('facility',0)) for x in r['final_seeds'])+'|')
+    lines+=['','|目標|4seed平均（全数換算）|最小〜最大（全数換算）|','|---|---:|---|']
+    for goal,r in report['targets'].items():
+        values=[row['arrivals_full_equivalent'] for row in r['final_seeds']]
+        lines.append(f"|{goal}|{sum(values)/len(values):.1f}|{min(values)}〜{max(values)}|")
     lines+=['','各seedは2%の実件数、全数相当は50倍。全数で合わせた重みを共通使用しており、各seedを別個に校正したものではない。各seedのTVDは `figures/20261015_independent_A/seeds.csv`。','','## 出典と制約','','- 正確なコマンド・固定係数：`figures/20261015_independent_A/commands.json`。最終scenario/gammaも同ディレクトリに保存。','- 一次集計：`summary.json`、地区別PT比：`origins.csv`、メッシュ増減：`mesh_changes.csv`。','- Javaの選択失敗（非0戻り人数）は `generation_status.json`。例外なしを失敗0と呼ばない。','- PTは大型店買物、今回の候補は通常買物を含む。母集団の違いを残す参考適合である。','- 重みの調整は新施設に限定しているが、来訪後のO変更と活動生成失敗の変化は後続へ波及する。','- 既存行先間の条件付き確率比の不変性と、最終出力の非来訪者・既存店の絶対人数の不変性を区別する。']
     save(dest/'commands.json',commands);save(dest/'generation_status.json',audit)
     for name,header,rows in [('origins.csv',['target','origin','count','share','pt_share'],origins),('seeds.csv',['target','weight','seed','arrivals_sample','full_equivalent','origin_tvd','destination_tvd'],seeds),('mesh_changes.csv',['target','control','mesh','before','after','net'],meshes)]:

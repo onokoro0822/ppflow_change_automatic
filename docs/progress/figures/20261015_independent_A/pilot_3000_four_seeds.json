@@ -1,0 +1,88 @@
+{
+  "source": ".local/pflow/output/independent_A_calibration_20261015/report.json",
+  "stage": "3000_pilot_mean_complete",
+  "mean": 3137.5,
+  "initial_full_weight": 4413.1167637143735,
+  "runs": [
+    {
+      "input": {
+        "weight": 4615.384615384615,
+        "seed": 42,
+        "sample_factor": 50,
+        "closed": false
+      },
+      "counts": {
+        "shopping_total": 39971,
+        "target_city": 1159,
+        "target_city_inflow": 648,
+        "target_mesh": 128,
+        "facility": 57,
+        "ordinary_facility_arrivals": 48
+      },
+      "arrivals_full_equivalent": 2850,
+      "origin_tvd": 0.4518113231665546,
+      "destination_tvd": 0.09477101826258241,
+      "directory": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/t3000_mean_s42/generated/scenario"
+    },
+    {
+      "input": {
+        "weight": 4615.384615384615,
+        "seed": 43,
+        "sample_factor": 50,
+        "closed": false
+      },
+      "counts": {
+        "shopping_total": 40266,
+        "target_city": 1144,
+        "target_city_inflow": 642,
+        "target_mesh": 127,
+        "facility": 60,
+        "ordinary_facility_arrivals": 47
+      },
+      "arrivals_full_equivalent": 3000,
+      "origin_tvd": 0.46985992098106627,
+      "destination_tvd": 0.09320173278309435,
+      "directory": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/t3000_mean_s43/generated/scenario"
+    },
+    {
+      "input": {
+        "weight": 4615.384615384615,
+        "seed": 44,
+        "sample_factor": 50,
+        "closed": false
+      },
+      "counts": {
+        "shopping_total": 40214,
+        "target_city": 1240,
+        "target_city_inflow": 699,
+        "target_mesh": 144,
+        "facility": 72,
+        "ordinary_facility_arrivals": 62
+      },
+      "arrivals_full_equivalent": 3600,
+      "origin_tvd": 0.4536198482334764,
+      "destination_tvd": 0.09576521558410113,
+      "directory": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/t3000_mean_s44/generated/scenario"
+    },
+    {
+      "input": {
+        "weight": 4615.384615384615,
+        "seed": 45,
+        "sample_factor": 50,
+        "closed": false
+      },
+      "counts": {
+        "shopping_total": 40392,
+        "target_city": 1122,
+        "target_city_inflow": 632,
+        "target_mesh": 125,
+        "facility": 62,
+        "ordinary_facility_arrivals": 50
+      },
+      "arrivals_full_equivalent": 3100,
+      "origin_tvd": 0.36928192743963095,
+      "destination_tvd": 0.09586773486984973,
+      "directory": "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/t3000_mean_s45/generated/scenario"
+    }
+  ]
+}
