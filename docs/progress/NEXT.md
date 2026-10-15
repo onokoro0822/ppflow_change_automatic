@@ -4,8 +4,8 @@
 
 ## 最優先：新施設専用の1重み校正（10/15・本人指示）
 
-1. 実行中の `pflow_independent_calibration.py --pilot-only` で2% seed42〜45を確認する。
-2. SSD接続を確認し、同じ出力先に `--resume`（pilot-onlyなし）で全数seed42と最終重みの2%4seedを実行する。
+1. 実行中の `scripts/run_independent_a_pipeline.py` を確認する。状態は `.local/pflow/output/independent_A_calibration_20261015/pipeline_status.json`、ログは同ディレクトリの `pipeline_20261015_223022.log`。二重起動しない。
+2. ワーカーは各目標の2%4seed→全数seed42→最終重み2%4seed→全数対照比較→レポート生成を自動実行する。終了後に結果を確認する。
 3. 閉店後baselineと固定入力・新施設重み0の全数対照を生成し、前回Aと比較する。人数・TVD・中村区流入・既存店・非来訪者を報告。
 4. 全数の生成失敗・系列不一致を別途監査し、記録と週報を更新してpushする。
 
