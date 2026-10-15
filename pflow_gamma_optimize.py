@@ -60,8 +60,29 @@ def options(c,gamma_path,distance):
             '--shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only on '
             f'--activity-trace on --shopping-gamma-config {gamma_path}')
 
+def check_generation_logs(directory):
+    for path in (directory/'logs').glob('*.log'):
+        text=path.read_text()
+        if any(marker in text for marker in ('[ERROR]', 'Unresolved compilation', 'Exception')):
+            raise RuntimeError(f'Inspect generation errors: {path}')
+
 def run_case(out,label,x,seed,factor,c,target,units,oref,dref,full_home):
-    case=out/label;case.mkdir(parents=True,exist_ok=False)
+    case=out/label
+    if (case/'metrics.json').exists():
+        stored=json.loads((case/'metrics.json').read_text())
+        if stored['parameters']!=x or stored['seed']!=seed or stored['sample_factor']!=factor:raise ValueError('Resume parameters differ')
+        print('REUSE',label,flush=True);return stored
+    if case.exists():
+        command=json.loads((case/'command.json').read_text())
+        if command['parameters']!=x or command['seed']!=seed or command['sample_factor']!=factor:raise ValueError('Resume parameters differ')
+        cmd=command['command'];directory=Path(cmd[cmd.index('--output-root')+1])/'scenario'
+        if not (directory/'.complete').exists():raise ValueError('Incomplete run retained: '+str(case))
+        check_generation_logs(directory)
+        metrics=measure(directory,target,units,oref,dref)
+        if metrics['counts'].get('ordinary_facility_arrivals',0):raise RuntimeError('Ordinary shopping reached new facility')
+        metrics.update(seed=seed,sample_factor=factor,parameters=x,arrivals_full_equivalent=metrics['counts'].get('facility',0)*factor)
+        save(case/'metrics.json',metrics);print('RECOVER',label,flush=True);return metrics
+    case.mkdir(parents=True,exist_ok=False)
     scenario=json.loads((ROOT/'config/gamma/meitetsu_closed.json').read_text())
     scenario.update(scenarioId=label,injectFacility=True,meshCapacityAdd=x[2],facility=dict(id=target.facilityId,longitude=target.longitude,latitude=target.latitude,capacity=x[3]))
     gamma=json.loads((ROOT/'config/gamma/postclosure_b.json').read_text());gamma['indicators'][target.gcode]+=x[0]
@@ -74,9 +95,7 @@ def run_case(out,label,x,seed,factor,c,target,units,oref,dref,full_home):
     print('GENERATE',label,flush=True)
     with (case/'run.log').open('w') as log:subprocess.run(cmd,cwd=ROOT,env=env,stdout=log,stderr=subprocess.STDOUT,check=True)
     directory=runroot/'scenario'
-    for p in (directory/'logs').glob('*.log'):
-        text=p.read_text()
-        if '[ERROR]' in text or 'Unresolved compilation' in text or 'Exception' in text:raise RuntimeError(f'Inspect generation errors: {p}')
+    check_generation_logs(directory)
     metrics=measure(directory,target,units,oref,dref)
     if metrics['counts'].get('ordinary_facility_arrivals',0):raise RuntimeError('Ordinary shopping reached new facility')
     metrics.update(seed=seed,sample_factor=factor,parameters=x,arrivals_full_equivalent=metrics['counts'].get('facility',0)*factor)
@@ -84,8 +103,8 @@ def run_case(out,label,x,seed,factor,c,target,units,oref,dref,full_home):
     return metrics
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--model',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--full-home',type=Path,default=Path('/Volumes/PFLOW_SSD/PFLOW'));p.add_argument('--targets',type=int,nargs='+',default=[3000,6000]);p.add_argument('--pilot-rounds',type=int,default=2);p.add_argument('--full-rounds',type=int,default=3);p.add_argument('--w',type=float,default=.1);p.add_argument('--w-dest',type=float,default=1.);p.add_argument('--expectation-only',action='store_true');a=p.parse_args()
-    out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
+    p=argparse.ArgumentParser();p.add_argument('--model',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--full-home',type=Path,default=Path('/Volumes/PFLOW_SSD/PFLOW'));p.add_argument('--targets',type=int,nargs='+',default=[3000,6000]);p.add_argument('--pilot-rounds',type=int,default=2);p.add_argument('--full-rounds',type=int,default=3);p.add_argument('--w',type=float,default=.1);p.add_argument('--w-dest',type=float,default=1.);p.add_argument('--expectation-only',action='store_true');p.add_argument('--resume',action='store_true');a=p.parse_args()
+    out=a.output.resolve();out.mkdir(parents=True,exist_ok=a.resume)
     with a.model.open('rb') as f:model=pickle.load(f) # locally produced cache, never external pickle
     c=model.c;target=AnalysisTarget.load(ROOT/'config/gamma/analysis_target.json')
     units,oref,dref=references(ROOT.parent/'中京PTデータ/chukyo_pt_2022_od_d5_shopping_facility_age.csv',ROOT.parent/'中京PTデータ/chukyo_pt_2022_od_purpose_mode_raw.csv')
@@ -112,7 +131,13 @@ def main():
                 # Count feedback changes inputs and regenerates every activity.
                 from pflow_joint_target_calibration import next_capacity
                 cap=next_capacity([dict(capacity=f,arrivals_sample=count) for f,count in history],goal,model.competing)
-                x=list(x);x[3]=float(np.clip(cap,*BOUNDS[3]))
+                previous_x=list(x);x=list(x);x[3]=float(np.clip(cap,*BOUNDS[3]))
+                if abs(x[3]-previous_x[3])<1 or (x[3]>=BOUNDS[3,1] and n<goal):
+                    full_scale=n/max(model.predict(previous_x)['arrivals'],1e-9)
+                    revised=optimize(model,goal,oref,dref,full_scale,a.w,a.w_dest)
+                    record['expectations'].append(revised);x=revised['parameters']
+                if x==previous_x:
+                    record['stopped_reason']='Input bounds prevent further count correction';break
             best=min(record['full'],key=lambda r:abs(r['counts'].get('facility',0)-goal));record['best']=best;record['count_met']=abs(best['counts'].get('facility',0)-goal)/goal<=.02
         save(out/'report.json',report)
     report['status']='expectation_only' if a.expectation_only else 'finished';save(out/'report.json',report)

@@ -56,6 +56,17 @@ class ExpectedModel:
                 if not math.isfinite(lon+lat):continue
                 mesh=third_mesh_code(lon,lat);stores[mesh][row[7]]+=1
                 if row[7] in index:memberships[row[7]].add(mesh)
+        # Hospital/restaurant loading also registers shared meshes with cities.
+        for filename in ['city_hospital.csv','city_restaurant.csv']:
+            with (facilities/filename).open() as f:
+                next(f)
+                for line in f:
+                    row=line.rstrip().split(',')
+                    if filename=='city_hospital.csv':
+                        city=row[0];lon=float(row[1]);lat=float(row[2])
+                    else:
+                        city=row[7];lon=float(row[20])-.000293;lat=float(row[21])+.000106950
+                    if city in index:memberships[city].add(third_mesh_code(lon,lat))
         capacity[target.meshCode]-=745.942954248366
         if capacity[target.meshCode]<0:raise ValueError('Negative closed mesh capacity')
         self.mesh_cap=capacity[target.meshCode]
@@ -101,7 +112,6 @@ class ExpectedModel:
         destination_unit=self.names.index(self.units_target)
         new_dist=np.zeros(self.nu);new_dist[destination_unit]=1
         change=share[:,None]*(new_dist[None,:]-self.delta)
-        target_dist=self.delta+change
         physical=np.divide(self.numerator+mesh_add*self.delta+(self.mesh_cap+mesh_add)*change,cap[:,None],out=np.zeros_like(self.numerator),where=cap[:,None]>0)
         ind=self.indicator.copy();ind[self.ti]+=gamma_add
         utility=self.c['beta']*np.log1p(cap)+self.c['gamma']*np.log1p(ind)
@@ -121,3 +131,22 @@ class ExpectedModel:
                 else:mesh_weight=n*(self.mesh_cap+mesh_add)/cap[ci]
                 origins[g['origin_unit']]+=p[pos]*mesh_weight*share[ci]*self.factor
         return dict(arrivals=sum(origins.values()),origins=dict(origins),destinations=dict(zip(self.names,(dest*self.factor).tolist())),expected_selection_failures=fail*self.factor)
+
+
+def main():
+    import argparse,hashlib,pickle
+    from pflow_scenario_metrics import references
+    from pflow_target import AnalysisTarget
+    root=Path(__file__).resolve().parent
+    p=argparse.ArgumentParser();p.add_argument('--baseline',type=Path,required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--sample-factor',type=int,default=50);a=p.parse_args()
+    if a.output.exists():raise ValueError('Do not overwrite expected-model cache')
+    target=AnalysisTarget.load(root/'config/gamma/analysis_target.json')
+    units,_,_=references(root.parent/'中京PTデータ/chukyo_pt_2022_od_d5_shopping_facility_age.csv',root.parent/'中京PTデータ/chukyo_pt_2022_od_purpose_mode_raw.csv')
+    c=json.loads((root/'config/gamma/adopted_b.json').read_text())['coefficients'];i=json.loads((root/'config/gamma/postclosure_b.json').read_text())['indicators']
+    from pflow_gamma_expected import ExpectedModel as CacheModel
+    model=CacheModel(root/'.local/pflow/data/facilities',a.baseline,target,units,c,i,a.sample_factor);model.units=None
+    with a.output.open('wb') as f:pickle.dump(model,f)
+    metadata=dict(version=2,baseline=str(a.baseline.resolve()),sample_factor=a.sample_factor,events=model.event_count,competing_capacity=model.competing,target=target.as_dict(),coefficients=c,
+                  source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),limitations=['Frozen baseline previous O and shopping demand; no chain feedback in surrogate.','Haversine substitutes Java distance utility.','Actual regeneration is required for count/distribution verification.'])
+    a.output.with_suffix('.json').write_text(json.dumps(metadata,ensure_ascii=False,indent=2)+'\n');print(json.dumps(metadata,ensure_ascii=False))
+if __name__=='__main__':main()
