@@ -1,0 +1,86 @@
+{
+  "before": {
+    "input": {
+      "weight": 4413.1167637143735,
+      "seed": 42,
+      "sample_factor": 1,
+      "closed": false
+    },
+    "counts": {
+      "shopping_total": 2001775,
+      "target_city": 58172,
+      "target_city_inflow": 32455,
+      "target_mesh": 6401,
+      "facility": 2862,
+      "ordinary_facility_arrivals": 2200
+    },
+    "origin_tvd": 0.3652426592377237
+  },
+  "after": {
+    "input": {
+      "weight": 4625.908557352593,
+      "seed": 42,
+      "sample_factor": 1,
+      "closed": false
+    },
+    "counts": {
+      "shopping_total": 2001775,
+      "target_city": 58173,
+      "target_city_inflow": 32456,
+      "target_mesh": 6511,
+      "facility": 2975,
+      "ordinary_facility_arrivals": 2293
+    },
+    "origin_tvd": 0.36331989905100526
+  },
+  "comparison": {
+    "counts": {
+      "aligned_persons": 7023479,
+      "changed_shopping_events": 113,
+      "changed_shopping_persons": 113
+    },
+    "aligned_city_net": {
+      "23105": 1,
+      "23110": -1
+    },
+    "aligned_mesh_net": {
+      "52365677": -2,
+      "52365790": 110,
+      "52366700": -41,
+      "52365678": -2,
+      "52365699": -2,
+      "52366701": -19,
+      "52366710": -8,
+      "52365781": -3,
+      "52365791": -11,
+      "52366607": -1,
+      "52366609": -4,
+      "52366618": -1,
+      "52365688": -3,
+      "52365698": -2,
+      "52366619": -5,
+      "52365686": -1,
+      "52365679": -1,
+      "52366629": -1,
+      "52365780": -2,
+      "52365687": -1
+    },
+    "aligned_city_transfers": [
+      {
+        "origin_city": "23105",
+        "destination_city": "23105",
+        "count": 112
+      },
+      {
+        "origin_city": "23110",
+        "destination_city": "23105",
+        "count": 1
+      }
+    ],
+    "notes": [
+      "Unaligned activity sequences are reported separately, not paired by row.",
+      "Nonvisitor refers to no new-facility ID in final output.",
+      "Same-coordinate choices of a different retail ID are not spatial destination changes."
+    ]
+  }
+}
