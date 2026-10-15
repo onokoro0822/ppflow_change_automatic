@@ -1,0 +1,26 @@
+{
+  "3000": {
+    "v1": {
+      "uncorrected_expected_arrivals": 3031.8750385584517,
+      "origin_tvd": 0.46603450993362955,
+      "destination_tvd": 0.08825963076859494
+    },
+    "v2": {
+      "uncorrected_expected_arrivals": 3030.6496774541215,
+      "origin_tvd": 0.46601622072886667,
+      "destination_tvd": 0.08816138274380614
+    }
+  },
+  "6000": {
+    "v1": {
+      "uncorrected_expected_arrivals": 5953.208363617627,
+      "origin_tvd": 0.4659026826022823,
+      "destination_tvd": 0.09105453862226183
+    },
+    "v2": {
+      "uncorrected_expected_arrivals": 5950.821768522796,
+      "origin_tvd": 0.4658853995073893,
+      "destination_tvd": 0.09096315830836979
+    }
+  }
+}

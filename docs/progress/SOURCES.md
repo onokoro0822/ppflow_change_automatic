@@ -1,6 +1,15 @@
 # 参照資料
 
-最終更新: 2026-10-14 JST
+最終更新: 2026-10-15 JST
+
+## A全数自動校正の保存結果（2026-10-15）
+
+- `.local/pflow/output/gamma_A_52365790_20261014/report.json`：期待値探索、2%4seed×2回、全数seed42×2回の入力と実集計。10/15のコマンドで読み出し確認。
+- `config/gamma/adopted_b.json`、`output/gamma_telepoint_3402/gamma_estimation.json`：採用(b)の係数・数値標準誤差・AIC。指標は3402行数であり面積ではない。
+- `pflow_scenario_metrics.py`：実際の直前Oと施設IDによる集計、県内OD条件付き行先TVD。
+- `pflow_gamma_controls.py`：最終距離倍率を一致させた閉店前後の比較生成。SSD未接続により全数追加比較は保留。
+- [結果・再現コマンド](20261015_A方式全数校正.md)、[表・図と一次集計](figures/20261015_gamma_A/summary.json)。追加Web資料なし。
+
 
 ## A方式への訂正とγ資料（2026-10-14）
 
