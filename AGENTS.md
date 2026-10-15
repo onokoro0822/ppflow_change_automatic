@@ -44,3 +44,12 @@ These rules exist because skipping them caused real mistakes in this project.
 - Report uncertainty plainly: single-seed results, 2% sample, hypotheses marked 【仮】.
 - Prefer small, reviewable changes: one option or script per commit, with a test in `tests/` for Python code, and run `.venv/bin/python -m unittest discover -s tests` before committing.
 - Long runs (about 8 minutes each) go in the background; record the exact command and scenario file so the result can be reproduced.
+
+## Saving usage (long runs and handoffs)
+
+Most usage is spent re-reading the long conversation each time you check on a running job. Follow these rules:
+
+- Start long runs (Pseudo-PFLOW generation, calibration pipelines, full-population comparisons) in the background with `nohup ... > <log> 2>&1 &`, record the command, PID and log path in `docs/progress/NEXT.md`, and then end your turn. Do not poll with `tail`, `ps` or sleep loops while it runs.
+- When the user says the run has finished (or asks you to continue), read only the final lines of the log and the summary files you need, then aggregate.
+- At the end of each stage, update `docs/progress/NEXT.md` so that its first item says exactly where to resume (inputs, outputs, commands, what is still running). The next stage should be able to start in a fresh conversation from "continue from NEXT.md".
+- Monitoring a running job and checking finished results can be handed to Claude Code, which can read the logs on this Mac. Spend your own turns on implementation and on starting runs.
