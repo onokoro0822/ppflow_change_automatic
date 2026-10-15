@@ -7,10 +7,11 @@
   "default_reference": ".local/pflow/output/capacity_experiment/baseline/23",
   "default_generated": ".local/pflow/output/gamma_closure_52365790_20261014/default/baseline/23",
   "java_source_changed_this_turn": false,
-  "full_csv_reaudited_this_turn": false,
-  "reason": "SSD not mounted; full metrics read from saved local report.json",
+  "full_csv_reaudited_this_turn": true,
+  "reason": "SSD reconnected; both full new-facility cases remeasured and count tables match saved metrics",
   "code_commit": "e08f7e8a82c3ce0347f84a694dbaa8952a98a827",
   "control_sample_cases_completed": 4,
   "control_logs_checked": 12,
-  "control_error_logs": []
+  "control_error_logs": [],
+  "full_reaudit_logs_checked": 6
 }

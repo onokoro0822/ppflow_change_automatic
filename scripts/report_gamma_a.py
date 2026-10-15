@@ -13,6 +13,8 @@ def main():
     control=ROOT/'.local/pflow/output/gamma_A_controls_20261015/controls.json'
     report=json.loads((source/'report.json').read_text())
     controls=json.loads(control.read_text()) if control.exists() else {}
+    reaudit_path=control.parent/'full_reaudit.json'
+    reaudit=json.loads(reaudit_path.read_text()) if reaudit_path.exists() else {}
     dest=ROOT/'docs/progress/figures/20261015_gamma_A';dest.mkdir(parents=True,exist_ok=True)
     estimation=json.loads((ROOT/'output/gamma_telepoint_3402/gamma_estimation.json').read_text())
     _,oref,_=references(ROOT.parent/'中京PTデータ/chukyo_pt_2022_od_d5_shopping_facility_age.csv',ROOT.parent/'中京PTデータ/chukyo_pt_2022_od_purpose_mode_raw.csv')
@@ -60,7 +62,28 @@ def main():
                 c=m['counts'];lines.append(f"|{g}|{state}|{'50' if state.endswith('50') else '1'}|{c.get('target_city',0)}|{c.get('target_city_inflow',0)}|{c.get('target_mesh',0)}|{m['destination_tvd']:.6f}|")
             for key in ['closure_paired_comparison','full_paired_comparison']:
                 if key in values:lines.append('\n'+g+' '+key+': `'+json.dumps(values[key]['counts'],ensure_ascii=False)+'`')
-    lines+=['','全数CSVは外付けSSDに保存。10/15の再開時にSSDが未接続のため、全数の係数一致baseline生成と新施設非来訪者の変更件数監査は未完了。全数値は内蔵側に保存された`report.json`を読んだ値で、このターンでSSD上CSVを再集計した値ではない。','','## 活動固定Bとの比較','','|方式|3,000目標の実数/TVD|6,000目標の実数/TVD|解釈|','|---|---|---|---|','|A（今回）|3,040 / 0.458750|5,991 / 0.458073|入力を変えて活動生成し直す|','|B（保存済み旧実験）|3,000 / 0.001510|6,000 / 0.000797|地区別整数枠への割当て|','','Bは閉店前・旧メッシュ52366700の別条件。方式の性質を示す参考比較であり、同条件の優劣比較ではない。Bの小さなTVDは入力枠への適合で、予測精度を意味しない。出典 `figures/20261014_fixed_activity/results.csv`。','','## 再実行・出力先','','最終scenario/gamma設定は `figures/20261015_gamma_A/t3000_{scenario,gamma}.json` および `t6000_{scenario,gamma}.json` に複製保存した。個別の実行コマンドは`figures/20261015_gamma_A/summary.json`の`targets.*.command.command`、元ファイルは `.local/pflow/output/gamma_A_52365790_20261014/t3000_full1/command.json` と `t6000_full1/command.json`。全数CSVは `/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_52365790_20261014/t{3000,6000}_full1/scenario/23`。','','```sh','.venv/bin/python pflow_gamma_controls.py --report .local/pflow/output/gamma_A_52365790_20261014/report.json --output .local/pflow/output/gamma_A_controls_20261015 --resume','.venv/bin/python scripts/report_gamma_a.py','```','','最終パラメータでのv1→v2感度も確認した（補正前期待値：3,031.875→3,030.650、5,953.208→5,950.822）。出典 `figures/20261015_gamma_A/final_parameter_surrogate_sensitivity.json`。この差だけで出発地TVDの大きな残差を説明することはできない。近似モデルv1では病院・飲食店由来の一部共有メッシュ所属が欠けた。v2修正で初回3,000候補の期待数は2,999.978→2,998.765（約−0.04%）。今回の探索はv1、最終人数はJava実生成の値。近似はbaselineのO・活動を固定するため、連鎖的変化は実生成でしか評価できない。','','![人数・適合度](figures/20261015_gamma_A/calibration.png)\n\n![PTと実生成の直前活動地区構成](figures/20261015_gamma_A/origin_composition.png)','','全数seed感度、同条件B比較、既存施設による独立検証、床面積からの需要予測は未完了。']
+    if reaudit:
+        output['full_reaudit']=reaudit
+        lines+=['','SSD再接続後、全数の新施設ありCSVを再集計した。確認済みケース: '+', '.join(g for g,r in reaudit.items() if r['count_fields_identical'])+'。施設・出発地・行先・都市・メッシュ件数が保存済み集計と一致。']
+    full_controls={g:v for g,v in controls.items() if 'postclosure_f1' in v and 'full_paired_comparison' in v}
+    if full_controls:
+        lines+=['','### 距離係数をそろえた全数比較（閉店後→新施設あり、seed42）','','|設定|指標|閉店後|新施設あり|増減|','|---|---|---|---|---|']
+        for g,v in full_controls.items():
+            before=v['postclosure_f1'];after=report['targets'][g]['best']
+            for key,label in [('facility','新施設'),('target_mesh','対象メッシュ全店'),('target_city','中村区全体'),('target_city_inflow','区外Oから中村区'),('shopping_total','出力全体の買物')]:
+                a=before['counts'].get(key,0);b=after['counts'].get(key,0)
+                lines.append(f'|{g}|{label}|{a:,}|{b:,}|{b-a:+,}|')
+            a=before['counts'].get('target_mesh',0)-before['counts'].get('facility',0);b=after['counts'].get('target_mesh',0)-after['counts'].get('facility',0)
+            lines.append(f'|{g}|対象メッシュの既存店|{a:,}|{b:,}|{b-a:+,}|')
+            a=before['destination_tvd'];b=after['destination_tvd']
+            lines.append(f'|{g}|愛知県内OD行先TVD|{a:.6f}|{b:.6f}|{b-a:+.6f}|')
+        lines+=['','対象メッシュと中村区は重なる集計で、加算して総効果にしない。全店到着の増減であり、直接転換と来訪後の連鎖効果を因果的に分解した値ではない。閉店前→後は上の2%比較、新施設追加はこの全数比較として区別する。','','|設定|非来訪者の買物先変更（活動件数）|同（人数）|全体の活動系列不一致人数|うち非来訪者|','|---|---|---|---|---|']
+        for g,v in full_controls.items():
+            c=v['full_paired_comparison']['counts']
+            lines.append('|'+g+'|'+'|'.join(f"{c.get(k,0):,}" for k in ['nonvisitor_changed_shopping_events','nonvisitor_changed_shopping_persons','unaligned_persons','unaligned_nonvisitor_persons'])+'|')
+        lines+=['','非来訪者は新施設あり出力で新施設IDへの買物到着がない人。日時・目的等が対応する人だけで行き先変更を数え、不一致の系列は別計上する。同座標・同所在地で施設IDだけ変わる場合は、空間的な行き先変更に含めない。','','![閉店後から新施設ありのメッシュ別買物到着増減](figures/20261015_gamma_A/mesh_changes.png)']
+    status='全数CSVはSSDに保存。係数一致baselineと非来訪者変更監査が両目標で完了。' if len(full_controls)==len(report['targets']) else '全数の係数一致baseline生成と非来訪者監査は継続中。未完了のケースを確認済みとして扱わない。'
+    lines+=['',status,'','## 活動固定Bとの比較','','|方式|3,000目標の実数/TVD|6,000目標の実数/TVD|解釈|','|---|---|---|---|','|A（今回）|3,040 / 0.458750|5,991 / 0.458073|入力を変えて活動生成し直す|','|B（保存済み旧実験）|3,000 / 0.001510|6,000 / 0.000797|地区別整数枠への割当て|','','Bは閉店前・旧メッシュ52366700の別条件。方式の性質を示す参考比較であり、同条件の優劣比較ではない。Bの小さなTVDは入力枠への適合で、予測精度を意味しない。出典 `figures/20261014_fixed_activity/results.csv`。','','## 再実行・出力先','','最終scenario/gamma設定は `figures/20261015_gamma_A/t3000_{scenario,gamma}.json` および `t6000_{scenario,gamma}.json` に複製保存した。個別の実行コマンドは`figures/20261015_gamma_A/summary.json`の`targets.*.command.command`、元ファイルは `.local/pflow/output/gamma_A_52365790_20261014/t3000_full1/command.json` と `t6000_full1/command.json`。全数CSVは `/Volumes/PFLOW_SSD/PFLOW/output/gamma_A_52365790_20261014/t{3000,6000}_full1/scenario/23`。','','```sh','.venv/bin/python pflow_gamma_controls.py --report .local/pflow/output/gamma_A_52365790_20261014/report.json --output .local/pflow/output/gamma_A_controls_20261015 --resume','.venv/bin/python scripts/report_gamma_a.py','```','','最終パラメータでのv1→v2感度も確認した（補正前期待値：3,031.875→3,030.650、5,953.208→5,950.822）。出典 `figures/20261015_gamma_A/final_parameter_surrogate_sensitivity.json`。この差だけで出発地TVDの大きな残差を説明することはできない。近似モデルv1では病院・飲食店由来の一部共有メッシュ所属が欠けた。v2修正で初回3,000候補の期待数は2,999.978→2,998.765（約−0.04%）。今回の探索はv1、最終人数はJava実生成の値。近似はbaselineのO・活動を固定するため、連鎖的変化は実生成でしか評価できない。','','![人数・適合度](figures/20261015_gamma_A/calibration.png)\n\n![PTと実生成の直前活動地区構成](figures/20261015_gamma_A/origin_composition.png)','','全数seed感度、同条件B比較、既存施設による独立検証、床面積からの需要予測は未完了。']
     for name,header,rows in [('parameters.csv',['target']+report['parameter_order'],params),('origins.csv',['target','origin','arrivals','observed_share_aichi','pt_share_aichi'],origin_rows),('pilots.csv',['target','round','seed','arrivals_sample','full_equivalent','origin_tvd','destination_tvd'],pilot_rows)]:
         with (dest/name).open('w') as f:w=csv.writer(f);w.writerow(header);w.writerows(rows)
     (dest/'summary.json').write_text(json.dumps(output,ensure_ascii=False,indent=2)+'\n')
@@ -83,5 +106,29 @@ def main():
     ax.set(xticks=range(5),xticklabels=labels,ylabel='Share (%)',title='Previous activity district (Aichi-only)',ylim=(0,55));ax.legend()
     fig.savefig(dest/'origin_composition.png',dpi=170);plt.close(fig)
 
+    if full_controls:
+        from matplotlib.colors import SymLogNorm
+        from matplotlib.ticker import MaxNLocator
+        import math
+        fig,axes=plt.subplots(1,len(full_controls),figsize=(6*len(full_controls),4.8),layout='constrained',squeeze=False)
+        mesh_rows=[]
+        maxabs=max(1,max(abs(report['targets'][g]['best']['mesh_counts'].get(m,0)-v['postclosure_f1']['mesh_counts'].get(m,0)) for g,v in full_controls.items() for m in set(report['targets'][g]['best']['mesh_counts'])|set(v['postclosure_f1']['mesh_counts'])))
+        for ax,(g,v) in zip(axes[0],full_controls.items()):
+            before=v['postclosure_f1']['mesh_counts'];after=report['targets'][g]['best']['mesh_counts']
+            coords=[]
+            for mesh in sorted(set(before)|set(after)):
+                delta=after.get(mesh,0)-before.get(mesh,0)
+                mesh_rows.append([g,mesh,before.get(mesh,0),after.get(mesh,0),delta])
+                lon=100+int(mesh[2:4])+int(mesh[5])/8+(int(mesh[7])+.5)/80
+                lat=int(mesh[:2])*2/3+int(mesh[4])/12+(int(mesh[6])+.5)/120
+                if 136.7<=lon<=137.1 and 35.04<=lat<=35.32:coords.append((lon,lat,delta))
+            plot=ax.scatter([x[0] for x in coords],[x[1] for x in coords],c=[x[2] for x in coords],s=32,marker='s',cmap='RdBu_r',norm=SymLogNorm(linthresh=10,vmin=-maxabs,vmax=maxabs))
+            target=report['analysis_target'];ax.scatter([target['longitude']],[target['latitude']],marker='*',facecolors='none',edgecolors='black',s=200)
+            ax.set(title=f'Target {g}: new - closed (seed 42)',xlabel='Longitude',ylabel='Latitude',xlim=(136.7,137.1),ylim=(35.04,35.32));ax.set_aspect(1/math.cos(math.radians(35.2)))
+            ax.xaxis.set_major_locator(MaxNLocator(5))
+            fig.colorbar(plot,ax=ax,label='Shopping arrivals / day (symlog)')
+        fig.savefig(dest/'mesh_changes.png',dpi=170);plt.close(fig)
+        with (dest/'mesh_changes.csv').open('w') as f:
+            w=csv.writer(f);w.writerow(['target','mesh','closed_arrivals','new_arrivals','net_change']);w.writerows(mesh_rows)
     print(dest)
 if __name__=='__main__':main()
