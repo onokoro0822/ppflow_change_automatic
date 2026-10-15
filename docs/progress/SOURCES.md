@@ -1,5 +1,11 @@
 # 参照資料
 
+## 新施設専用重み（2026-10-15）
+
+- 本チャットの本人指示：外部来訪需要と人流モデルの分離、3,000／6,000、固定γ・距離・mesh capacity、新施設重みのみ校正。
+- `pflow_independent_calibration.py`、`scripts/report_independent_a.py`：入力変更→再生成・読み取り集計。`.local/pflow/output/independent_A_calibration_20261015/` に各実行入力・結果を保存。
+- `../Pseudo-PFLOW-v3/src/test/java/pseudo/gen/IndependentFacilityTest.java`：都市制限・通常買物切替・条件付き既存比率・乱数不変性。
+
 最終更新: 2026-10-15 JST
 
 ## 全数の係数一致比較・失敗監査（2026-10-15午後）
