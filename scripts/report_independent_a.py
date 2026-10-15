@@ -55,6 +55,8 @@ def main():
             v=control['counts'];paired=r['comparisons'][name]['counts']
             lines.append(f"|{goal}・{name}|{c['target_city']-v['target_city']:+d}|{c['target_city_inflow']-v['target_city_inflow']:+d}|{c['target_mesh']-c.get('facility',0)-v['target_mesh']:+d}|{paired.get('nonvisitor_changed_shopping_persons',0)}|{paired.get('unaligned_nonvisitor_persons',0)}|")
         prior=oldcontrol[goal]
+        previous=old['targets'][goal]['best']['counts'];base=prior['postclosure_f1']['counts'];paired=prior['full_paired_comparison']['counts']
+        lines.append(f"|{goal}・前回A閉店後対照|{previous['target_city']-base['target_city']:+d}|{previous['target_city_inflow']-base['target_city_inflow']:+d}|{previous['target_mesh']-previous.get('facility',0)-base['target_mesh']:+d}|{paired.get('nonvisitor_changed_shopping_persons',0)}|{paired.get('unaligned_nonvisitor_persons',0)}|")
         save(dest/f'previous_t{goal}_control.json',prior)
     lines+=['','## 最終重みと2%感度','','|目標|専用重み|全数±2%達成|seed42実件|seed43実件|seed44実件|seed45実件|','|---|---:|---|---:|---:|---:|---:|']
     for goal,r in report['targets'].items():lines.append('|'+goal+'|'+str(r['best']['input']['weight'])+'|'+str(r['count_met'])+'|'+'|'.join(str(x['counts'].get('facility',0)) for x in r['final_seeds'])+'|')
