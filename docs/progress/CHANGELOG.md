@@ -1,5 +1,9 @@
 # 進捗記録の更新履歴
 
+## 2026-10-16 段階校正の手順1
+
+都市一致fallbackの新施設漏出を修正。出典：ActGenerator.choiceFacility、FacilityFilterTest（9件）、対象Java全26件・Python155件成功。既定207再生成はNEXTの起動記録を参照、結果未確認。
+
 ## 2026-10-16（Claude）
 
 - 文献整理（開業・閉店と人流）を追加し、段階目標による校正（MNL・mesh capacity・facility capacity）を本人決定としてNEXT・DECISIONSに記録した。

@@ -1,5 +1,9 @@
 # 参照資料
 
+## 2026-10-16 段階校正の手順1
+
+都市一致fallbackの新施設漏出を修正。出典：ActGenerator.choiceFacility、FacilityFilterTest（9件）、対象Java全26件・Python155件成功。既定207再生成はNEXTの起動記録を参照、結果未確認。
+
 ## 2026-10-16 最終確認
 
 - `figures/20261015_independent_A/summary.json`：全ケース・2対照の保存結果。`full_reaudit.json`：実CSV再集計。`commands.json`：正確な入力とコマンド。

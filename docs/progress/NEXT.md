@@ -2,6 +2,15 @@
 
 最終更新: 2026-10-16 JST
 
+## 手順1の再開地点（2026-10-16）
+
+- 都市一致onで、新施設（正の施設ID）を選択市区町村と同じ所在地に限定する修正を実施。都市一致候補がない場合の既存店fallbackでも別都市の新施設を復活させない。専用重みは使用しない。
+- 人工テストを含むJava対象26テスト、Python155テスト成功。全Javaテストは既存truck系のAPI不整合でtestCompile失敗し、`../Pseudo-PFLOW-v3/scripts/test_facility_filter.sh`で対象を限定して確認。
+- **既定207 CSVの再生成・比較をバックグラウンド実行中。まだ一致確認済みとは扱わない。** PID `11727`、ログ `/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/stagewise_20261016_step1/run.log`、起動記録 `/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/stagewise_20261016_step1/launch.json`。
+- コマンド：`nohup /usr/bin/caffeinate -i bash scripts/verify_stagewise_default.sh /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/stagewise_20261016_step1 > /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/stagewise_20261016_step1/run.log 2>&1 &`。
+- 次回は `exit_code.txt`（0が成功）、`verification.txt`、`default_diff.txt`、`log_errors.txt` を確認。既存出力へ上書き・二重起動しない。終了時はMac通知・音・OKダイアログと `終了結果.txt`。
+- 成功後に下記手順2へ進む。MNLの商業指標追加とmeshCapacityAddの連動箇所を確認し、段階探索の入力を分離できるか検証する。感度ケースの校正・全数結果は未実施。
+
 ## 最優先（2026-10-16 本人決定）：既存の三段階構造のまま、段階ごとの目標で校正する
 
 背景：10/14 MCD定例の指摘（市区町村→メッシュ→建物の配分をセットで整合させる、メッシュ配分を優先）と、
