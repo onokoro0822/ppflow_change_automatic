@@ -25,6 +25,13 @@ def main():
             value=dict(stage=stage,pid=os.getpid(),updated_utc=datetime.now(timezone.utc).isoformat(),**extra)
             temp=OUT/'pipeline_status.tmp';temp.write_text(json.dumps(value,indent=2)+'\n');temp.replace(OUT/'pipeline_status.json')
             print(json.dumps(value),flush=True)
+            if stage in {'results_ready_for_review','failed','report_pending_document_changed'}:
+                # Notification failure must not change the experiment's outcome.
+                try:
+                    from pflow_completion_notice import notify
+                    notify(OUT)
+                except Exception as exc:
+                    print('Notification failed: '+str(exc),flush=True)
         try:
             state('calibrating')
             subprocess.run([sys.executable,str(ROOT/'pflow_independent_calibration.py'),'--output',str(OUT),'--resume'],cwd=ROOT,check=True)

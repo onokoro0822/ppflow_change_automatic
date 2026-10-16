@@ -1,5 +1,10 @@
 # 参照資料
 
+## 2026-10-16 終了通知
+
+- 本チャットの本人依頼と `scripts/pflow_completion_notice.py`、`tests/test_pflow_completion_notice.py`。Macのプロセス終了イベントを使用。
+- `.local/pflow/output/independent_A_calibration_20261015/notification_launch.json` / `notification_watcher.json`：実行中処理への待受登録。`notification_test.log`：テストダイアログのOK応答。
+
 ## 2026-10-16 完了段階と復旧ログ
 
 - `figures/20261015_independent_A/closed_checkpoint_20261016.json`：両全数・最終4seed・閉店後対照比較の一次集計。
