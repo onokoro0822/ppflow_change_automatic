@@ -308,3 +308,11 @@
 ## 採用(b)と閉店入力監査（2026-10-14夕方）
 
 本チャットの本人指示、DECISIONS同日夕方、`output/gamma_telepoint_3402/gamma_estimation.json`、`city_retail.csv` と `mesh_ecensus.csv` を照合。[ハッシュ・実数・コード上の座標](20261014_gamma導入と閉店入力監査.md)。
+
+## 大型店の開業・閉店と人流（2026-10-16、Claude）
+
+- Miyauchi, Nakajima & Redding (2025) QJE 140(4)「The Economics of Spatial Mobility」— 大型店閉店のイベントスタディ（本文確認）。
+- 松浦・元橋 (2006) RIETI DP 06-J-051 — 大規模店の参入・退出と中小店売上（本文確認）。
+- 千葉昭彦 (2013) 東北学院大学論集 — 大型SC進出前後の買物先（本文確認）。
+- 中京PT 2011年（平日休日比較OD、到着施設×目的）を `中京PTデータ/chukyo_pt_2011_od_facility_purpose_weekday_holiday.csv` に追加。
+- 詳細: [文献整理](20261016_開業閉店と人流変化_文献整理.md)
