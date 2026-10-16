@@ -32,6 +32,10 @@ def main():
                 state('report_pending_document_changed');return
             state('reporting')
             subprocess.run([sys.executable,str(ROOT/'scripts/report_independent_a.py')],cwd=ROOT,check=True)
+            state('verifying')
+            subprocess.run([sys.executable,str(ROOT/'scripts/verify_independent_a.py')],cwd=ROOT,check=True)
+            state('plotting')
+            subprocess.run([sys.executable,str(ROOT/'scripts/plot_independent_a.py')],cwd=ROOT,check=True)
             state('results_ready_for_review')
         except BaseException as exc:
             state('failed',error=str(exc));raise

@@ -1,6 +1,19 @@
 # 次に取り組むこと
 
-最終更新: 2026-10-15 JST
+最終更新: 2026-10-16 JST
+
+## 次回はここから：重み0対照の再生成と最終報告（2026-10-16）
+
+1. **実行中**：`scripts/run_independent_a_pipeline.py`、PID **2946**。長時間処理をpollせず、この段階ではターン終了。次の「再開」でログ末尾と状態ファイルだけ確認する。
+   - ログ：`/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/pipeline_20261016_102128.log`
+   - 状態：`/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/pipeline_status.json`。成功時 `results_ready_for_review`、失敗時 `failed`。
+   - 起動：`nohup /usr/bin/caffeinate -i .venv/bin/python scripts/run_independent_a_pipeline.py > /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/pipeline_20261016_102128.log 2>&1 &`（独立セッションで起動済み、二重起動禁止）。
+2. 入力・途中結果：`/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/report.json` と各ケースの `command.json` / `scenario.json` / `gamma.json`。3,000/6,000の校正・最終4seed・閉店後対照比較は完了。残りは `fixed_inputs_zero_weight` の全数生成→2ケース比較→レポート→全数再集計検証→図作成（ワーカーが自動実行）。
+3. SSD出力：`/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/`。中断出力は `/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/fixed_inputs_zero_weight/interrupted_20261016_102128` に保存。元データと完了済みCSVを変更しない。
+4. 成功後：`docs/progress/20261015_新施設専用重み校正.md`、`figures/20261015_independent_A/summary.json` / `full_reaudit.json` / `comparison.png` を確認し、図を目視する。CURRENT・NEXT・CHANGELOG・SOURCES・週報を最終値へ更新してcommit/push。レポート先頭の過去「実験中」記述を整理する。
+5. 最新検証：Python151成功。Java変更なし、既定207一致は既存確認を維持。TVD再計算は集合の走査順の丸め差のみ1e-12まで許容、件数は完全一致を要求。
+
+以下は履歴。
 
 ## 最優先：新施設専用の1重み校正（10/15・本人指示）
 

@@ -1,5 +1,11 @@
 # 参照資料
 
+## 2026-10-16 完了段階と復旧ログ
+
+- `figures/20261015_independent_A/closed_checkpoint_20261016.json`：両全数・最終4seed・閉店後対照比較の一次集計。
+- `.local/pflow/output/independent_A_calibration_20261015/fixed_inputs_zero_weight/run_interrupted_20261016_102128.log`：SSD Input/output error。
+- 同出力ルートの `latest_launch.json`：復旧後の正確な起動コマンド・PID・ログ・退避先。
+
 ## 新施設専用重み（2026-10-15）
 
 - `figures/20261015_independent_A/pilot_3000_four_seeds.json`：3,000側の2%4seed一次集計。

@@ -1,5 +1,5 @@
 """Verify saved final inputs and remeasure the full outputs before publication."""
-import hashlib,json,sys
+import hashlib,json,sys,math
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
@@ -24,8 +24,10 @@ def main():
             if row['input']['weight']!=old['input']['weight']:raise ValueError('Final seed weight mismatch')
         check_generation_logs(directory)
         fresh=measure(directory,target,units,origins,destinations)
-        for key in ['counts','origin_counts','destination_counts','mesh_counts','city_counts','origin_tvd','destination_tvd']:
+        for key in ['counts','origin_counts','destination_counts','mesh_counts','city_counts']:
             if fresh[key]!=old[key]:raise ValueError('Remeasurement differs: '+goal+' '+key)
+        for key in ['origin_tvd','destination_tvd']:
+            if not math.isclose(fresh[key],old[key],rel_tol=0,abs_tol=1e-12):raise ValueError('TVD differs: '+goal+' '+key)
         audit[goal]=fresh
         print(goal,'full output matches saved metrics',fresh['counts'],flush=True)
     path=ROOT/'docs/progress/figures/20261015_independent_A/full_reaudit.json'
