@@ -1,0 +1,70 @@
+{
+  "closed": {
+    "Commuter": {
+      "nonzero_return_persons": 40675,
+      "processed_persons": 3296764,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/closed/scenario/logs/Commuter.log"
+    },
+    "NonCommuter": {
+      "nonzero_return_persons": 52836,
+      "processed_persons": 2442107,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/closed/scenario/logs/NonCommuter.log"
+    },
+    "Student": {
+      "nonzero_return_persons": 3196,
+      "processed_persons": 1284608,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/closed/scenario/logs/Student.log"
+    }
+  },
+  "fixed_inputs_zero_weight": {
+    "Commuter": {
+      "nonzero_return_persons": 40670,
+      "processed_persons": 3296764,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/fixed_inputs_zero_weight/scenario/logs/Commuter.log"
+    },
+    "NonCommuter": {
+      "nonzero_return_persons": 52832,
+      "processed_persons": 2442107,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/fixed_inputs_zero_weight/scenario/logs/NonCommuter.log"
+    },
+    "Student": {
+      "nonzero_return_persons": 3195,
+      "processed_persons": 1284608,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/fixed_inputs_zero_weight/scenario/logs/Student.log"
+    }
+  },
+  "3000": {
+    "Commuter": {
+      "nonzero_return_persons": 40670,
+      "processed_persons": 3296764,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/t3000_full1/scenario/logs/Commuter.log"
+    },
+    "NonCommuter": {
+      "nonzero_return_persons": 52832,
+      "processed_persons": 2442107,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/t3000_full1/scenario/logs/NonCommuter.log"
+    },
+    "Student": {
+      "nonzero_return_persons": 3195,
+      "processed_persons": 1284608,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/t3000_full1/scenario/logs/Student.log"
+    }
+  },
+  "6000": {
+    "Commuter": {
+      "nonzero_return_persons": 40671,
+      "processed_persons": 3296764,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/t6000_full0/scenario/logs/Commuter.log"
+    },
+    "NonCommuter": {
+      "nonzero_return_persons": 52832,
+      "processed_persons": 2442107,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/t6000_full0/scenario/logs/NonCommuter.log"
+    },
+    "Student": {
+      "nonzero_return_persons": 3195,
+      "processed_persons": 1284608,
+      "source": "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/t6000_full0/scenario/logs/Student.log"
+    }
+  }
+}

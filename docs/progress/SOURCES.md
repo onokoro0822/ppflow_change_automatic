@@ -1,5 +1,11 @@
 # 参照資料
 
+## 2026-10-16 最終確認
+
+- `figures/20261015_independent_A/summary.json`：全ケース・2対照の保存結果。`full_reaudit.json`：実CSV再集計。`commands.json`：正確な入力とコマンド。
+- `origins.csv` / `seeds.csv` / `mesh_changes.csv`：地区別PT構成比・4seed感度・メッシュ別増減。`generation_status.json`：Java非0戻り人数。
+- `comparison.png`：前回Aとの比較、10/16に表示確認。各方式の閉店後対照との差であり、専用重み単独の比較ではない。
+
 ## 2026-10-16 終了通知
 
 - 本チャットの本人依頼と `scripts/pflow_completion_notice.py`、`tests/test_pflow_completion_notice.py`。Macのプロセス終了イベントを使用。

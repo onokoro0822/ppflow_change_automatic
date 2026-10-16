@@ -2,25 +2,14 @@
 
 最終更新: 2026-10-16 JST
 
-## 終了通知（2026-10-16追加）
+## 再開地点：計算は完了、次は結果の解釈と発表資料
 
-- 計算PID2946の終了イベントを待つ通知プロセスPID3982を起動済み。`kqueue NOTE_EXIT` で待機し、ログ・PIDの定期監視やAI呼出しはしない。二重起動しない。
-- 終了時にmacOS通知（Glass音）と、OKで閉じる確認ダイアログを表示。バナー・音は通知許可／集中モード／音量の影響を受ける。
-- 完了は「計算・検証が完了」、失敗・異常終了は「処理が停止」、文書更新保留は「結果の確認が必要」と区別。通知はGit pushや人によるレビューの完了を意味しない。
-- 通知ログ：`.local/pflow/output/independent_A_calibration_20261015/notification_watcher.log`。受領記録 `notification_*.json` と `終了結果.txt` を同ディレクトリに保存。
-- 再起動後のパイプラインには終了フックを組込み済み。今回の既存プロセスは再起動せず、イベント待受を外付けした。
-- 次回は下記のパイプライン結果を確認し、図表の目視・記録更新・pushを行う。
-
-## 次回はここから：重み0対照の再生成と最終報告（2026-10-16）
-
-1. **実行中**：`scripts/run_independent_a_pipeline.py`、PID **2946**。長時間処理をpollせず、この段階ではターン終了。次の「再開」でログ末尾と状態ファイルだけ確認する。
-   - ログ：`/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/pipeline_20261016_102128.log`
-   - 状態：`/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/pipeline_status.json`。成功時 `results_ready_for_review`、失敗時 `failed`。
-   - 起動：`nohup /usr/bin/caffeinate -i .venv/bin/python scripts/run_independent_a_pipeline.py > /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/pipeline_20261016_102128.log 2>&1 &`（独立セッションで起動済み、二重起動禁止）。
-2. 入力・途中結果：`/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/report.json` と各ケースの `command.json` / `scenario.json` / `gamma.json`。3,000/6,000の校正・最終4seed・閉店後対照比較は完了。残りは `fixed_inputs_zero_weight` の全数生成→2ケース比較→レポート→全数再集計検証→図作成（ワーカーが自動実行）。
-3. SSD出力：`/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/`。中断出力は `/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/fixed_inputs_zero_weight/interrupted_20261016_102128` に保存。元データと完了済みCSVを変更しない。
-4. 成功後：`docs/progress/20261015_新施設専用重み校正.md`、`figures/20261015_independent_A/summary.json` / `full_reaudit.json` / `comparison.png` を確認し、図を目視する。CURRENT・NEXT・CHANGELOG・SOURCES・週報を最終値へ更新してcommit/push。レポート先頭の過去「実験中」記述を整理する。
-5. 最新検証：Python151成功。Java変更なし、既定207一致は既存確認を維持。TVD再計算は集合の走査順の丸め差のみ1e-12まで許容、件数は完全一致を要求。
+1. **今回の校正・対照比較・検証・図作成は完了**。PID2946の状態は `results_ready_for_review`。同じジョブを再起動しない。実行中としていた下の記録は履歴。
+2. まず [最終報告](20261015_新施設専用重み校正.md) を読む。3,000→2,975、6,000→5,975。重み0対照では対応系列の非来訪者変更0／0、系列不一致0／1。閉店後対照とは分けて解釈する。
+3. 発表資料では「外部需要を入力し、新施設専用重みで校正」「既存行先の条件付き配分維持」「来訪後の波及」を説明。PTのずれと通常買物を含む対象集団の違いを明記する。
+4. 次の実装・実験候補は、6,000側の系列不一致1人の原因監査、固定γ・capacity復元による非来訪者変更の要因分解、同条件B比較、独立既存施設検証。未実施として扱い、今回の人数校正達成と混同しない。
+5. 出典：`figures/20261015_independent_A/summary.json`、`full_reaudit.json`、`commands.json`、`generation_status.json`、`origins.csv`、`seeds.csv`、`mesh_changes.csv`、`comparison.png`。作業用一次出力は `.local/pflow/output/independent_A_calibration_20261015/report.json`、全数CSVは `/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/`。
+6. 長時間の追加実験を始める場合は独立プロセス＋終了通知を使い、PID・ログ・再開地点をここに残してターン終了する。定期pollしない。
 
 以下は履歴。
 

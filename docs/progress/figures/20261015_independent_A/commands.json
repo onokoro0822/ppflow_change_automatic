@@ -1,0 +1,94 @@
+{
+  "3000": {
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario-file",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/t3000_full1/scenario.json",
+      "--output-root",
+      "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/t3000_full1",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "1",
+      "--pflow-home",
+      "/Volumes/PFLOW_SSD/PFLOW",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.43590586364374384 --shopping-mnl-multipliers 0.9171120757320695,-0.08266305088851081,-4.266766913696244,-0.9742489937064989 --shopping-large-store 0.22389070848047118,0.43590586364374384,0.9171120757320695,-0.08266305088851081,-4.266766913696244,-0.9742489937064989,1 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only off --activity-trace on --shopping-gamma-config /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/t3000_full1/gamma.json"
+    ],
+    "input": {
+      "weight": 4625.908557352593,
+      "seed": 42,
+      "sample_factor": 1,
+      "closed": false
+    },
+    "fixed": {
+      "mesh_add": 745.942954248366,
+      "gamma_add_rows": 306.0,
+      "coefficients": {
+        "gamma": 0.011720855296350972,
+        "beta": 0.43590586364374384,
+        "distance_multiplier": 0.9171120757320695,
+        "area_multiplier": -0.08266305088851081,
+        "population_multiplier": -4.266766913696244,
+        "office_multiplier": -0.9742489937064989
+      }
+    },
+    "analysis_target": {
+      "meshCode": "52365790",
+      "gcode": "23105",
+      "longitude": 136.88665075,
+      "latitude": 35.16649051,
+      "facilityId": 900000001,
+      "tolerance": 1e-06,
+      "source": "city_retail.csv: exact address 名駅1丁目2-1; existing Java constant datum shift; model coordinates, not a newly validated geodetic conversion"
+    }
+  },
+  "6000": {
+    "command": [
+      "bash",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/scripts/run_pflow_capacity_sweep.sh",
+      "--scenario-file",
+      "/Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/t6000_full0/scenario.json",
+      "--output-root",
+      "/Volumes/PFLOW_SSD/PFLOW/output/independent_A_20261015/t6000_full0",
+      "--seed",
+      "42",
+      "--sample-factor",
+      "1",
+      "--pflow-home",
+      "/Volumes/PFLOW_SSD/PFLOW",
+      "--skip-compile",
+      "--pflow-args",
+      "--shopping-attraction-beta 0.43590586364374384 --shopping-mnl-multipliers 0.9171120757320695,-0.08266305088851081,-4.266766913696244,-0.9742489937064989 --shopping-large-store 0.22389070848047118,0.43590586364374384,0.9171120757320695,-0.08266305088851081,-4.266766913696244,-0.9742489937064989,1 --shopping-local-mesh-capacity raw --facility-city-match on --large-store-facility-only off --activity-trace on --shopping-gamma-config /Users/yuuki/Desktop/university/syuron/ppflow_change_automatic/.local/pflow/output/independent_A_calibration_20261015/t6000_full0/gamma.json"
+    ],
+    "input": {
+      "weight": 10105.263157894737,
+      "seed": 42,
+      "sample_factor": 1,
+      "closed": false
+    },
+    "fixed": {
+      "mesh_add": 745.942954248366,
+      "gamma_add_rows": 306.0,
+      "coefficients": {
+        "gamma": 0.011720855296350972,
+        "beta": 0.43590586364374384,
+        "distance_multiplier": 0.9171120757320695,
+        "area_multiplier": -0.08266305088851081,
+        "population_multiplier": -4.266766913696244,
+        "office_multiplier": -0.9742489937064989
+      }
+    },
+    "analysis_target": {
+      "meshCode": "52365790",
+      "gcode": "23105",
+      "longitude": 136.88665075,
+      "latitude": 35.16649051,
+      "facilityId": 900000001,
+      "tolerance": 1e-06,
+      "source": "city_retail.csv: exact address 名駅1丁目2-1; existing Java constant datum shift; model coordinates, not a newly validated geodetic conversion"
+    }
+  }
+}
